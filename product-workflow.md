@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.1\
+**Version:** 2.2\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -23,13 +23,13 @@ back when it finds a problem it cannot solve on its own. It is not a
 strict waterfall.
 
 ```mermaid
-flowchart LR
-    S1[1. Discovery & Strategy] --> S2[2. Brainstorming / PRD / Spec]
-    S2 --> S3[3. UI/UX & Software Architecture]
-    S3 --> S4[4. SOW / Planning]
-    S4 --> S5[5. AI-native SDLC]
-    S5 --> S6[6. Hardening / Deployment / Launch]
-    S6 --> S7[7. Maintenance & Iteration]
+flowchart TD
+    S1["Stage 1: Discovery & Strategy"] --> S2["Stage 2: Brainstorming / PRD / Spec"]
+    S2 --> S3["Stage 3: UI/UX & Software Architecture"]
+    S3 --> S4["Stage 4: SOW / Planning"]
+    S4 --> S5["Stage 5: AI-native SDLC"]
+    S5 --> S6["Stage 6: Hardening / Deployment / Launch"]
+    S6 --> S7["Stage 7: Maintenance & Iteration"]
 
     S7 -. new opportunities, feedback .-> S1
     S5 -. requirement or design gaps .-> S2
@@ -51,10 +51,16 @@ at two levels.
 | Epic level, just in time | Before each epic | Review the epic and its requirements; finish the feature spec; finish the epic's UX flow and UI; confirm technical design and dependencies; break down into tasks; add acceptance criteria and test mapping; update test plan and AI evaluation cases; build through the AI-native SDLC |
 
 ```mermaid
-flowchart LR
-    A[Prioritised epic] --> B[Feature spec] --> C[Epic UX/UI design]
-    C --> D[Technical design] --> E[Tasks & test planning]
-    E --> F[AI-native SDLC] --> G[Epic verification] --> H[Integration / release]
+flowchart TB
+    subgraph Specify["Specify and design"]
+        direction LR
+        A[Prioritised epic] --> B[Feature spec] --> C[Epic UX/UI design] --> D[Technical design]
+    end
+    subgraph Deliver["Plan, build, release"]
+        direction LR
+        E[Tasks & test planning] --> F[AI-native SDLC] --> G[Epic verification] --> H[Integration / release]
+    end
+    Specify --> Deliver
 ```
 
 Steps may overlap, but before a task is implemented its requirements,
@@ -386,3 +392,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 1.1 | 2026-11-17 | Status corrected: only stage 4 (UX/UI Design) is in progress; all other stages are not started. |
 | 2.0 | 2026-11-17 | Seven-stage workflow: Discovery & Strategy, Brainstorming / PRD / Spec, UI/UX & Software Architecture, SOW / Planning, AI-native SDLC, Hardening / Deployment / Launch, Maintenance & Iteration. Adds the AI-native SDLC loop and quality gates, the epic execution loop, and `docs/test-strategy.md` in the document map. Current status and next steps moved to the Build Tracker. |
 | 2.1 | 2026-11-17 | Document map: added docs/solution-options.md for stage 2 (brainstorming notes and solution options). |
+| 2.2 | 2026-11-17 | Diagrams only, no process changed: the overview no longer shows "Unsupported markdown: list" in the stage boxes (labels now read "Stage 1: ..."), and the overview and the epic loop are laid out so they stay readable at page width. |

@@ -8,12 +8,17 @@ by AI agents such as Claude Code.
 
 | File | Purpose |
 |------|---------|
+| [README.md](README.md) | Where to start: what to read for which question, how the documents fit together, and links to the live pages. |
 | [GLOSSARY.md](GLOSSARY.md) | Domain terms. Use these words everywhere; avoid the listed alternatives. |
 | [product-vision.md](product-vision.md) | What TripMate is and why. |
 | [prd.md](prd.md) | What the MVP must do: requirements, business rules, acceptance criteria. |
 | [mvp-roadmap.md](mvp-roadmap.md) | Phases, milestones, release gates. |
 | [product-workflow.md](product-workflow.md) | How we go from problem to release, and which document belongs to which stage. |
+| [docs/solution-options.md](docs/solution-options.md) | Which options were considered for each problem, and why features are in or out of the MVP. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
+
+When a document is created, add it here and turn its box in the
+README diagram from planned to existing.
 
 ## Writing
 
@@ -27,6 +32,12 @@ by AI agents such as Claude Code.
   appears in the document map. Propose any new kind of document first.
 - Write an ADR only for a decision that is hard to reverse, would
   surprise a future reader, and came from a real trade-off.
+- Show before you tell. Use a Mermaid diagram for a lifecycle, a flow,
+  or a timeline, and a table for anything compared across rows. Keep
+  the rule itself in text or a table next to the diagram; the diagram
+  illustrates the rule and does not replace it.
+- Put each list item on its own line. Do not run a list into a
+  paragraph.
 
 ## Versioning
 

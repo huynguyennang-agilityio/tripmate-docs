@@ -1,8 +1,49 @@
 # TripMate
 
-**Version:** 1.4
+**Version:** 1.5
 
 A shared workspace where a group of friends plan a trip together as equals, track progress while travelling, and settle shared costs fairly at the end.
+
+## Map of terms
+
+How the main terms relate. The definitions below are the rule; the map
+only shows where each term sits.
+
+```mermaid
+flowchart TD
+    subgraph People
+        Invitation -->|lets a person join as| Member
+        Owner -->|is a| Member
+        Member -->|leaves or is removed| Former["Former member"]
+    end
+    subgraph Deciding["Deciding together"]
+        Idea["Idea draft"] -->|published by a Member| Proposal
+        Vote -->|Yes or No on| Proposal
+        Proposal -->|more than half vote Yes| Decision
+    end
+    subgraph Itin["Itinerary"]
+        Itinerary -->|is made of| Item["Itinerary item"]
+        Item -->|may have| Cost["Estimated cost"]
+        Window["Day window"] -->|is checked by| Warn["Feasibility warning"]
+        Cost -->|is checked by| Warn
+    end
+    subgraph Ready["Readiness"]
+        Gap -->|is listed in| Checklist["Readiness checklist"]
+        Gap -->|is announced by| Nudge
+    end
+    subgraph Money
+        Expense -->|changes| Balance
+        Balance -->|all Balances give| Plan["Settlement plan"]
+        Plan -->|is carried out as| Settlement
+        Settlement -->|changes| Balance
+        Budget -->|is checked by| Warn
+    end
+    Member -->|is Author of| Proposal
+    Member -->|casts| Vote
+    Decision -->|can change| Itinerary
+    Member -->|pays| Expense
+    Warn -->|when active, opens| Gap
+```
 
 ## People
 
@@ -160,3 +201,4 @@ _Avoid_: Payment, Transfer, Repayment
 | 1.2 | 2026-11-16 | Readiness terms: Gap, Readiness checklist, Nudge. |
 | 1.3 | 2026-11-16 | Added a version number and this history. |
 | 1.4 | 2026-11-17 | Invitation: shared as a link, a short code, or a QR code. |
+| 1.5 | 2026-11-17 | Added a map of how the main terms relate. No definition changed. |

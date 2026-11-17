@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.7\
+**Version:** 1.8\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language
 
@@ -80,6 +80,20 @@ and has no role.
   what and when. The audit log is the main safeguard in an equal-rights
   model.
 
+**Rights at a glance**
+
+| What | Owner | Member | Former member |
+|------|-------|--------|---------------|
+| Edit trip details; confirm, cancel, or archive the trip, and undo | Yes | Yes | No |
+| Discuss, create Proposals, and vote | Yes | Yes | No |
+| Edit the Itinerary, bookings, tasks, Expenses, and Settlements | Yes | Yes | No |
+| See and share the Invitation | Yes | Yes | No |
+| Create, revoke, and regenerate the Invitation | Yes | No | No |
+| Remove Members and transfer ownership | Yes | No | No |
+| Leave the trip | After transferring ownership | Yes | -- |
+| Counted in Balances and the Settlement plan | Yes | Yes | Yes, until their Balance is zero |
+| Rejoin through the Invitation as the same Member | -- | -- | Yes |
+
 ## 4. Product Scope
 
 Why the scope looks like this, and which options were set aside, is in
@@ -130,11 +144,14 @@ Why the scope looks like this, and which options were set aside, is in
 - AI actions that directly confirm purchases or settle payments.
 - A language setting inside the app, and translation of content that
   Members write.
+
 ## 5. Functional Requirements
 
-Priority definitions: - **P0:** Required for MVP. - **P1:** Valuable,
-but may be deferred if capacity is constrained. - **P2:** Future
-release.
+| Priority | Meaning |
+|----------|---------|
+| **P0** | Required for MVP. |
+| **P1** | Valuable, but may be deferred if capacity is constrained. |
+| **P2** | Future release. |
 
 ### FR-01 -- Authentication and User Profile
 
@@ -167,6 +184,25 @@ release.
 | TRIP-08 | Any Member can leave the trip at any time, regardless of their Balance.                      | P0       |
 
 **Trip lifecycle**
+
+```mermaid
+stateDiagram-v2
+    [*] --> Planning: trip created
+    Planning --> Confirmed: any Member confirms
+    Confirmed --> Ongoing: start date, automatic
+    Ongoing --> Completed: after end date, automatic
+    Planning --> Cancelled: any Member cancels
+    Confirmed --> Cancelled: any Member cancels
+    Cancelled --> Planning: undo
+    Cancelled --> Confirmed: undo
+    Completed --> Archived: any Member archives
+    Cancelled --> Archived: any Member archives
+    Archived --> Completed: unarchive
+    Archived --> Cancelled: unarchive
+```
+
+Undo and unarchive return the trip to the state it was in. The diagram
+shows the paths; the table below is the rule.
 
 | State     | Entered when                                               |
 |-----------|------------------------------------------------------------|
@@ -242,6 +278,25 @@ release.
   never block it from becoming a Decision.
 - No Member, including the Owner, can decide a Proposal on behalf of the
   group.
+
+**Proposal lifecycle**
+
+```mermaid
+stateDiagram-v2
+    state "Idea draft" as Draft
+    state "Open Proposal" as Open
+    [*] --> Open: a Member creates it, or asks the assistant to draft it
+    [*] --> Draft: a Member presses Capture ideas
+    Draft --> Open: a Member publishes it and becomes its Author
+    Draft --> [*]: dismissed
+    Open --> Decision: more than half of current Members vote Yes
+    Open --> Rejected: more than half of current Members vote No
+    Open --> Withdrawn: the Author withdraws it
+    Open --> Outdated: another Proposal about the same Itinerary item becomes a Decision
+    Open --> Duplicate: a Member marks it as a Duplicate
+```
+
+Idea drafts are defined in FR-04.
 
 **Acceptance criteria**
 
@@ -431,6 +486,17 @@ Core calculation:
   owed.
 - Former members are included until their Balance is zero.
 
+Example, in thousands of VND. Balances: A +500, B +100, C -200,
+D -400. A has the largest positive Balance, so A is the hub. Three
+transfers bring every Balance to zero:
+
+```mermaid
+flowchart LR
+    C["C owes 200"] -- "sends 200" --> A["A is owed 500 (hub)"]
+    D["D owes 400"] -- "sends 400" --> A
+    A -- "passes on 100" --> B["B is owed 100"]
+```
+
 **Acceptance criteria**
 
 - The sum of all Balances must equal zero.
@@ -510,6 +576,28 @@ needs two nights (16 and 17).
 - Wording suggests rather than blames and names nobody, for example:
   "Nobody has a place to sleep on the night of 17 Nov yet. Can someone
   take it? [Take it] [Already sorted] [Remind me later]".
+
+How one Gap leads to a Nudge, or does not:
+
+```mermaid
+flowchart TD
+    G["A Gap opens"] --> L["Readiness checklist updates at once, silently"]
+    L --> ACK{"Acknowledged?"}
+    ACK -->|Yes| N0["Stays in the checklist, never nudged"]
+    ACK -->|No| SG{"Stage group nudging yet?"}
+    SG -->|No| N1["Shown in the checklist only"]
+    SG -->|Yes| ONCE{"Already nudged?"}
+    ONCE -->|Yes| N2["Not nudged again, unless snoozed: then after one day or at the next stage milestone"]
+    ONCE -->|No| Q["Wait until the discussion has been quiet for 10 minutes"]
+    Q --> CL{"Gap still open?"}
+    CL -->|No| N3["Nothing is posted"]
+    CL -->|Yes| P["Post one Nudge that batches all open Gaps, with quick choices"]
+```
+
+The posted Nudge is subject to the limit above: at most one per trip
+per day, plus one on Confirm and one the day before departure. A Gap on
+a Proposal (RDY-03) does not follow this flow; it shows on the Proposal
+card at once.
 
 **Quick choices plus "Other…"**
 
@@ -737,3 +825,4 @@ The MVP must also pass:
 | 1.5 | 2026-11-16 | Added this version history. |
 | 1.6 | 2026-11-17 | Invitation can also be shared as an 8-character code and a QR code (TRIP-04, new TRIP-09); all three forms share expiry and revoke; code attempts are rate-limited. |
 | 1.7 | 2026-11-17 | Section 4 links to the new docs/solution-options.md for the reasons behind the MVP scope. No requirement changed. |
+| 1.8 | 2026-11-17 | Readability only, no requirement changed: rights-at-a-glance table (section 3.2), priorities as a table, diagrams for the trip lifecycle (FR-02), the Proposal lifecycle (FR-03), a Settlement plan example (FR-08), and the Nudge flow (FR-10). |
