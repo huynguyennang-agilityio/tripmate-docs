@@ -1,6 +1,6 @@
 # TripMate
 
-**Version:** 1.3
+**Version:** 1.4
 
 A shared workspace where a group of friends plan a trip together as equals, track progress while travelling, and settle shared costs fairly at the end.
 
@@ -19,7 +19,7 @@ A person who has left or been removed from a trip. Takes no part in new activity
 _Avoid_: Removed user, Deleted member
 
 **Invitation**:
-The single shareable link that lets people join a trip; it expires and can be revoked. Someone holding the link who has not joined is not a Member and has no role.
+The single way to join a trip, shared as a link, a short code, or a QR code; all three forms expire and are revoked together. Someone holding the link who has not joined is not a Member and has no role.
 _Avoid_: Guest, Invitee (as a role)
 
 ## Trip lifecycle
@@ -159,3 +159,4 @@ _Avoid_: Payment, Transfer, Repayment
 | 1.1 | 2026-11-16 | First glossary: People, Trip, Proposals and decisions, Itinerary, Money. |
 | 1.2 | 2026-11-16 | Readiness terms: Gap, Readiness checklist, Nudge. |
 | 1.3 | 2026-11-16 | Added a version number and this history. |
+| 1.4 | 2026-11-17 | Invitation: shared as a link, a short code, or a QR code. |
