@@ -70,7 +70,7 @@ is the source of truth; the artifact is updated in the same change.
 
 | Document | Artifact |
 |----------|----------|
-| prd.md | [English PRD](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U), [Vietnamese reference translation](https://claude.ai/artifact/DzZcZN3J7kNEAf5tZLWvCs) |
+| prd.md | [English PRD](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) |
 | product-workflow.md | [TripMate Product Workflow](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) |
 
 ## Git workflow

@@ -76,7 +76,6 @@ the same content in a form that is easier to read or try.
 | [TripMate Product Workflow](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) | The seven stages as an interactive page |
 | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) | Current stage, document versions, daily reports |
 | [PRD (English)](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) | prd.md as a document page |
-| [PRD (Vietnamese reference translation)](https://claude.ai/artifact/DzZcZN3J7kNEAf5tZLWvCs) | prd.md translated for reference |
 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) | Clickable Web client |
 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) | Clickable Mobile client |
 | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) | Clickable Desktop client |
