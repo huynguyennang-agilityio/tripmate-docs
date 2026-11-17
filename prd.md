@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.11\
+**Version:** 1.12\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
@@ -170,12 +170,26 @@ Why the scope looks like this, and which options were set aside, is in
 | AUTH-03 | Users can view and edit their profile.       | P0       |
 | AUTH-04 | Users can set a display name and avatar.     | P1       |
 | AUTH-05 | Social sign-in is supported.                 | P1       |
+| AUTH-06 | Users who signed up with email and password can reset a forgotten password by email. | P1 |
 
 **Acceptance criteria**
 
 - Unauthenticated users cannot access protected trip data.
 - The backend validates authentication on every protected request.
 - A user can update their profile without changing another user's data.
+
+**Password reset (AUTH-06)**
+
+AUTH-06 is planned for after the MVP. Until then a user who forgets
+their password signs in with Google, if their account uses it.
+
+- The user asks for a reset link by entering their email.
+- The response is the same whether or not an account exists for that
+  email, so the screen never reveals who has an account.
+- The reset link works once and expires after a limited time.
+- Setting a new password signs the user out of their other sessions.
+- An account created with Google sign-in has no TripMate password;
+  the reset screen points the user to Google sign-in.
 
 ### FR-02 -- Trip Management
 
@@ -818,8 +832,8 @@ How each group of requirements is measured. The metrics are defined in
 | Section 6: Web, Mobile, Desktop | None in the MVP; a metric is chosen after the MVP |
 | All of the above | Successfully Organized Trips (North Star); repeat trip creation rate |
 
-FR-09 (Trip Summary and Memories) is planned for after the MVP and has
-no metric yet.
+FR-09 (Trip Summary and Memories) and AUTH-06 (password reset) are
+planned for after the MVP and have no metric yet.
 
 ## 10. Resolved Product Decisions
 
@@ -892,3 +906,4 @@ no metric yet.
 | 1.9 | 2026-11-17 | Status: Approved. A trip in Planning also becomes Ongoing on its start date. Confirm can be undone (TRIP-07). A Former member with a Balance keeps read-only access to their own money records. The acceptance scenario uses only P0: idea capture (AI-09) and Saved places (ITN-07) become P0, Saved places are shared by the trip, in-app notifications stay P1 and DESK-03 requires native notifications for Nudges only. Acceptance criteria for the desktop client. Requirements-to-metric table. Section 6 and Compatibility now name Desktop. |
 | 1.10 | 2026-11-17 | Requirements and success metrics: the Visited or Skipped metric is agreed; the cross-platform metric is left until after the MVP. No requirement changed. |
 | 1.11 | 2026-11-17 | Header links to the page version of this document. No requirement changed. |
+| 1.12 | 2026-11-17 | New AUTH-06 (P1, after the MVP): reset a forgotten password by email, with rules that keep accounts private and sign out other sessions. |
