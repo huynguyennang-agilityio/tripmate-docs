@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.0\
+**Version:** 2.1\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -108,7 +108,8 @@ scope, and requirements that can be built and tested.
   List, MVP Scope & Prioritization, PRD, Epic / Feature Breakdown,
   Feature Specifications, Acceptance Criteria, Scope & Out-of-scope,
   Requirements-to-Metric Mapping.
-- **Documents:** [prd.md](prd.md); `docs/specs/<epic>/spec.md`;
+- **Documents:** [docs/solution-options.md](docs/solution-options.md);
+  [prd.md](prd.md); `docs/specs/<epic>/spec.md`;
   [GLOSSARY.md](GLOSSARY.md).
 - **Ready to move on when:** every P0 requirement has acceptance
   criteria; MVP scope and out of scope are agreed; the epic about to be
@@ -334,6 +335,7 @@ exist today, and their versions, is shown in the Build Tracker.
 | [GLOSSARY.md](GLOSSARY.md) | What do our words mean? | All |
 | `docs/discovery.md` | Whose problem, what evidence, which competitors and market, which strategy and business model, which assumptions are still open? | 1 |
 | [product-vision.md](product-vision.md) | What is the product and why build it? Vision, value, positioning, goals, metrics, principles | 1 |
+| [docs/solution-options.md](docs/solution-options.md) | Which ways of solving each problem were considered, which was chosen, and why features are in or out of the MVP? | 2 |
 | [prd.md](prd.md) | What must it do? MVP scope, requirements, business rules, acceptance criteria | 2 |
 | `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, tasks | 2--4 |
 | Prototype canvases | How will people use it? | 3 |
@@ -383,3 +385,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 1.0 | 2026-11-17 | First version: eight stages, feedback loops, two planning levels, current status, document map, Claude Code practices. |
 | 1.1 | 2026-11-17 | Status corrected: only stage 4 (UX/UI Design) is in progress; all other stages are not started. |
 | 2.0 | 2026-11-17 | Seven-stage workflow: Discovery & Strategy, Brainstorming / PRD / Spec, UI/UX & Software Architecture, SOW / Planning, AI-native SDLC, Hardening / Deployment / Launch, Maintenance & Iteration. Adds the AI-native SDLC loop and quality gates, the epic execution loop, and `docs/test-strategy.md` in the document map. Current status and next steps moved to the Build Tracker. |
+| 2.1 | 2026-11-17 | Document map: added docs/solution-options.md for stage 2 (brainstorming notes and solution options). |
