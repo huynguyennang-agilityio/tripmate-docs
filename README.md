@@ -12,11 +12,11 @@ separate repositories.
 | I want to... | Read |
 |--------------|------|
 | Understand what TripMate is and why we build it | [product-vision.md](product-vision.md) |
-| Know what the MVP must do | [prd.md](prd.md) |
+| Know what the MVP must do | [prd.md](prd.md), or its [page version](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) |
 | See what we still need to learn from real groups | [docs/discovery.md](docs/discovery.md) |
 | Know why the MVP looks the way it does | [docs/solution-options.md](docs/solution-options.md), then [docs/adr](docs/adr/) |
 | Know in what order and by when | [mvp-roadmap.md](mvp-roadmap.md) |
-| Know how we work and which document belongs to which stage | [product-workflow.md](product-workflow.md) |
+| Know how we work and which document belongs to which stage | [product-workflow.md](product-workflow.md), or its [page version](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) |
 | Look up a term | [GLOSSARY.md](GLOSSARY.md) |
 | See where the work stands today | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) |
 | Try the product | The prototypes under [Live pages](#live-pages) |
@@ -70,7 +70,8 @@ flowchart TB
 ## Live pages
 
 The files in this repository are the source of truth. These pages show
-the same content in a form that is easier to read or try.
+the same content in a form that is easier to read or try. A document
+that has a page version also links to it in its own header.
 
 | Page | Shows |
 |------|-------|
