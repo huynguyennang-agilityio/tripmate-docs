@@ -3,7 +3,7 @@
 **Document type:** Product Vision\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.7
+**Version:** 1.8
 
 Terms follow [GLOSSARY.md](GLOSSARY.md).
 
@@ -196,6 +196,8 @@ Supporting metrics:
 -   Expense coverage.
 -   Settlement completion rate.
 -   Repeat trip creation rate.
+-   Share of Itinerary items marked Visited or Skipped by the end of
+    the trip.
 
 Targets should be established after observing beta usage rather than
 assumed before product validation.
@@ -208,13 +210,13 @@ How each goal in section 8 is measured:
 | Keep trip decisions and operational information in one place | Percentage of trips with at least two active members |
 | Help groups discover relevant places and build practical itineraries | AI proposal acceptance rate |
 | Make booking responsibilities visible | Booking record completion rate |
-| Show progress during the trip | Proposed: share of Itinerary items marked Visited or Skipped by the end of the trip |
+| Show progress during the trip | Share of Itinerary items marked Visited or Skipped by the end of the trip |
 | Make shared expenses transparent and settlement straightforward | Expense coverage; settlement completion rate |
-| Deliver a consistent experience across Web, iOS, Android, and Desktop | Proposed: share of trips used on two or more platforms |
+| Deliver a consistent experience across Web, iOS, Android, and Desktop | None in the MVP; a metric is chosen after the MVP (candidate: share of trips used on two or more platforms) |
 
-The two metrics marked Proposed are new and not agreed yet. Trip
-creation rate, Invitation acceptance rate, and repeat trip creation
-rate measure adoption as a whole, together with the North Star Metric.
+Trip creation rate, Invitation acceptance rate, and repeat trip
+creation rate measure adoption as a whole, together with the North
+Star Metric.
 
 ## 11. Product Experience
 
@@ -300,3 +302,4 @@ product.
 | 1.5 | 2026-11-17 | Readability only, no content changed: personas and the Proposal / Decision / Booked distinction as tables, run-together lists split into list items, and a diagram of the trip lifecycle in section 11. |
 | 1.6 | 2026-11-17 | Section 10: a table that gives every goal a metric, with two proposed metrics for progress during the trip and consistency across platforms. |
 | 1.7 | 2026-11-17 | Status: Approved. The product owner closed Stage 1; see docs/discovery.md for the conditions and the waiver. |
+| 1.8 | 2026-11-17 | Metrics: share of Itinerary items marked Visited or Skipped is agreed and added to the supporting metrics; the metric for consistency across platforms is left until after the MVP. |

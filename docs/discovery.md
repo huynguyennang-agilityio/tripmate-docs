@@ -3,7 +3,7 @@
 **Document type:** Discovery\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.1\
+**Version:** 1.2\
 **Stage:** 1. Discovery & Strategy
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). This document answers
@@ -22,14 +22,13 @@ when these three conditions hold.
 |-----------|-------|
 | At least five conversations or tests with real groups | Waived by the product owner on 2026-11-17; 0 sessions recorded |
 | Each core assumption is marked validated, rejected, or still open | Listed in section 3; all still open |
-| Vision, goals, non-goals, and principles are written, and each goal has a metric | Written in [product-vision.md](../product-vision.md); two of the seven metrics are proposed and not agreed yet |
+| Vision, goals, non-goals, and principles are written, and each goal has a metric | Written in [product-vision.md](../product-vision.md); six of the seven goals have an agreed metric; the metric for consistency across platforms is left until after the MVP |
 
 **Stage 1 is closed.** On 2026-11-17 the product owner waived the
 five sessions for this internal project and closed the stage. The
 assumptions in section 3 are therefore not validated: they stay open
 and are tested as the work goes on, in prototype tests and in the beta
-(Phase 7 of [mvp-roadmap.md](../mvp-roadmap.md)). The two proposed
-metrics stay proposed until beta data exists.
+(Phase 7 of [mvp-roadmap.md](../mvp-roadmap.md)).
 
 How an assumption is settled from here on:
 
@@ -114,3 +113,4 @@ The workflow lists these Stage 1 deliverables. None of them is written.
 |---------|------|---------|
 | 1.0 | 2026-11-17 | First version: Stage 1 conditions and where they stand, assumptions A1 to A11 (all open), an empty log for five sessions, and the deliverables not covered yet. |
 | 1.1 | 2026-11-17 | Stage 1 closed by the product owner, who waived the five sessions. Assumptions stay open and are tested in prototype tests and the beta. Status: Approved. |
+| 1.2 | 2026-11-17 | Metrics settled: six goals have an agreed metric; the cross-platform metric is left until after the MVP. |
