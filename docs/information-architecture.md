@@ -4,13 +4,15 @@
 **Product:** TripMate\
 **Status:** Draft\
 **Version:** 1.0\
+**Visual version:** [TripMate Information Architecture artifact](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS)\
 **Stage:** 3. UI/UX & Software Architecture Design
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). Requirements and their IDs
 are in [prd.md](../prd.md). This document answers *where things live
-in TripMate and how people move between them*. It is the same for Web,
-Mobile, and Desktop; each prototype canvas shows how its platform
-presents it.
+in TripMate and how people move between them*. The places and links
+are the same for Web, Mobile, and Desktop; each prototype canvas shows
+how its platform presents them. The artifact shows the same content as
+an interactive map and is updated with every version of this file.
 
 ## 1. Scope
 
@@ -169,4 +171,4 @@ Not written yet.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-11-17 | First version: places, Navigation Map, navigation rules (Bookings and Tasks live in Plan), and platform presentation. |
+| 1.0 | 2026-11-17 | First version: places, Navigation Map, navigation rules (Bookings and Tasks live in Plan), and platform presentation, with an interactive artifact. |

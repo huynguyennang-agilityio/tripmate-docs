@@ -88,6 +88,7 @@ is the source of truth; the artifact is updated in the same change.
 |----------|----------|
 | prd.md | [English PRD](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) |
 | product-workflow.md | [TripMate Product Workflow](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) |
+| docs/information-architecture.md | [TripMate Information Architecture](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) |
 
 ## Git workflow
 

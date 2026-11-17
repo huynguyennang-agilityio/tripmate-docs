@@ -19,7 +19,7 @@ separate repositories.
 | Know how we work and which document belongs to which stage | [product-workflow.md](product-workflow.md), or its [page version](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) |
 | Look up a term | [GLOSSARY.md](GLOSSARY.md) |
 | See where the work stands today | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) |
-| See which screens exist and how they connect | [docs/information-architecture.md](docs/information-architecture.md) |
+| See which screens exist and how they connect | [docs/information-architecture.md](docs/information-architecture.md), or its [page version](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) |
 | Try the product | The prototypes under [Live pages](#live-pages) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
@@ -78,6 +78,7 @@ that has a page version also links to it in its own header.
 |------|-------|
 | [TripMate Product Workflow](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) | The seven stages as an interactive page |
 | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) | Current stage, document versions, daily reports |
+| [TripMate Information Architecture](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) | The Navigation Map as an interactive page: places, links, journeys, platforms |
 | [PRD (English)](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) | prd.md as a document page |
 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) | Clickable Web client |
 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) | Clickable Mobile client |
