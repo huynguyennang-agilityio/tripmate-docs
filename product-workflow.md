@@ -3,254 +3,347 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.1\
-**Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)
+**Version:** 2.0\
+**Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
+**Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
 Terms follow [GLOSSARY.md](GLOSSARY.md). This file is the source of
-truth; the artifact shows the same content as an interactive diagram
-and is updated with every version of this file.
+truth for how TripMate is built; the artifact shows the same content as
+an interactive page and is updated with every version of this file.
 
-Eight stages take TripMate from the user's problem to a released
-product. Work moves forward, but any stage can send work back when it
-finds a problem it cannot solve on its own. Stages 4 to 6 repeat for
-every epic, and stage 7 follows its own Development Flow.
+This document describes the process only. It changes when the process
+changes. Where the work stands today, which documents exist, and the
+daily reports live in the Build Tracker.
 
 ## 1. Overview
 
+Seven stages take TripMate from the user's problem to a product that is
+operated and improved. Work moves forward, but any stage can send work
+back when it finds a problem it cannot solve on its own. It is not a
+strict waterfall.
+
 ```mermaid
 flowchart LR
-    S1[1. Discovery] --> S2[2. Definition] --> S3[3. Planning]
-    S3 --> S4
-    subgraph L2 [Level 2: repeats for every epic]
-        S4[4. UX/UI Design] --> S5[5. Technical Planning] --> S6[6. Specification]
-    end
-    S6 --> S7[7. Development & QA] --> S8[8. Launch & Growth]
+    S1[1. Discovery & Strategy] --> S2[2. Brainstorming / PRD / Spec]
+    S2 --> S3[3. UI/UX & Software Architecture]
+    S3 --> S4[4. SOW / Planning]
+    S4 --> S5[5. AI-native SDLC]
+    S5 --> S6[6. Hardening / Deployment / Launch]
+    S6 --> S7[7. Maintenance & Iteration]
 
-    S4 -. missing or wrong requirement .-> S3
-    S5 -. technical constraint .-> S4
-    S5 -. not feasible or too costly .-> S3
-    S6 -. gap in technical design .-> S5
-    S6 -. missing flow or state .-> S4
-    S7 -. acceptance criteria wrong .-> S6
-    S7 -. technical design issue .-> S5
-    S7 -. UX issue found in build .-> S4
-    S7 -. requirement changed .-> S3
-    S8 -. feature improvements .-> S3
-    S8 -. user feedback, new opportunity .-> S1
+    S7 -. new opportunities, feedback .-> S1
+    S5 -. requirement or design gaps .-> S2
+    S5 -. UX or architecture issues .-> S3
+    S6 -. release defects .-> S5
 ```
 
 Solid arrows lead to the next stage; dotted arrows are feedback loops.
-Stage 7 is detailed in `docs/development-flow.md` (to be written).
+Section 5 lists every loop.
 
 ## 2. Two Levels of Planning
 
+TripMate is never specified in full detail up front. Planning happens
+at two levels.
+
 | Level | When | Covers |
 |-------|------|--------|
-| Level 1: product-wide | Once for the MVP; updated when a later stage sends work back | Product vision, PRD, MVP roadmap, glossary; core user journeys as a clickable prototype; system architecture and technical strategy |
-| Level 2: feature by feature | Before every epic | Review the epic's screens and states (stage 4); technical design where needed (stage 5); spec, business rules, acceptance criteria, tasks (stage 6); build through the Development Flow (stage 7) |
+| Product level | Once for the MVP; updated when a later stage sends work back | Vision and strategy; PRD and MVP scope; high-level epic breakdown; product-level UX/UI; high-level architecture; initial roadmap; overall test and AI evaluation strategy |
+| Epic level, just in time | Before each epic | Review the epic and its requirements; finish the feature spec; finish the epic's UX flow and UI; confirm technical design and dependencies; break down into tasks; add acceptance criteria and test mapping; update test plan and AI evaluation cases; build through the AI-native SDLC |
 
-Level 2 means TripMate is never specified in full detail up front: only
-the epic about to be built is detailed, then handed to developers and
-Claude Code.
+```mermaid
+flowchart LR
+    A[Prioritised epic] --> B[Feature spec] --> C[Epic UX/UI design]
+    C --> D[Technical design] --> E[Tasks & test planning]
+    E --> F[AI-native SDLC] --> G[Epic verification] --> H[Integration / release]
+```
 
-## 3. Where TripMate Is Now
+Steps may overlap, but before a task is implemented its requirements,
+design, and acceptance criteria must be clear.
 
-| Stage | Status | What exists | Missing |
-|-------|--------|-------------|---------|
-| 1. Discovery | Not started | Problem statement and target users in the vision | No user interviews or tests yet; assumptions unvalidated |
-| 2. Definition | Not started | [product-vision.md](product-vision.md) v1.4: value, goals, principles | Success metrics need numbers after beta |
-| 3. Planning | Not started | [prd.md](prd.md) v1.5, [mvp-roadmap.md](mvp-roadmap.md) v1.5, [GLOSSARY.md](GLOSSARY.md), ADR-0001 to ADR-0004 | Backlog as issues |
-| 4. UX/UI Design | In progress | Clickable prototypes for Web, Mobile and Desktop, in Vietnamese and English, including sign-in to invite | Usability test, design system |
-| 5. Technical Planning | Not started | Stack chosen; repo split; desktop on Tauri | Architecture doc, data model, API conventions, Maps provider |
-| 6. Specification | Not started | PRD has acceptance criteria, 15 business rules and requirement IDs | Per-epic specs and tasks |
-| 7. Development & QA | Not started | -- | Development Flow doc, repos, CI |
-| 8. Launch & Growth | Not started | Release gates and beta metrics in the roadmap | Release plan, code signing, store review |
+## 3. Stages
 
-**Next three steps**
+Every stage gate is approved by the product owner.
 
-1. **Test the prototype with a real group.** Four or five friends plan
-   a trip in the Mobile prototype. Check the riskiest assumptions:
-   majority voting, Nudges, idea capture.
-2. **Write the architecture doc and pick the Maps provider.** The Maps
-   choice blocks ITN-06 and the travel-time Gap.
-3. **Run Level 2 for the first epic: Auth, Trip and Invitation.** Its
-   prototype is ready, so the spec and tasks can follow straight away.
+### Stage 1 -- Discovery & Market Research & Strategy
 
-## 4. Feedback Loops
+**Goal:** Understand the real problem, the target users, the market,
+and the opportunity; decide what TripMate should solve and why.
+
+- **Activities:** discover and validate the problem; user research,
+  interviews, and surveys; target users and personas; competitor and
+  market analysis; pain points, unmet needs, and market gaps; product
+  vision and strategy; value proposition and positioning; business
+  model and revenue opportunities; goals, success metrics, and
+  principles; non-goals and assumptions to test.
+- **Deliverables:** Problem Statement, User Research Findings, User
+  Personas, Competitor Analysis, Market Research, Product Vision,
+  Product Strategy, Value Proposition, Product Positioning, Business
+  Model Hypothesis, Success Metrics, Product Principles, Assumptions &
+  Risks.
+- **Documents:** [product-vision.md](product-vision.md);
+  `docs/discovery.md`.
+- **Ready to move on when:** at least five conversations or tests with
+  real groups are done; each core assumption is marked validated,
+  rejected, or still open; vision, goals, non-goals, and principles are
+  written and each goal has a metric.
+
+### Stage 2 -- Brainstorming / PRD / Spec
+
+**Goal:** Turn the opportunity and strategy into a solution, an MVP
+scope, and requirements that can be built and tested.
+
+- **Activities:**
+  - *Brainstorming:* explore solution directions and feature options;
+    weigh impact, effort, risk, and feasibility; prioritise the MVP; set
+    scope and out of scope.
+  - *PRD:* goals and users; capabilities and feature groups;
+    product-level user stories and use cases; functional and
+    non-functional requirements; MVP scope and dependencies; high-level
+    acceptance criteria linked to success metrics.
+  - *Feature spec, just in time per epic:* behaviour and business rules;
+    preconditions and postconditions; validation and permissions; errors
+    and edge cases; state transitions; API or integration expectations;
+    detailed acceptance criteria.
+- **Deliverables:** Brainstorming Notes / Solution Options, Feature
+  List, MVP Scope & Prioritization, PRD, Epic / Feature Breakdown,
+  Feature Specifications, Acceptance Criteria, Scope & Out-of-scope,
+  Requirements-to-Metric Mapping.
+- **Documents:** [prd.md](prd.md); `docs/specs/<epic>/spec.md`;
+  [GLOSSARY.md](GLOSSARY.md).
+- **Ready to move on when:** every P0 requirement has acceptance
+  criteria; MVP scope and out of scope are agreed; the epic about to be
+  built has a feature spec.
+
+### Stage 3 -- UI/UX & Software Architecture Design
+
+**Goal:** Design the user experience and the technical architecture so
+the product is consistent, feasible, and able to grow.
+
+- **Activities:**
+  - *Product-level UX/UI (first):* information architecture; global
+    user journey; navigation; high-level core flows and wireframes;
+    design system foundation; overall prototype of the key flows;
+    initial usability review. This is not a design of every screen.
+  - *Epic-level UX/UI (per epic):* review the epic's spec; detailed
+    flows and wireframes; high-fidelity UI; interactive prototype;
+    usability testing; design review and refinement; design handoff.
+    Design follows the MVP and its dependencies; not every epic is
+    designed before development starts.
+  - *Software architecture:* architecture style and system boundaries;
+    module boundaries; Web, Mobile, Desktop, and Backend
+    responsibilities; data model; API contracts; authentication and
+    authorization; real-time communication; third-party integrations;
+    caching and background jobs; security, privacy, and data
+    protection; observability; performance, scalability, and
+    reliability; key decisions as ADRs.
+- **Deliverables:** Product Information Architecture, Global User
+  Journey, Navigation Map, High-level User Flow Diagrams, Design System
+  Foundation, High-level Wireframes, Overall Product Prototype, Initial
+  Usability Findings, Epic Design Packages, Software Architecture
+  Document, Component / Module Design, Database ERD, API Contracts,
+  Integration Design, Security Architecture, Deployment /
+  Infrastructure Overview, ADRs.
+- **Documents:** prototype canvases; `docs/ux-review.md`;
+  `docs/architecture.md`; [docs/adr](docs/adr/); the technical design
+  section of each `docs/specs/<epic>/spec.md`.
+- **Ready to move on when:** every core journey can be clicked through;
+  key states are designed; a usability test is done and serious issues
+  are fixed or decided; the architecture is reviewed and the data model
+  and API contracts are ready for the next epic.
+
+### Stage 4 -- SOW / Planning
+
+**Goal:** Turn the agreed scope and design into a plan that can be
+tracked, estimated, and controlled.
+
+- **Activities:**
+  - *Scope of work:* scope, deliverables, milestones, timeline,
+    responsibilities, assumptions, constraints, dependencies, and
+    acceptance conditions. TripMate is a small internal project, so a
+    short scope and plan replaces a formal SOW.
+  - *Development planning:* Product → Epic → Feature → Task breakdown;
+    dependencies and order; estimates; milestones and release plan;
+    ownership; risks and mitigation; Definition of Done.
+  - *Test strategy:* test levels (unit, integration, contract,
+    end-to-end); test types (functional, regression, security,
+    performance, usability); environments and test data; ownership.
+    Every acceptance criterion has at least one test or a recorded
+    reason for the exception.
+  - *AI evaluation plan:* golden dataset; metrics and thresholds; output
+    quality and structured output; tool calling and retrieval;
+    grounding; prompt injection and unsafe tool behaviour; latency,
+    tokens, and cost; regression evaluation and release gates.
+- **Deliverables:** SOW / Project Scope, Development Plan, Epic /
+  Feature / Task Breakdown, Dependency Map, Estimates & Milestones,
+  Risk Register, Definition of Done, Test Strategy,
+  Requirements-to-Test Matrix, AI Evaluation Plan, Golden Dataset
+  (initial version), Release Plan.
+- **Documents:** [mvp-roadmap.md](mvp-roadmap.md);
+  `docs/test-strategy.md`; tasks as issues.
+- **Ready to move on when:** every epic is ordered with its
+  dependencies; every task for the next epic has scope, dependencies,
+  and a test; the Definition of Done and AI release gates are written.
+
+### Stage 5 -- AI-native SDLC
+
+**Goal:** Build each task, feature, and epic with AI help while keeping
+human oversight, independent verification, and quality gates.
+
+```mermaid
+flowchart TD
+    A[Backlog issue / task] --> B[AI analyses and plans]
+    B --> C{Human approves plan?}
+    C -->|No| D[Revise plan] --> B
+    C -->|Yes| E[AI implementation] --> F[Automated tests & verification]
+    F --> G[Independent AI review] --> H[Human review]
+    H --> I{All quality gates pass?}
+    I -->|No| J[Fix issues] --> E
+    I -->|Yes| K[Merge request approved] --> L[Merge]
+```
+
+- **Activities:**
+  - *Task preparation:* pick a task with clear scope, linked to its
+    epic, feature spec, design, and acceptance criteria; note
+    dependencies and test expectations; create the issue and branch.
+  - *AI analysis and planning:* the AI reads the requirement, the
+    codebase, and conventions; analyses impact; proposes a plan with the
+    files to change and a test plan. A person approves the plan before
+    implementation.
+  - *Implementation:* within the task's scope; follows architecture,
+    coding standards, and security constraints; tests change with the
+    code.
+  - *Verification:* unit, integration, contract, end-to-end, and
+    regression tests; static analysis and lint; security checks; UI and
+    design QA where relevant; AI evaluation where relevant.
+  - *Review:* an independent AI review, then a human code review, for
+    correctness, tests, readability, security, and scope. Reviewers do
+    not change code during a review-only pass.
+  - *Git workflow:* issue → branch → commit → merge request; tests and
+    lint run before a merge request is opened or updated.
+- **Quality gates:** acceptance criteria met; related tests pass; no
+  open Critical or High defect; security checks pass; AI evaluation
+  meets its threshold for AI features; no unapproved out-of-scope
+  change; human approval done.
+- **Deliverables:** Implemented Code, Automated Tests, Test /
+  Evaluation Results, AI Review Findings, Human Review Approval, Merge
+  Request, Updated Technical Documentation.
+- **Documents:** `docs/development-flow.md` (the detailed loop and the
+  Definition of Done); code repositories.
+
+### Stage 6 -- Hardening / Deployment / Launching
+
+**Goal:** Make sure the product is safe, stable, and ready to operate
+before users get it.
+
+- **Activities:**
+  - *Security:* authentication and authorization review; OWASP checks;
+    API security and input validation; secret management; rate
+    limiting and abuse prevention; dependency scanning; prompt
+    injection and tool boundary checks.
+  - *Performance and reliability:* load and stress tests; profiling;
+    timeouts, retries, and circuit breakers; idempotency and duplicate
+    requests; failure recovery; database tuning.
+  - *Operations:* structured logging; metrics and tracing; dashboards
+    and alerts; backup and restore checks; disaster recovery; incident
+    response.
+  - *AI hardening:* model timeouts and fallbacks; token and cost limits;
+    tool permission boundaries; human approval for risky actions;
+    structured output validation; AI regression evaluation.
+  - *Deployment preparation:* environments; database migrations; CI/CD
+    and release pipeline; feature flags; rollback; monitoring readiness;
+    app store, desktop signing, and web release.
+  - *Launch:* internal testing → closed beta → soft launch → public
+    launch, with feedback collection and issue triage.
+- **Deliverables:** Security Assessment, Performance / Load Test
+  Results, Operational Readiness Checklist, Deployment Runbook,
+  Migration & Rollback Plan, Monitoring / Alerting Setup, Release
+  Candidate, Launch Checklist, Release Notes, Launch Feedback Summary.
+- **Documents:** `docs/release-plan.md`.
+- **Ready to move on when:** the release gates in the roadmap pass;
+  beta groups complete a trip end to end; operations are stable.
+
+### Stage 7 -- Maintenance & Iteration
+
+**Goal:** Watch the product's health, handle operational issues, and
+keep improving from real data and feedback.
+
+- **Activities:**
+  - *Monitoring and operations:* availability, errors, and latency;
+    infrastructure and database health; API and integration failures;
+    AI quality, latency, and cost; incidents and production bugs.
+  - *Product analytics:* activation and onboarding; feature adoption;
+    engagement and retention; conversion; journey drop-off.
+  - *Feedback and improvement:* collect feedback; analyse support
+    issues; find usability problems; prioritise fixes and improvements;
+    update the roadmap and backlog.
+  - *Technical maintenance:* security patches; dependency upgrades;
+    database and infrastructure maintenance; technical debt;
+    performance and reliability.
+- **Deliverables:** Product Analytics Reports, User Feedback Summary,
+  Incident / Bug Reports, Maintenance Backlog, Technical Debt Backlog,
+  Updated Product Roadmap, Iteration Plan.
+- **Documents:** updates to [mvp-roadmap.md](mvp-roadmap.md),
+  [prd.md](prd.md), and `docs/discovery.md`; backlog as issues.
+
+## 4. Recommended Approach for TripMate
+
+1. Finish product-level discovery, vision, strategy, and PRD at a level
+   that sets direction.
+2. Agree the MVP and the priority epics.
+3. Do product-level UX/UI and high-level software architecture.
+4. Write the development plan, test strategy, and AI evaluation plan at
+   product level.
+5. For each priority epic, finish the spec, detailed design, technical
+   design, and task breakdown just in time.
+6. Build the epic through the AI-native SDLC with independent
+   verification and human approval.
+7. Harden, release, and launch as readiness allows.
+8. Watch data and feedback, and keep iterating.
+
+**Core principle:** set the overall direction and design first, then
+deliver epic by epic. Not every detail is specified up front, but every
+epic must be clear before implementation starts.
+
+## 5. Feedback Loops
 
 When a stage finds a problem it cannot solve on its own, the work goes
 back to the stage that owns the decision. The fix is made there, its
 document gets a new version, and the work moves forward again.
 
-| Found in | Problem | Go back to | Update |
-|----------|---------|------------|--------|
-| 4. UX/UI Design | A requirement is missing, wrong, or conflicts with the design | 3. Planning | prd.md |
-| 5. Technical Planning | The design needs something the platform cannot do well | 4. UX/UI Design | Prototype |
-| 5. Technical Planning | A feature is not feasible or costs too much for the MVP | 3. Planning | prd.md, roadmap |
-| 6. Specification | The spec needs data or an API the architecture does not have | 5. Technical Planning | architecture.md, ADR |
-| 6. Specification | A flow, screen or state was never designed | 4. UX/UI Design | Prototype |
-| 7. Development & QA | Acceptance criteria are wrong, missing or untestable | 6. Specification | Epic spec |
-| 7. Development & QA | The technical design does not work in practice | 5. Technical Planning | architecture.md, ADR |
-| 7. Development & QA | Building the screen shows the UX does not work | 4. UX/UI Design | Prototype, ux-review.md |
-| 7. Development & QA | The product requirement itself changed | 3. Planning | prd.md, roadmap |
-| 8. Launch & Growth | Beta use shows features to improve or add | 3. Planning | Roadmap, prd.md |
-| 8. Launch & Growth | Feedback shows a new problem or opportunity | 1. Discovery | discovery.md |
-
-## 5. Stage Details
-
-Every stage gate is approved by the product owner.
-
-### Stage 1 -- Product Discovery
-
-**Goal:** Understand the problem before deciding what to build.
-
-- **Activities:** describe the problem and when it happens; interview or
-  observe groups who plan trips together; look at how people manage
-  today (chat apps, spreadsheets, Splitwise); list assumptions and test
-  the riskiest ones.
-- **Deliverables:** `docs/discovery.md`: problem, personas, competitors,
-  assumptions with evidence.
-- **Exit criteria:** at least five conversations or tests with real
-  groups; each core assumption marked validated, rejected, or still
-  open.
-- **Feedback loops in:** from Launch & Growth when feedback shows a new
-  problem or opportunity.
-
-### Stage 2 -- Product Definition
-
-**Goal:** Agree on what the product is, for whom, and what success
-looks like.
-
-- **Activities:** write vision and value proposition; set goals and
-  non-goals; choose success metrics; write product principles.
-- **Deliverables:** [product-vision.md](product-vision.md).
-- **Exit criteria:** vision, goals, non-goals, and principles written;
-  each goal has a metric; product owner approves.
-- **Feedback loops in:** from Discovery when the problem turns out to be
-  different from what we thought.
-
-### Stage 3 -- Product Planning
-
-**Goal:** Turn the direction into a scoped, ordered plan.
-
-- **Activities:** find features from the core journeys; prioritise into
-  MVP and later; write requirements with IDs and acceptance criteria;
-  plan epics and milestones; name domain terms in the glossary.
-- **Deliverables:** [prd.md](prd.md) (with MVP scope and business
-  rules), [mvp-roadmap.md](mvp-roadmap.md), [GLOSSARY.md](GLOSSARY.md),
-  backlog of epics as issues.
-- **Exit criteria:** every P0 requirement has acceptance criteria; MVP
-  scope and out-of-scope agreed; the roadmap orders every epic.
-- **Feedback loops in:** from UX/UI Design (missing or wrong
-  requirement), Technical Planning (not feasible or too costly),
-  Development (requirement changed), Launch & Growth (feature
-  improvements).
-
-### Stage 4 -- UX/UI Design
-
-**Goal:** Design how people will use it, and check it with real users.
-
-- **Activities:** map journeys and flows for the epic; design screens
-  for Web, Mobile, and Desktop, in Vietnamese and English; cover empty,
-  loading, error, and success states; build a clickable prototype; test
-  it with target users and fix serious issues.
-- **Deliverables:** prototype canvases; `docs/ux-review.md` with
-  findings and changes.
-- **Exit criteria:** every core journey can be clicked through; key
-  states designed; usability test done, serious issues fixed or
-  decided.
-- **Feedback loops out:** to Planning when a requirement is missing or
-  wrong.
-- **Feedback loops in:** from Technical Planning (constraint),
-  Specification (missing flow or state), Development (UX problem found
-  while building).
-
-### Stage 5 -- Technical Planning
-
-**Goal:** Design the technical solution that meets the requirements and
-the design.
-
-- **Activities:** define architecture and module boundaries; design the
-  data model and API conventions; plan infrastructure, CI/CD,
-  monitoring, and security; assess third-party risks (AI, Maps); record
-  hard trade-offs as ADRs.
-- **Deliverables:** `docs/architecture.md`; ADRs in
-  [docs/adr](docs/adr/).
-- **Exit criteria:** architecture reviewed; data model and API contracts
-  ready for the next epic; major risks have a mitigation.
-- **Feedback loops out:** to UX/UI Design (technical constraint), to
-  Planning (not feasible or too costly).
-- **Feedback loops in:** from Specification (gap in technical design),
-  Development (design does not work in practice).
-
-### Stage 6 -- Specification & Implementation Planning
-
-**Goal:** Say exactly how the epic behaves and how it will be built and
-checked.
-
-- **Activities:** specify behaviour, rules, validation, permissions,
-  errors, and edge cases; write testable acceptance criteria; add the
-  technical design for the epic; split into Backend, Web, Mobile, and
-  Desktop tasks with dependencies; review tasks for gaps and overlap.
-- **Deliverables:** `docs/specs/<epic>/spec.md`; tasks as issues, linked
-  to requirement IDs.
-- **Exit criteria:** every acceptance criterion is testable; every task
-  has scope, dependencies, and a test; a developer or Claude Code can
-  start without guessing a requirement.
-- **Feedback loops out:** to Technical Planning (gap in technical
-  design), to UX/UI Design (missing flow or state).
-- **Feedback loops in:** from Development (acceptance criteria wrong or
-  missing).
-
-### Stage 7 -- Development & Quality Assurance
-
-**Goal:** Build in small increments and verify each one.
-
-- **Activities:** follow the Development Flow (issue, branch, implement,
-  test, review, merge, deploy); unit, integration, contract, and
-  end-to-end tests; AI evaluations for AI features; verify against
-  acceptance criteria and the approved design.
-- **Deliverables:** code, tests, merged pull requests, release
-  candidate; `docs/development-flow.md` describes the loop.
-- **Exit criteria:** all acceptance criteria verified; no open critical
-  defect; the release gates in the roadmap pass.
-- **Feedback loops out:** to Specification, Technical Planning, UX/UI
-  Design, or Planning, depending on where the problem lies.
-
-### Stage 8 -- Launch & Growth
-
-**Goal:** Release, measure, learn, and improve.
-
-- **Activities:** prepare production, rollback, and monitoring; sign
-  desktop builds and pass store review; run a beta with real groups;
-  track adoption, retention, and feedback; update the roadmap.
-- **Deliverables:** `docs/release-plan.md`; beta report; updated
-  roadmap.
-- **Exit criteria:** beta groups complete a trip end to end; operations
-  stable; next improvements prioritised.
-- **Feedback loops out:** to Planning (feature improvements), to
-  Discovery (new problem or opportunity).
+| Found | Go back to | Update |
+|-------|------------|--------|
+| Problem or market assumptions are wrong | 1. Discovery & Strategy | discovery.md, product-vision.md |
+| Product scope or requirements are unclear | 2. PRD / Spec | prd.md, epic spec |
+| A UX flow or the UI does not meet the need | 3. UI/UX Design | Prototype, ux-review.md |
+| The architecture does not meet the requirements | 3. Software Architecture | architecture.md, ADR |
+| Scope, estimates, or dependencies are not feasible | 4. Planning | mvp-roadmap.md |
+| Implementation or tests find a defect | 5. AI-native SDLC | Code, tests |
+| A production issue needs a code fix | 5. AI-native SDLC | Code, tests |
+| Deployment or operational readiness is not met | 6. Hardening / Deployment | release-plan.md |
+| User feedback opens a new opportunity | 1. Discovery or 2. PRD / Spec | discovery.md or prd.md |
 
 ## 6. Document Map
 
 One document per question, created only when there is real content for
 it. Every change bumps the document's version, adds a row to its
-version history, and is tagged in this repository.
+version history, and is tagged in this repository. Which documents
+exist today, and their versions, is shown in the Build Tracker.
 
-| Document | Answers | Stage | Status |
-|----------|---------|-------|--------|
-| [GLOSSARY.md](GLOSSARY.md) | What do our words mean? | All | v1.3 |
-| `docs/discovery.md` | Whose problem, what evidence, which assumptions are still open? | 1 | To create |
-| [product-vision.md](product-vision.md) | What is the product and why build it? | 2 | v1.4 |
-| [prd.md](prd.md) | What must it do? Includes MVP scope, business rules, acceptance criteria | 3 | v1.5 |
-| [mvp-roadmap.md](mvp-roadmap.md) | In what order and by when? | 3 | v1.5 |
-| Prototype canvases | How will people use it? | 4 | In progress |
-| `docs/ux-review.md` | What did testing show and what changed? | 4 | After first test |
-| `docs/architecture.md` | How is the system organised? Data model, API conventions, infrastructure | 5 | To create |
-| [docs/adr](docs/adr/) | Why this decision over the alternatives? | 5 | 0001--0004 |
-| `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, tasks | 6 | Per epic |
-| `docs/development-flow.md` | How does a task go from issue to merged and deployed? | 7 | To create |
-| `docs/release-plan.md` | How do we ship, roll back, and measure? | 8 | Before beta |
+| Document | Answers | Stage |
+|----------|---------|-------|
+| [GLOSSARY.md](GLOSSARY.md) | What do our words mean? | All |
+| `docs/discovery.md` | Whose problem, what evidence, which competitors and market, which strategy and business model, which assumptions are still open? | 1 |
+| [product-vision.md](product-vision.md) | What is the product and why build it? Vision, value, positioning, goals, metrics, principles | 1 |
+| [prd.md](prd.md) | What must it do? MVP scope, requirements, business rules, acceptance criteria | 2 |
+| `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, tasks | 2--4 |
+| Prototype canvases | How will people use it? | 3 |
+| `docs/ux-review.md` | What did testing show and what changed? | 3 |
+| `docs/architecture.md` | How is the system organised? Modules, data model, API contracts, security, infrastructure | 3 |
+| [docs/adr](docs/adr/) | Why this decision over the alternatives? | 3 |
+| [mvp-roadmap.md](mvp-roadmap.md) | In what order and by when? Phases, milestones, risks, release gates | 4 |
+| `docs/test-strategy.md` | How is TripMate tested? Test levels, requirements-to-test mapping, AI evaluation plan and golden dataset | 4 |
+| `docs/development-flow.md` | How does a task go from issue to merged? Definition of Done | 5 |
+| `docs/release-plan.md` | How do we harden, ship, roll back, and measure? | 6 |
 
 **Rules**
 
@@ -277,10 +370,11 @@ version history, and is tagged in this repository.
 
 **Verify what it builds**
 
-- Automated tests and an AI code review run before any human review.
+- Automated tests and an independent AI review run before any human
+  review.
 - AI features (idea capture, Itinerary drafts, Gap revisions) get
   evaluation sets with expected outcomes, run on every change.
-- A person approves every stage gate and every merge.
+- A person approves every plan, every stage gate, and every merge.
 
 ## 8. Version History
 
@@ -288,3 +382,4 @@ version history, and is tagged in this repository.
 |---------|------|---------|
 | 1.0 | 2026-11-17 | First version: eight stages, feedback loops, two planning levels, current status, document map, Claude Code practices. |
 | 1.1 | 2026-11-17 | Status corrected: only stage 4 (UX/UI Design) is in progress; all other stages are not started. |
+| 2.0 | 2026-11-17 | Seven-stage workflow: Discovery & Strategy, Brainstorming / PRD / Spec, UI/UX & Software Architecture, SOW / Planning, AI-native SDLC, Hardening / Deployment / Launch, Maintenance & Iteration. Adds the AI-native SDLC loop and quality gates, the epic execution loop, and `docs/test-strategy.md` in the document map. Current status and next steps moved to the Build Tracker. |
