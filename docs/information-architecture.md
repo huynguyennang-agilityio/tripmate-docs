@@ -40,7 +40,7 @@ only finish one action (for example "Mark paid") are not places.
 | Join with code | Enter an Invitation code; also reached by scanning a QR code | TRIP-04 |
 | Invitation preview | The trip a valid Invitation leads to, and Join | TRIP-04 |
 | Trip | One trip, with four tabs: Plan, Chat, Money, Members | |
-| Trip · Plan | Itinerary by day, Feasibility warnings, Visited and Skipped, progress, Saved places, map | ITN-01 to ITN-11 |
+| Trip · Plan | Itinerary by day with each Booking on the day it applies, Feasibility warnings, Visited and Skipped, progress, Saved places, map | ITN-01 to ITN-11 |
 | Trip · Chat | The trip discussion, the Readiness checklist pinned on top, Nudges, Proposal cards, Idea drafts, the assistant | COL-01 to COL-10, AI-01 to AI-09, RDY-01 to RDY-08 |
 | Trip · Money | Balance, spending against the Budget, Settlement plan, Expenses | EXP-01 to EXP-12 |
 | Trip · Members | Member list with Balances, Former members, leave, remove, transfer ownership | TRIP-05, TRIP-06, TRIP-08 |
@@ -49,13 +49,13 @@ only finish one action (for example "Mark paid") are not places.
 | Proposal | One Proposal with its Votes, Feasibility warnings, and Gaps | COL-03, COL-05, COL-08, ITN-11, RDY-03 |
 | Itinerary item | Time, notes, order, Estimated cost, route | ITN-02, ITN-03, ITN-06, ITN-10 |
 | Add Expense | Amount, payer, Participants, split | EXP-01 to EXP-05 |
-| Bookings and Tasks | Booking records and trip tasks. Where they sit in the Trip is open (section 5) | BOOK-01 to BOOK-09, TASK-01 to TASK-05 |
+| Bookings and Tasks | Every Booking and Task, opened from the top of Plan | BOOK-01 to BOOK-09, TASK-01 to TASK-05 |
 | Trip summary | The recap of a Completed trip. After the MVP | FR-09 |
 
 ## 3. Navigation Map
 
 Solid arrows are links a user follows. Dashed boxes are places planned
-for after the MVP or not placed yet.
+for after the MVP.
 
 ```mermaid
 flowchart LR
@@ -76,10 +76,10 @@ flowchart LR
         Chat["Chat"]
         Money["Money"]
         Members["Members"]
-        BT["Bookings and Tasks"]:::open
     end
     subgraph Detail["Inside a trip"]
         Item["Itinerary item"]
+        BT["Bookings and Tasks"]
         Proposal
         AddExp["Add Expense"]
         Invite
@@ -97,13 +97,13 @@ flowchart LR
     MyTrips -->|open a trip| Plan
     Plan --- Chat --- Money --- Members
     Plan --> Item
+    Plan --> BT
     Plan -.-> Summary
     Chat --> Proposal
     Money --> AddExp
     Members --> Invite
     Plan --> Edit
     classDef later stroke-dasharray: 5 5
-    classDef open stroke-dasharray: 2 4
 ```
 
 ## 4. Navigation rules
@@ -134,10 +134,15 @@ flowchart LR
   separate place.
 - The four Trip tabs stay visible inside a trip. Back from a tab
   returns to My trips.
-- Detail places (Itinerary item, Proposal, Add Expense, Invite, Edit
-  trip) return to the tab they were opened from.
+- Detail places (Itinerary item, Bookings and Tasks, Proposal, Add
+  Expense, Invite, Edit trip) return to the tab they were opened from.
+- Bookings and Tasks live in Plan, not in a tab of their own. Each
+  Booking also shows on the day it applies, for example a hotel
+  check-in on its first night or a bus at its departure time; the top
+  of Plan shows how many Bookings there are and how many Tasks are due,
+  and opens the full list.
 - A Nudge or a Gap links to the place that fixes it, for example a
-  missing accommodation Booking opens Bookings.
+  missing accommodation Booking opens Bookings and Tasks.
 
 ## 5. Platform presentation
 
@@ -152,12 +157,6 @@ are shown differs.
 | Invitation | Share sheet, QR code shown on screen | Copy link or code, QR code shown | `tripmate://join/...` opens the join screen (DESK-02) |
 | Extra entry points | None in the MVP | None | Tray count of open Gaps (DESK-04), quick-add Expense shortcut (DESK-05), native Nudge notifications (DESK-03) |
 
-**Open question**
-
-- Where Bookings and Tasks sit inside a trip: a fifth tab, a section in
-  Plan, or a place reached from Chat and the Readiness checklist. The
-  answer is recorded here and in the prototypes once decided.
-
 ## 6. Global User Journey
 
 Not written yet.
@@ -170,4 +169,4 @@ Not written yet.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-11-17 | First version: places, Navigation Map, navigation rules, platform presentation, and one open question on where Bookings and Tasks sit. |
+| 1.0 | 2026-11-17 | First version: places, Navigation Map, navigation rules (Bookings and Tasks live in Plan), and platform presentation. |
