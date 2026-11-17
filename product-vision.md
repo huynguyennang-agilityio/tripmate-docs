@@ -2,8 +2,8 @@
 
 **Document type:** Product Vision\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.6
+**Status:** Approved\
+**Version:** 1.7
 
 Terms follow [GLOSSARY.md](GLOSSARY.md).
 
@@ -299,3 +299,4 @@ product.
 | 1.4 | 2026-11-16 | Added this version history. |
 | 1.5 | 2026-11-17 | Readability only, no content changed: personas and the Proposal / Decision / Booked distinction as tables, run-together lists split into list items, and a diagram of the trip lifecycle in section 11. |
 | 1.6 | 2026-11-17 | Section 10: a table that gives every goal a metric, with two proposed metrics for progress during the trip and consistency across platforms. |
+| 1.7 | 2026-11-17 | Status: Approved. The product owner closed Stage 1; see docs/discovery.md for the conditions and the waiver. |
