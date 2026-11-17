@@ -3,7 +3,7 @@
 **Document type:** Solution Options\
 **Product:** TripMate\
 **Status:** Draft\
-**Version:** 1.0\
+**Version:** 1.1\
 **Stage:** 2. Brainstorming / PRD / Spec
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). This document answers *why
@@ -41,6 +41,7 @@ discussed but never written down; section 5 lists them as open.
 |----------|--------|-----------|-----|--------|
 | Who decides for the group? | A Proposal becomes a Decision when more than half of the current Members vote Yes | The Owner decides a Proposal early | Nobody should be "the one who decides" | [ADR-0002](adr/0002-equal-rights-for-members.md) |
 | Who may change trip state, Expenses, bookings and tasks? | Every Member, with undo and an audit log | Only the Owner may Cancel or Archive | Undo plus the audit log protect against mistakes without ranking Members | [ADR-0002](adr/0002-equal-rights-for-members.md) |
+| Can Confirm be undone? | Yes, by any Member; the trip returns to Planning and the change is audited | Confirm is one-way; undoing Confirm needs a majority vote | Plans change in a group of friends, and undo plus the audit log is how every other state change is protected | [ADR-0002](adr/0002-equal-rights-for-members.md) |
 | How are ideas kept apart from agreed plans? | Proposals, Votes and Decisions with explicit states | Not recorded | Ideas and agreed plans must be easy to tell apart (P2) | [prd.md](../prd.md) FR-03 |
 
 ### 2.2 Keeping the Itinerary current (P3)
@@ -49,12 +50,15 @@ discussed but never written down; section 5 lists them as open.
 |----------|--------|-----------|-----|--------|
 | How is the Itinerary changed? | Direct edits in every state except Confirmed; while Confirmed, changes need a Proposal | Every Itinerary item always needs a Proposal | Always voting slows early brainstorming and changes on the road | [ADR-0002](adr/0002-equal-rights-for-members.md) |
 | How does the group see progress during the trip? | Items marked Visited or Skipped, and spending against the Budget | Not recorded | Progress should be visible while travelling | [prd.md](../prd.md) FR-05 |
+| Does a trip that nobody confirmed still start? | Yes: a trip in Planning or Confirmed becomes Ongoing on its start date | Only a Confirmed trip becomes Ongoing | Nothing should block the group on the day they leave | [prd.md](../prd.md) FR-02 |
 
 ### 2.3 Sensible plans from many people (P7)
 
 | Question | Chosen | Set aside | Why | Source |
 |----------|--------|-----------|-----|--------|
 | How are good ideas kept from getting lost in the chat? | AI idea capture on request, turning chat ideas into drafts a Member can publish as Proposals | Not recorded | Good ideas get lost in the chat (P7) | [prd.md](../prd.md) v1.2 |
+| Is idea capture required for the MVP? | Yes, P0 | P1, built only if capacity permits | It answers the core problem of ideas lost in chat, and the MVP acceptance scenario may only use P0 requirements | [prd.md](../prd.md) section 10 |
+| Who sees a Saved place? | Every Member of the trip; Saved places are P0 | A personal list for each Member; P1 | The group is the planning unit, and a Nudge must offer everyone the same quick choices | [prd.md](../prd.md) FR-05 |
 | How is the same idea not raised twice? | Duplicate warnings when creating a Proposal, and Duplicate marking | Not recorded | Many people plan at the same time | [prd.md](../prd.md) v1.2 |
 | How is the group stopped from voting for an impossible plan? | Feasibility warnings for time and Budget before Members vote; warnings never block | Not recorded | A voted plan can still be impossible in a day or over the Budget | [prd.md](../prd.md) section 12 |
 | How does the group know what the trip is still missing? | A Readiness checklist of Gaps from deterministic rules, with timed Nudges that never block | Not recorded | Not recorded | [prd.md](../prd.md) section 10, FR-10 |
@@ -78,6 +82,7 @@ discussed but never written down; section 5 lists them as open.
 | How is the group settled up? | A Settlement plan routed through the Member with the largest positive Balance | General minimum-cash-flow matching; paying back each Expense to its payer | At most one transfer per Member, and easy to explain | [ADR-0004](adr/0004-hub-settlement-plan.md) |
 | Can a Member leave while owing or being owed? | Yes; they become a Former member and stay in the Settlement plan | Leaving only at a zero Balance | Blocking departure recovers no money | [ADR-0003](adr/0003-members-may-leave-with-a-balance.md) |
 | Can an Expense be edited after settlement has started? | Yes, by any Member; Balances are recalculated and the change is audited | Lock Expenses once Settlements exist | Fixing mistakes easily matters more | [ADR-0002](adr/0002-equal-rights-for-members.md) |
+| What can a Former member with a Balance still see? | The Expenses they took part in, their own Balance and the Settlement plan, read-only, until their Balance is zero | No access after leaving; letting them record their own Settlements | A person who owes must be able to see why; a person outside the trip should not write to its money records | [ADR-0003](adr/0003-members-may-leave-with-a-balance.md) |
 | Does TripMate move money? | No; it records Settlements only | Payment processing, holding user funds | Payments need legal and operational review | [product-vision.md](../product-vision.md) section 9, [mvp-roadmap.md](../mvp-roadmap.md) section 11 |
 
 ### 2.6 Joining, reach and platforms
@@ -88,7 +93,7 @@ discussed but never written down; section 5 lists them as open.
 | Can non-members see a trip? | No public read-only links in the MVP | Public read-only Itinerary links | Not recorded | [prd.md](../prd.md) section 10 |
 | Which clients ship in the MVP? | Responsive Web (Next.js), Flutter Mobile, and a Tauri Desktop app | Flutter for the Web client; Desktop after the MVP | Next.js suits browser planning; Desktop is also the team's Rust learning track | [mvp-roadmap.md](../mvp-roadmap.md) section 2 |
 | How is the backend structured? | A FastAPI modular monolith | Microservices | Not recorded | [mvp-roadmap.md](../mvp-roadmap.md) section 2 |
-| Which notifications are sent? | In-app on every client, native notifications on Desktop | Mobile push and email notifications | Not recorded | [prd.md](../prd.md) section 10 |
+| Which notifications are sent? | Nudges in the discussion on every client and as native notifications on Desktop (P0); personal in-app notifications are P1 | Personal in-app notifications as P0; mobile push and email notifications | Nudges carry what the trip is missing; personal notifications can follow after the MVP | [prd.md](../prd.md) section 10 |
 | Which languages? | Vietnamese and English, following the device language | An in-app language setting; translating Member content | Not recorded | [prd.md](../prd.md) section 10 |
 
 ## 3. MVP Prioritisation
@@ -156,3 +161,4 @@ listed as open in section 5.
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-17 | First version: problems P1 to P7, chosen and set-aside options from the PRD, the ADRs and the roadmap, MVP and deferred features with reasons, open items. |
+| 1.1 | 2026-11-17 | Decisions from PRD v1.9 with the options set aside: undo of Confirm, a trip starting without Confirm, idea capture and Saved places as P0, what a Former member can still see, and which notifications are P0. |

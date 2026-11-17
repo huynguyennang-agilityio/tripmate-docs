@@ -1,6 +1,6 @@
 # TripMate
 
-**Version:** 1.5
+**Version:** 1.6
 
 A shared workspace where a group of friends plan a trip together as equals, track progress while travelling, and settle shared costs fairly at the end.
 
@@ -56,7 +56,7 @@ A person who has joined a trip. All Members, including the Owner, have equal rig
 _Avoid_: Participant (except for the people sharing an Expense), User, Traveller
 
 **Former member**:
-A person who has left or been removed from a trip. Takes no part in new activity, but remains in past Expenses, Balances and history.
+A person who has left or been removed from a trip. Takes no part in new activity, but remains in past Expenses, Balances and history. While their Balance is not zero they can still read their own money records, and nothing else.
 _Avoid_: Removed user, Deleted member
 
 **Invitation**:
@@ -69,10 +69,10 @@ _Avoid_: Guest, Invitee (as a role)
 The trip is being planned; the state a new trip starts in.
 
 **Confirmed**:
-The group has agreed to travel on the current plan.
+The group has agreed to travel on the current plan. Any Member can undo it, which returns the trip to Planning.
 
 **Ongoing**:
-The trip is happening, based on its start and end dates.
+The trip is happening, based on its start and end dates. A trip becomes Ongoing on its start date whether or not it was Confirmed.
 
 **Completed**:
 The trip is over, based on its end date.
@@ -100,7 +100,7 @@ A Member's Yes or No on a Proposal. Each Member has one Vote per Proposal.
 _Avoid_: Like, Reaction
 
 **Decision**:
-A Proposal that more than half of the current Members voted Yes on. A Decision is not a Booking.
+A Proposal that more than half of the current Members voted Yes on. A Decision is not a booking.
 _Avoid_: Confirmed suggestion, Approved, Accepted
 
 **Rejected**:
@@ -145,6 +145,10 @@ _Avoid_: Price, Cost (unqualified)
 A notice that a day's plan cannot fit in its Day window once travel time is counted, or that Estimated costs exceed the Budget. It informs the group and never blocks a Decision.
 _Avoid_: Error, Validation, Conflict
 
+**Saved place**:
+A place a Member kept for the trip to consider later. Every Member of the trip sees the same Saved places, and they can be offered as quick choices in a Nudge.
+_Avoid_: Favourite, Bookmark, Wishlist
+
 **Visited**:
 An Itinerary item the group actually went to.
 _Avoid_: Done, Completed
@@ -152,6 +156,22 @@ _Avoid_: Done, Completed
 **Skipped**:
 An Itinerary item the group decided not to go to after all.
 _Avoid_: Cancelled, Removed
+
+## Bookings, tasks and safeguards
+
+These three are written in lower case in running text, like "trip".
+
+**Booking**:
+A real-world reservation or purchase that a Member recorded in the trip: a flight, accommodation, transport, an activity, a restaurant, or something else. It is entered by hand, and it is not proof that the supplier confirmed anything.
+_Avoid_: Reservation, Order, Ticket
+
+**Task**:
+A piece of preparation work for the trip that can be assigned to one Member, with a status and an optional due date.
+_Avoid_: To-do, Job, Action item
+
+**Audit log**:
+The record of who changed what and when, for every change to trip state, the Itinerary, bookings, tasks, Expenses and Settlements. It is the main safeguard of equal rights.
+_Avoid_: History, Activity feed, Changelog
 
 ## Readiness
 
@@ -181,6 +201,10 @@ _Avoid_: Limit, Cap
 Money one Member paid on behalf of some or all Members (the Participants), split among them.
 _Avoid_: Cost, Bill, Transaction
 
+**Participant**:
+A Member who shares in an Expense. Only its Participants are charged for an Expense; the Member who paid is a Participant only if selected.
+_Avoid_: Sharer, Member (for the people sharing one Expense)
+
 **Balance**:
 What a Member has paid minus what they owe across the trip. Positive means they should receive money; negative means they should pay.
 _Avoid_: Debt, Net
@@ -202,3 +226,4 @@ _Avoid_: Payment, Transfer, Repayment
 | 1.3 | 2026-11-16 | Added a version number and this history. |
 | 1.4 | 2026-11-17 | Invitation: shared as a link, a short code, or a QR code. |
 | 1.5 | 2026-11-17 | Added a map of how the main terms relate. No definition changed. |
+| 1.6 | 2026-11-17 | New terms: Saved place, Booking, Task, Audit log, Participant. Confirmed can be undone; Ongoing starts on the start date whether or not the trip was Confirmed; a Former member with a Balance can still read their own money records. |

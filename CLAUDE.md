@@ -14,6 +14,7 @@ by AI agents such as Claude Code.
 | [prd.md](prd.md) | What the MVP must do: requirements, business rules, acceptance criteria. |
 | [mvp-roadmap.md](mvp-roadmap.md) | Phases, milestones, release gates. |
 | [product-workflow.md](product-workflow.md) | How we go from problem to release, and which document belongs to which stage. |
+| [docs/discovery.md](docs/discovery.md) | The assumptions TripMate rests on, how each is tested, and what real groups told us. |
 | [docs/solution-options.md](docs/solution-options.md) | Which options were considered for each problem, and why features are in or out of the MVP. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
 
@@ -47,8 +48,9 @@ Every change to a document must:
    1.6).
 2. Add a row to the document's Version History table at the end:
    version, date (YYYY-MM-DD), what changed.
-3. Update cross-references that name a version (for example the roadmap
-   says which PRD version it follows).
+3. Keep cross-references free of version numbers: write "scope follows
+   prd.md", not "scope follows prd.md v1.8", so a change in one
+   document does not force a new version of another.
 4. Update the artifact copies listed below so they show the same
    version and content.
 
@@ -62,6 +64,19 @@ Old versions are kept as git tags, so never keep copies of old files.
 
 Read an old version with `git show v1.5:prd.md`, compare with
 `git diff v1.5 v1.6 -- prd.md`.
+
+## Status
+
+Every document header has a `**Status:**` line with one of three
+values.
+
+| Status | Meaning |
+|--------|---------|
+| Draft | Still being written. |
+| Proposed | Complete and waiting for the product owner's approval. |
+| Approved | The product owner has approved it. |
+
+Only the product owner moves a document to Approved.
 
 ## Artifact copies
 

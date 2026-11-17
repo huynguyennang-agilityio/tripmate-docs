@@ -3,10 +3,10 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.8\
+**Version:** 1.9\
 **Planning horizon:** 13 weeks (initial estimate)
 
-Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md) v1.8.
+Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md).
 
 ## 1. Roadmap Objective
 
@@ -65,43 +65,23 @@ A group of friends can create a trip, collaborate on a plan, record
 bookings, track shared spending, and settle balances using TripMate
 without relying on a separate spreadsheet for the core workflow.
 
-### MVP includes
+### What is in and what is deferred
 
--   Authentication and profiles.
--   Trip creation and invitations.
--   Membership: equal Member rights, Owner manages membership only.
--   Basic discussion, Proposals, and majority voting.
--   Duplicate warnings and marking.
--   Feasibility warnings for time and Budget, with Estimated costs.
--   Readiness checklist of Gaps and timed Nudges, with quick choices
-    plus "Other…".
--   AI place recommendations and Itinerary drafts as Proposals.
--   Manual Itinerary editing.
--   Trip progress: Visited/Skipped items and spending against the Budget.
--   Booking records and task assignments.
--   Expense recording and split calculations.
--   Settlement plan and recorded Settlements.
--   In-app notifications, plus native notifications on Desktop.
--   Responsive Web, Flutter Mobile, and Tauri Desktop clients.
--   Desktop: tray with open Gaps, Invitation deep links, quick-add
-    Expense shortcut, read-only offline Itinerary, auto-update, signed
-    installers.
-
-### Explicitly deferred
-
--   Direct flight or hotel purchasing.
--   Payment processing.
--   Bank integrations.
--   Automated booking changes or cancellations.
--   Public social feed.
--   Public read-only trip links.
--   Mobile push and email notifications (email only for authentication).
--   Full marketplace.
--   Multiple currencies within one trip.
--   Automated booking email ingestion.
--   AI actions that purchase, book, or settle payments.
+The list of what the MVP includes and what is deferred is kept in one
+place: [prd.md](prd.md), sections 4.1 and 4.2. The reasons are in
+[docs/solution-options.md](docs/solution-options.md).
 
 ## 4. Thirteen-Week Roadmap
+
+**Stages and phases.** A stage in
+[product-workflow.md](product-workflow.md) is a way of working; a phase
+here is a slot in the schedule.
+
+| Phase | Stage of the workflow |
+|-------|-----------------------|
+| Phase 0 | Finishes the product-level work of stages 1 to 4 |
+| Phases 1 to 5 | Stage 5, epic by epic; each epic's spec and design are finished just in time (stages 2 to 4 at epic level) |
+| Phases 6 and 7 | Stage 6 |
 
 Desktop work runs alongside each phase: every phase adds the one Rust
 feature that matches what the backend just gained, and Week 12 finishes
@@ -194,7 +174,9 @@ are set yet.
 -   A user can create a trip and becomes its Owner.
 -   Signed-in users can join through a valid Invitation link, code, or
     QR code.
--   Any Member can change the trip state and undo a cancel or archive.
+-   Any Member can change the trip state and undo a confirm, cancel,
+    or archive.
+-   A trip in Planning or Confirmed becomes Ongoing on its start date.
 -   Non-members cannot access private trip data.
 -   Web and Mobile display consistent trip information.
 
@@ -211,13 +193,13 @@ are set yet.
 -   Rejected, Withdrawn, and Outdated Proposal states.
 -   Similar-Proposal warning on create and Duplicate marking.
 -   Basic polls if capacity permits.
--   In-app notifications for important events.
+-   In-app notifications for important events (P1, if capacity
+    permits).
 -   Readiness checklist pinned in the discussion, with Foundation Gaps
     (dates, destination, Budget).
 -   Nudge engine: quiet-chat wait, batching, daily limit, snooze,
     acknowledge, and quick choices plus "Other…".
--   Desktop: native notifications for notification events and Nudges
-    (DESK-03).
+-   Desktop: native notifications for Nudges (DESK-03).
 
 **Deliverables**
 
@@ -255,8 +237,8 @@ are set yet.
 -   Estimated cost per Itinerary item.
 -   Day window and travel-time estimates from the map provider.
 -   Feasibility warnings (time and Budget) on days and Proposals.
--   AI idea capture from the discussion into Idea drafts (P1, if
-    capacity permits).
+-   AI idea capture from the discussion into Idea drafts.
+-   Saved places, shared by the whole trip.
 -   Itinerary Gaps (empty day, too much travel, day does not fit, over
     Budget) on the checklist and on Proposals.
 -   "What's missing?" answered by the assistant from the checklist (P1,
@@ -264,6 +246,12 @@ are set yet.
 -   Basic map display.
 -   Desktop: tray icon with open Gaps (DESK-04) and read-only offline
     Itinerary cache in SQLite (DESK-06).
+
+Idea capture and Saved places are P0 and are not cut. If the phase
+runs out of time, these P1 items move to after the MVP first: basic map
+display (ITN-05), "What's missing?" (RDY-07), the assistant's budget
+estimate (AI-05), and its accommodation and restaurant suggestions
+(AI-06).
 
 **Deliverables**
 
@@ -280,6 +268,9 @@ are set yet.
 -   While the trip is Confirmed, the Itinerary changes only through a
     Decision.
 -   Members can mark items Visited or Skipped during the trip.
+-   A Member can press Capture ideas and publish an Idea draft as a
+    Proposal.
+-   A Saved place is visible to every Member of the trip.
 -   An overfull day or an over-Budget plan shows a Feasibility warning
     before Members vote, and never blocks a Decision.
 -   Invalid or incomplete AI output is rejected or safely handled.
@@ -339,6 +330,8 @@ owes whom.
 -   Hub Settlement plan (ADR-0004).
 -   Recording Settlements by any Member.
 -   Spending against the Budget during the trip.
+-   Read-only access for a Former member to their own money records
+    until their Balance is zero.
 -   Desktop: global shortcut for quick-add Expense (DESK-05).
 
 **Deliverables**
@@ -375,7 +368,8 @@ owes whom.
 **Exit criteria**
 
 -   Signed installers install on clean macOS and Windows machines.
--   Invitation deep links, notifications, tray count, quick-add Expense,
+-   Invitation deep links, Nudge notifications, tray count, quick-add
+    Expense,
     and offline Itinerary work end to end.
 -   An update published to the update channel installs automatically.
 -   No business logic lives in the Desktop client.
@@ -434,24 +428,25 @@ Use these Epics in the issue tracker:
 10. **EPIC-10: Cross-Platform Experience**
 11. **EPIC-11: Security, Observability, and Release**
 12. **EPIC-12: Desktop App (Tauri)**
+13. **EPIC-13: Readiness Checklist and Nudges**
 
 Where each phase gets its requirements and epics:
 
 | Phase | PRD requirements | Epics |
 |-------|------------------|-------|
 | 1 -- Core Foundation | FR-01, FR-02 | EPIC-01, EPIC-02 |
-| 2 -- Collaboration | FR-03; FR-10 (checklist, Foundation Gaps, Nudge engine) | EPIC-03 |
-| 3 -- Trip Planning and AI | FR-04, FR-05; FR-10 (Itinerary Gaps) | EPIC-04, EPIC-05 |
-| 4 -- Booking and Task Coordination | FR-06, FR-07; FR-10 (Preparation Gaps) | EPIC-06, EPIC-07 |
+| 2 -- Collaboration | FR-03; FR-10 (checklist, Foundation Gaps, Nudge engine) | EPIC-03, EPIC-13 |
+| 3 -- Trip Planning and AI | FR-04, FR-05; FR-10 (Itinerary Gaps) | EPIC-04, EPIC-05, EPIC-13 |
+| 4 -- Booking and Task Coordination | FR-06, FR-07; FR-10 (Preparation Gaps) | EPIC-06, EPIC-07, EPIC-13 |
 | 5 -- Expense Management | FR-08 | EPIC-08, EPIC-09 |
 | 6 -- Desktop Release | DESK-01 to DESK-07, built across Phases 1 to 5 | EPIC-12 |
 | 7 -- Beta and MVP Release | PRD section 9 | EPIC-11 |
 | Every phase | PRD section 6 | EPIC-10 |
 
-The table follows the epic names and the features listed in each
-phase. Two things are open: FR-10 (Readiness checklist and Nudges) is
-spread over three phases and has no epic of its own, and FR-09 (Trip
-Summary and Memories, P1 and P2) is in no phase and no epic.
+FR-10 (Readiness checklist and Nudges) is delivered across three
+phases under EPIC-13, so its rules have one spec. FR-09 (Trip Summary
+and Memories, P1 and P2) is planned for after the MVP and has no epic
+yet.
 
 Each Epic should be decomposed into user stories with:
 
@@ -465,19 +460,11 @@ Each Epic should be decomposed into user stories with:
 
 ## 7. Development Workflow
 
-Recommended workflow:
-
-1.  Create an Epic and define its scope.
-2.  Write user stories and acceptance criteria.
-3.  Review requirements and identify edge cases.
-4.  Create a technical implementation plan.
-5.  Ask the coding assistant to analyze before implementation.
-6.  Review and approve the plan.
-7.  Implement on a dedicated branch.
-8.  Run tests and local quality checks.
-9.  Review correctness, tests, readability, security, and scope.
-10. Open a merge request and obtain human approval.
-11. Merge only after required checks pass.
+How a task goes from issue to merged is described once, in
+[product-workflow.md](product-workflow.md), Stage 5 (AI-native SDLC):
+the AI plans, a person approves the plan, the AI implements, tests and
+an independent AI review run, a person reviews, and nothing merges
+until every quality gate passes.
 
 For a small team, Web, Mobile, and Backend work can proceed in parallel
 after API contracts and domain behavior are agreed. Avoid parallel
@@ -503,6 +490,8 @@ Create a small golden dataset covering:
 -   Different group sizes and budgets.
 -   Conflicting preferences.
 -   Requests to modify an existing itinerary.
+-   Chat excerpts with ideas to capture, including an idea raised
+    twice and messages that contain no idea.
 -   Missing or ambiguous information.
 -   Unsupported or unverifiable place claims.
 -   Attempts to change the Itinerary directly instead of through a
@@ -568,6 +557,7 @@ targets.
 | Expense correctness | Deterministic domain service and invariant-based tests. |
 | Booking provider complexity | Manual booking records in MVP; integrations later. |
 | Scope growth | Enforce MVP non-goals and review change requests. |
+| Phase 3 overload | Idea capture and Saved places are P0; defer the P1 items of Phase 3 first, in the order given there; re-estimate after Phase 0. |
 | Small-team capacity | Prioritize complete vertical slices and defer P1/P2 work when needed. |
 
 ## 11. Post-MVP Opportunities
@@ -580,6 +570,7 @@ After validating the core workflow:
 -   Deeper flight and accommodation search integrations.
 -   Weather-aware itinerary recommendations.
 -   Multi-currency expense handling.
+-   Trip summary and Budget comparison (FR-09).
 -   Trip memories and shared albums.
 -   Advanced group preference modeling.
 -   Optional payment provider integrations, subject to legal and
@@ -615,3 +606,4 @@ feedback.
 | 1.6 | 2026-11-17 | Phase 1: Invitation as link, code, and QR code; follows PRD v1.6. |
 | 1.7 | 2026-11-17 | Follows PRD v1.7. |
 | 1.8 | 2026-11-17 | Readability only, no scope or schedule changed: run-together lists split into list items, milestone and risk tables fixed, a 13-week chart in section 4, and a table of phases, PRD requirements, and epics in section 6 (with two open points noted). Follows PRD v1.8. |
+| 1.9 | 2026-11-17 | Aligned with the decisions in PRD v1.9: idea capture and Saved places are P0 in Phase 3, with the P1 items to defer first; in-app notifications are P1 and Desktop notifies for Nudges; undo of Confirm and automatic Ongoing in Phase 1; Former member read access in Phase 5. New EPIC-13 for Readiness and Nudges; FR-09 after the MVP. Stages and phases explained. The MVP list and the development workflow now link to prd.md and product-workflow.md instead of repeating them. Cross-references no longer name a version. |

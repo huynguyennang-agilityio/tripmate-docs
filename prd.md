@@ -2,8 +2,8 @@
 
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.8\
+**Status:** Approved\
+**Version:** 1.9\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language
 
@@ -58,7 +58,8 @@ The group can:
   tasks, and money.
 - **Former member:** A person who has left or been removed. They take
   no part in new activity but remain in past Expenses, Balances, and
-  history.
+  history. While their Balance is not zero they can still read their
+  own money records (section 3.2).
 
 Someone who holds the Invitation link but has not joined is not a Member
 and has no role.
@@ -75,6 +76,10 @@ and has no role.
   and transfer ownership.
 - The Owner can transfer ownership to any other Member and must do so
   before leaving the trip.
+- A Former member whose Balance is not zero keeps read-only access to
+  the Expenses they took part in, their own Balance, and the Settlement
+  plan, and to nothing else. The access ends when their Balance reaches
+  zero ([ADR-0003](docs/adr/0003-members-may-leave-with-a-balance.md)).
 - Every change to trip state, Itinerary, bookings, tasks, Expenses, and
   Settlements must be written to an audit log recording who changed
   what and when. The audit log is the main safeguard in an equal-rights
@@ -84,7 +89,8 @@ and has no role.
 
 | What | Owner | Member | Former member |
 |------|-------|--------|---------------|
-| Edit trip details; confirm, cancel, or archive the trip, and undo | Yes | Yes | No |
+| Read the trip: discussion, Itinerary, bookings, tasks, and money | Yes | Yes | Only the Expenses they took part in, their own Balance, and the Settlement plan, until their Balance is zero |
+| Edit trip details; confirm, cancel, or archive the trip, and undo each | Yes | Yes | No |
 | Discuss, create Proposals, and vote | Yes | Yes | No |
 | Edit the Itinerary, bookings, tasks, Expenses, and Settlements | Yes | Yes | No |
 | See and share the Invitation | Yes | Yes | No |
@@ -110,8 +116,9 @@ Why the scope looks like this, and which options were set aside, is in
 - Feasibility warnings for time and Budget, with Estimated costs.
 - Readiness checklist of Gaps and timed Nudges in the discussion.
 - AI-assisted place discovery and Itinerary drafting.
-- AI idea capture from the discussion (P1).
+- AI idea capture from the discussion.
 - Manual Itinerary editing.
+- Saved places, shared by the whole trip.
 - Trip progress: marking Itinerary items Visited or Skipped, and
   spending against the Budget.
 - Map display and basic route information where provider coverage
@@ -120,7 +127,7 @@ Why the scope looks like this, and which options were set aside, is in
 - Task assignment and status tracking.
 - Expense recording and split rules.
 - Balance calculation and the Settlement plan.
-- In-app notifications.
+- Nudges on every client; personal in-app notifications (P1).
 - Responsive Web, Flutter mobile, and Tauri desktop clients using the
   same backend.
 - Interface in Vietnamese and English, following the device language.
@@ -180,7 +187,7 @@ Why the scope looks like this, and which options were set aside, is in
 | TRIP-09 | Members can see the Invitation as a link, a short code, and a QR code, and share any of them. | P0       |
 | TRIP-05 | Members can view the Member list, including Former members.                                  | P0       |
 | TRIP-06 | The Owner can remove Members and transfer ownership.                                         | P0       |
-| TRIP-07 | Any Member can confirm, cancel, or archive the trip, and undo a cancel or archive.           | P0       |
+| TRIP-07 | Any Member can confirm, cancel, or archive the trip, and undo a confirm, cancel, or archive. | P0       |
 | TRIP-08 | Any Member can leave the trip at any time, regardless of their Balance.                      | P0       |
 
 **Trip lifecycle**
@@ -189,6 +196,8 @@ Why the scope looks like this, and which options were set aside, is in
 stateDiagram-v2
     [*] --> Planning: trip created
     Planning --> Confirmed: any Member confirms
+    Confirmed --> Planning: undo
+    Planning --> Ongoing: start date, automatic
     Confirmed --> Ongoing: start date, automatic
     Ongoing --> Completed: after end date, automatic
     Planning --> Cancelled: any Member cancels
@@ -201,14 +210,15 @@ stateDiagram-v2
     Archived --> Cancelled: unarchive
 ```
 
-Undo and unarchive return the trip to the state it was in. The diagram
-shows the paths; the table below is the rule.
+Undoing Confirm returns the trip to Planning. Undoing Cancel, and
+unarchiving, return the trip to the state it was in. The diagram shows
+the paths; the table below is the rule.
 
 | State     | Entered when                                               |
 |-----------|------------------------------------------------------------|
-| Planning  | The trip is created.                                       |
+| Planning  | The trip is created, or a Member undoes Confirm.           |
 | Confirmed | Any Member confirms the trip.                              |
-| Ongoing   | Automatically, on the start date.                          |
+| Ongoing   | Automatically, on the start date, from Planning or Confirmed. A trip does not need to be Confirmed to start. |
 | Completed | Automatically, after the end date.                         |
 | Cancelled | Any Member cancels from Planning or Confirmed. Undo returns the trip to the state it was in. |
 | Archived  | Any Member archives a Completed or Cancelled trip. Unarchiving returns it to that state. |
@@ -241,6 +251,12 @@ shows the paths; the table below is the rule.
 - Cancelling or archiving a trip never deletes Expense, Settlement, or
   booking history.
 - The Owner cannot leave until ownership has been transferred.
+- A trip in Planning or Confirmed becomes Ongoing on its start date; a
+  Cancelled or Archived trip does not.
+- A Former member whose Balance is not zero can read the Expenses they
+  took part in, their own Balance, and the Settlement plan, and cannot
+  read or change anything else. This access ends when their Balance
+  reaches zero.
 - When a Member leaves, their Votes on open Proposals are discarded and
   tasks assigned to them become unassigned.
 
@@ -305,8 +321,9 @@ Idea drafts are defined in FR-04.
 - A Decision does not automatically create a booking.
 - The UI clearly distinguishes discussion messages from Proposals and
   Decisions.
-- In-app notifications cover at least: a task assigned to me, a new
-  Proposal to vote on, and an Expense that involves me.
+- When in-app notifications are built (COL-07), they cover at least: a
+  task assigned to me, a new Proposal to vote on, and an Expense that
+  involves me.
 
 ### FR-04 -- AI Travel Assistant
 
@@ -320,7 +337,7 @@ Idea drafts are defined in FR-04.
 | AI-06 | The assistant can suggest accommodation and restaurants.                        | P1       |
 | AI-07 | The assistant can propose a route order.                                        | P1       |
 | AI-08 | The assistant explains the basis and limitations of recommendations.            | P1       |
-| AI-09 | On request, the assistant turns ideas from the trip discussion into Idea drafts. | P1      |
+| AI-09 | On request, the assistant turns ideas from the trip discussion into Idea drafts. | P0      |
 | AI-10 | The assistant can prefill Estimated costs for Itinerary items.                  | P1       |
 
 Suggested tools/capabilities: `get_trip_context`, `search_places`,
@@ -359,7 +376,7 @@ Suggested tools/capabilities: `get_trip_context`, `search_places`,
 | ITN-04 | Members can remove an Itinerary item.                                | P0       |
 | ITN-05 | Members can view Itinerary locations on a map.                       | P1       |
 | ITN-06 | Members can view route and travel-time estimates.                    | P0       |
-| ITN-07 | Members can save places for later consideration.                     | P1       |
+| ITN-07 | Members can save places for later consideration; Saved places are shared by the whole trip. | P0 |
 | ITN-08 | During the trip, Members can mark an Itinerary item Visited or Skipped. | P0    |
 | ITN-09 | Members can see how many Itinerary items are Visited, Skipped, and remaining. | P0 |
 | ITN-10 | An Itinerary item can have an optional Estimated cost.               | P0       |
@@ -402,6 +419,8 @@ Suggested tools/capabilities: `get_trip_context`, `search_places`,
   the Day window, or the Budget change.
 - When travel time is unavailable, the time warning says it could not be
   checked rather than staying silent.
+- A Saved place is visible to every Member of the trip, whoever saved
+  it, and can be offered as a quick choice in a Nudge.
 
 ### FR-06 -- Booking Management
 
@@ -621,8 +640,8 @@ card at once.
 
 ## 6. Cross-Platform Requirements
 
-TripMate has separate Web and Mobile clients that use the same backend
-and shared domain rules.
+TripMate has separate Web, Mobile, and Desktop clients that use the same
+backend and shared domain rules.
 
 ### Web client
 
@@ -650,7 +669,7 @@ and shared domain rules.
 |---------|-------------------------------------------------------------------------------------------------|----------|
 | DESK-01 | The desktop app shows the Web client in a native window.                                        | P0       |
 | DESK-02 | `tripmate://join/...` Invitation links open the desktop app at the join screen.                 | P0       |
-| DESK-03 | Native notifications for in-app notification events and Nudges, following the Nudge rules.      | P0       |
+| DESK-03 | Native notifications for Nudges, following the Nudge rules; and for in-app notification events once COL-07 is built. | P0 |
 | DESK-04 | A tray icon shows the number of open Gaps across the user's trips.                              | P0       |
 | DESK-05 | A global shortcut opens a quick-add Expense window.                                             | P0       |
 | DESK-06 | The Itinerary of each trip is cached locally (SQLite) and readable offline.                     | P0       |
@@ -660,6 +679,20 @@ and shared domain rules.
   only displays, caches, and bridges to the operating system.
 - The offline cache is read-only in the MVP: changes need a connection,
   and the cache shows when it was last synced.
+
+**Acceptance criteria**
+
+- Signed installers install on clean macOS and Windows machines.
+- A `tripmate://join/...` link opens the desktop app at the join screen.
+- A Nudge appears as a native notification, under the same timing and
+  limits as in the discussion.
+- The tray count equals the number of open Gaps across the user's trips.
+- The global shortcut opens the quick-add Expense window, and the
+  Expense is saved through the backend like any other.
+- Without a connection the cached Itinerary can be read, shows when it
+  was last synced, and cannot be changed.
+- An update published to the update channel installs automatically.
+- No money, voting, or Gap logic runs in the desktop client.
 
 ### Shared requirements
 
@@ -684,7 +717,9 @@ and shared domain rules.
 
 1. Every trip has exactly one current Owner.
 2. Every trip-scoped resource belongs to a trip.
-3. Only Members can access private trip resources.
+3. Only Members can access private trip resources; a Former member
+   keeps read-only access to their own money records until their
+   Balance is zero.
 4. All Members have equal rights over trip content and state; the Owner
    only manages membership.
 5. A Proposal becomes a Decision only by a majority of current Members.
@@ -716,7 +751,7 @@ and shared domain rules.
 | Integrity     | Financial operations use database transactions and idempotency safeguards. |
 | Auditability  | Every state, Itinerary, booking, task, and financial change is recorded with who made it and when. |
 | Reliability   | External service failures must not corrupt trip data. |
-| Compatibility | Responsive Web and supported iOS/Android versions. |
+| Compatibility | Responsive Web, supported iOS/Android versions, and macOS and Windows for Desktop. |
 | Observability | Structured logs, metrics, tracing, and actionable error reporting. |
 | AI safety     | Schema validation, bounded tool permissions, source/uncertainty communication, and Proposals instead of direct changes. |
 | Accessibility | Keyboard support and accessible labels on Web; platform accessibility semantics on Mobile. |
@@ -724,7 +759,9 @@ and shared domain rules.
 ## 9. MVP Release Acceptance
 
 The MVP is accepted when a real group can complete this end-to-end
-scenario:
+scenario. Every step uses only P0 requirements: a requirement that may
+be deferred never appears in this scenario or in the list of tests
+below.
 
 1. Member A creates a trip for five friends.
 2. A shares the Invitation; members B, C, D, and E join.
@@ -754,7 +791,7 @@ The MVP must also pass:
 - Gap rule tests (including night counting) and Nudge timing tests.
 - Expense calculation, rounding, and Settlement plan tests.
 - Cross-client API contract tests.
-- Desktop tests: deep links, notifications, offline cache, signed
+- Desktop tests: deep links, Nudge notifications, offline cache, signed
   installers on macOS and Windows.
 - Language tests: every screen in Vietnamese and English, with no
   missing translation keys and no clipped text.
@@ -762,6 +799,26 @@ The MVP must also pass:
 - AI schema and Proposal tests.
 - Audit log coverage tests.
 - Basic security and file access tests.
+
+**Requirements and success metrics**
+
+How each group of requirements is measured. The metrics are defined in
+[product-vision.md](product-vision.md), section 10.
+
+| Requirements | Success metrics |
+|--------------|-----------------|
+| FR-01, FR-02: accounts, trips, Invitation | Trip creation rate; Invitation acceptance rate; percentage of trips with at least two active members |
+| FR-03: discussion, Proposals, voting | Planning completion rate |
+| FR-04: AI assistant, idea capture | AI proposal acceptance rate |
+| FR-05: Itinerary, map, progress | Planning completion rate; share of Itinerary items marked Visited or Skipped (proposed metric) |
+| FR-06, FR-07: bookings and tasks | Booking record completion rate |
+| FR-08: Expenses and Settlement | Expense coverage; Settlement completion rate |
+| FR-10: Readiness checklist and Nudges | Planning completion rate |
+| Section 6: Web, Mobile, Desktop | Share of trips used on two or more platforms (proposed metric) |
+| All of the above | Successfully Organized Trips (North Star); repeat trip creation rate |
+
+FR-09 (Trip Summary and Memories) is planned for after the MVP and has
+no metric yet.
 
 ## 10. Resolved Product Decisions
 
@@ -776,11 +833,16 @@ The MVP must also pass:
 | What is the policy for currency precision and rounding? | One currency per trip in smallest units; remainders by join order ([ADR-0001](docs/adr/0001-single-currency-and-rounding.md)). |
 | How long do Invitation links remain valid? | 7 days; revocable and regenerable by the Owner. The code and QR code share the same expiry. |
 | How can friends join? | With the Invitation link, the 8-character code, or the QR code; all three are the same Invitation. |
-| Which notifications are in-app, push, or email? | In-app on every client, plus native notifications on desktop; no mobile push in the MVP; email only for authentication. |
+| Which notifications are in-app, push, or email? | Nudges appear in the discussion on every client and as native notifications on desktop (P0). Personal in-app notifications are P1 (COL-07). No mobile push in the MVP; email only for authentication. |
 | Is the desktop app in the MVP? | Yes: a Tauri app with all seven DESK requirements, built alongside each phase plus one release week. |
 | How does the group know what the trip is still missing? | A Readiness checklist of Gaps from deterministic rules, pinned in the discussion, with timed Nudges that never block. |
 | When may TripMate nudge the group? | After 10 quiet minutes, by stage group, batched, at most once per day. Gaps on a Proposal show immediately. |
 | How do Members answer a Nudge or assistant question? | Up to four quick choices plus "Other…"; free text that changes the plan becomes a Proposal. |
+| Does a trip that nobody confirmed still start? | Yes. A trip in Planning or Confirmed becomes Ongoing on its start date; Confirm is not required. |
+| Can Confirm be undone? | Yes, by any Member; the trip returns to Planning and the change is audited ([ADR-0002](docs/adr/0002-equal-rights-for-members.md)). |
+| What can a Former member still see? | While their Balance is not zero: the Expenses they took part in, their own Balance, and the Settlement plan, read-only. Nothing after that ([ADR-0003](docs/adr/0003-members-may-leave-with-a-balance.md)). |
+| Can the MVP acceptance scenario include a requirement that may be deferred? | No, only P0. Idea capture (AI-09) and Saved places (ITN-07) are therefore P0. In-app notifications (COL-07) stay P1, so the desktop app must notify for Nudges only. |
+| Who sees a Saved place? | Every Member of the trip. |
 | Which languages does the app support? | Vietnamese and English, following the device language (Vietnamese device → Vietnamese, anything else → English); no in-app setting; content Members write is not translated. |
 
 ## 11. Dependencies
@@ -803,7 +865,7 @@ The MVP must also pass:
 | Incorrect Expense calculations | Deterministic domain service, unit tests, property-based tests, and reconciliation invariants. |
 | Unauthorized access | Backend authorization on every trip-scoped operation. |
 | Accidental or careless changes under equal rights | Undoable Cancel and Archive, audit log on every change, and visibility of who changed what. |
-| Proposals stalling without a majority | Show who has not voted yet; in-app notifications for new Proposals. |
+| Proposals stalling without a majority | Show who has not voted yet; in-app notifications for new Proposals once COL-07 is built. |
 | Good ideas lost in chat or raised twice | AI idea capture on request, duplicate warnings when creating a Proposal, and Duplicate marking. |
 | A voted plan that cannot be followed or is too expensive | Feasibility warnings for time and Budget before Members vote. |
 | Misleading feasibility warnings from wrong map or cost estimates | Warnings never block; they show their source and say when a check could not run. |
@@ -826,3 +888,4 @@ The MVP must also pass:
 | 1.6 | 2026-11-17 | Invitation can also be shared as an 8-character code and a QR code (TRIP-04, new TRIP-09); all three forms share expiry and revoke; code attempts are rate-limited. |
 | 1.7 | 2026-11-17 | Section 4 links to the new docs/solution-options.md for the reasons behind the MVP scope. No requirement changed. |
 | 1.8 | 2026-11-17 | Readability only, no requirement changed: rights-at-a-glance table (section 3.2), priorities as a table, diagrams for the trip lifecycle (FR-02), the Proposal lifecycle (FR-03), a Settlement plan example (FR-08), and the Nudge flow (FR-10). |
+| 1.9 | 2026-11-17 | Status: Approved. A trip in Planning also becomes Ongoing on its start date. Confirm can be undone (TRIP-07). A Former member with a Balance keeps read-only access to their own money records. The acceptance scenario uses only P0: idea capture (AI-09) and Saved places (ITN-07) become P0, Saved places are shared by the trip, in-app notifications stay P1 and DESK-03 requires native notifications for Nudges only. Acceptance criteria for the desktop client. Requirements-to-metric table. Section 6 and Compatibility now name Desktop. |

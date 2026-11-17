@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.2\
+**Version:** 2.3\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -87,7 +87,7 @@ and the opportunity; decide what TripMate should solve and why.
   Model Hypothesis, Success Metrics, Product Principles, Assumptions &
   Risks.
 - **Documents:** [product-vision.md](product-vision.md);
-  `docs/discovery.md`.
+  [docs/discovery.md](docs/discovery.md).
 - **Ready to move on when:** at least five conversations or tests with
   real groups are done; each core assumption is marked validated,
   rejected, or still open; vision, goals, non-goals, and principles are
@@ -290,7 +290,8 @@ keep improving from real data and feedback.
   Incident / Bug Reports, Maintenance Backlog, Technical Debt Backlog,
   Updated Product Roadmap, Iteration Plan.
 - **Documents:** updates to [mvp-roadmap.md](mvp-roadmap.md),
-  [prd.md](prd.md), and `docs/discovery.md`; backlog as issues.
+  [prd.md](prd.md), and [docs/discovery.md](docs/discovery.md); backlog
+  as issues.
 
 ## 4. Recommended Approach for TripMate
 
@@ -339,7 +340,7 @@ exist today, and their versions, is shown in the Build Tracker.
 | Document | Answers | Stage |
 |----------|---------|-------|
 | [GLOSSARY.md](GLOSSARY.md) | What do our words mean? | All |
-| `docs/discovery.md` | Whose problem, what evidence, which competitors and market, which strategy and business model, which assumptions are still open? | 1 |
+| [docs/discovery.md](docs/discovery.md) | Whose problem, what evidence, which competitors and market, which strategy and business model, which assumptions are still open? | 1 |
 | [product-vision.md](product-vision.md) | What is the product and why build it? Vision, value, positioning, goals, metrics, principles | 1 |
 | [docs/solution-options.md](docs/solution-options.md) | Which ways of solving each problem were considered, which was chosen, and why features are in or out of the MVP? | 2 |
 | [prd.md](prd.md) | What must it do? MVP scope, requirements, business rules, acceptance criteria | 2 |
@@ -365,6 +366,12 @@ exist today, and their versions, is shown in the Build Tracker.
   generated instead of maintained by hand.
 - **ADRs only for real trade-offs** that are hard to reverse and would
   surprise a future reader.
+- **Status says who has agreed.** Every document header carries one of
+  three values: *Draft* (still being written), *Proposed* (waiting for
+  the product owner's approval), *Approved* (the product owner has
+  approved it).
+- **Cross-references name the document, not its version**, so a change
+  in one document does not force a new version of another.
 
 ## 7. Working with Claude Code
 
@@ -393,3 +400,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.0 | 2026-11-17 | Seven-stage workflow: Discovery & Strategy, Brainstorming / PRD / Spec, UI/UX & Software Architecture, SOW / Planning, AI-native SDLC, Hardening / Deployment / Launch, Maintenance & Iteration. Adds the AI-native SDLC loop and quality gates, the epic execution loop, and `docs/test-strategy.md` in the document map. Current status and next steps moved to the Build Tracker. |
 | 2.1 | 2026-11-17 | Document map: added docs/solution-options.md for stage 2 (brainstorming notes and solution options). |
 | 2.2 | 2026-11-17 | Diagrams only, no process changed: the overview no longer shows "Unsupported markdown: list" in the stage boxes (labels now read "Stage 1: ..."), and the overview and the epic loop are laid out so they stay readable at page width. |
+| 2.3 | 2026-11-17 | docs/discovery.md now exists and is linked. Two rules added to the document map: the Status values Draft, Proposed, and Approved, and cross-references that name the document without its version. |
