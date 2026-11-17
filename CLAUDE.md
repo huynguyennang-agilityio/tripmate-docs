@@ -16,6 +16,7 @@ by AI agents such as Claude Code.
 | [product-workflow.md](product-workflow.md) | How we go from problem to release, and which document belongs to which stage. |
 | [docs/discovery.md](docs/discovery.md) | The assumptions TripMate rests on, how each is tested, and what real groups told us. |
 | [docs/solution-options.md](docs/solution-options.md) | Which options were considered for each problem, and why features are in or out of the MVP. |
+| [docs/information-architecture.md](docs/information-architecture.md) | Where things live in the product and how people move between them, for every platform: places, Navigation Map, navigation rules. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
 
 When a document is created, add it here and turn its box in the

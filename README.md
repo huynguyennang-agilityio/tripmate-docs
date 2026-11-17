@@ -19,6 +19,7 @@ separate repositories.
 | Know how we work and which document belongs to which stage | [product-workflow.md](product-workflow.md), or its [page version](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) |
 | Look up a term | [GLOSSARY.md](GLOSSARY.md) |
 | See where the work stands today | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) |
+| See which screens exist and how they connect | [docs/information-architecture.md](docs/information-architecture.md) |
 | Try the product | The prototypes under [Live pages](#live-pages) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
@@ -43,7 +44,7 @@ flowchart TB
     end
     subgraph S3["3: UI/UX & Architecture"]
         direction LR
-        proto["Prototypes"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"]:::planned ~~~ arch["docs/architecture.md"]:::planned
+        proto["Prototypes"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"]:::planned ~~~ arch["docs/architecture.md"]:::planned
     end
     subgraph S4["4: SOW / Planning"]
         direction LR
@@ -95,6 +96,7 @@ product-workflow.md    The process and the document map
 docs/
   discovery.md         Stage 1
   solution-options.md  Stage 2
+  information-architecture.md  Stage 3
   adr/                 Decision records
 ```
 
