@@ -2,8 +2,8 @@
 
 **Document type:** Discovery\
 **Product:** TripMate\
-**Status:** Draft\
-**Version:** 1.0\
+**Status:** Approved\
+**Version:** 1.1\
 **Stage:** 1. Discovery & Strategy
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). This document answers
@@ -20,18 +20,26 @@ when these three conditions hold.
 
 | Condition | Today |
 |-----------|-------|
-| At least five conversations or tests with real groups | 0 of 5 recorded |
+| At least five conversations or tests with real groups | Waived by the product owner on 2026-11-17; 0 sessions recorded |
 | Each core assumption is marked validated, rejected, or still open | Listed in section 3; all still open |
 | Vision, goals, non-goals, and principles are written, and each goal has a metric | Written in [product-vision.md](../product-vision.md); two of the seven metrics are proposed and not agreed yet |
 
+**Stage 1 is closed.** On 2026-11-17 the product owner waived the
+five sessions for this internal project and closed the stage. The
+assumptions in section 3 are therefore not validated: they stay open
+and are tested as the work goes on, in prototype tests and in the beta
+(Phase 7 of [mvp-roadmap.md](../mvp-roadmap.md)). The two proposed
+metrics stay proposed until beta data exists.
+
+How an assumption is settled from here on:
+
 ```mermaid
 flowchart TD
-    A["List the assumptions"] --> B["Test with five real groups"]
+    A["List the assumptions"] --> B["Test with real groups"]
     B --> C["Mark each assumption"]
     C --> D{"Any rejected?"}
     D -->|Yes| E["Change the vision or the PRD"]
-    D -->|No| F["Stage 1 closes"]
-    E --> F
+    D -->|No| F["Nothing to change"]
 ```
 
 ## 2. The Problems We Believe Exist
@@ -63,9 +71,10 @@ designed. Status is one of **Open**, **Validated**, or **Rejected**.
 
 ## 4. Conversations and Tests
 
-At least five sessions with real groups are needed. Testing the
-prototype with four or five friends who are planning a real trip
-counts, one session per group. The prototypes are linked from the
+The five sessions that Stage 1 asks for were waived, so none is
+required. Every session that does happen is still recorded here:
+testing the prototype with friends who are planning a real trip, and
+each beta group. The prototypes are linked from the
 [README](../README.md#live-pages).
 
 For each session record the date, who the group was (size, how well
@@ -97,12 +106,11 @@ The workflow lists these Stage 1 deliverables. None of them is written.
 - When an assumption is rejected, change
   [product-vision.md](../product-vision.md) or [prd.md](../prd.md) in
   the same change and say so in section 4.
-- When the three conditions in section 1 hold, set the status of this
-  document and of the vision to Approved and close Stage 1 in the
-  Build Tracker.
+- When an assumption is validated, say which session showed it.
 
 ## 7. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-17 | First version: Stage 1 conditions and where they stand, assumptions A1 to A11 (all open), an empty log for five sessions, and the deliverables not covered yet. |
+| 1.1 | 2026-11-17 | Stage 1 closed by the product owner, who waived the five sessions. Assumptions stay open and are tested in prototype tests and the beta. Status: Approved. |
