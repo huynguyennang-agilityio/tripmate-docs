@@ -1,0 +1,116 @@
+# TripMate Docs
+
+TripMate is a shared workspace where a group of friends plan a trip
+together as equals, track progress while travelling, and settle shared
+costs fairly at the end.
+
+This repository holds TripMate's product documents. Code lives in
+separate repositories.
+
+## Start here
+
+| I want to... | Read |
+|--------------|------|
+| Understand what TripMate is and why we build it | [product-vision.md](product-vision.md) |
+| Know what the MVP must do | [prd.md](prd.md) |
+| Know why the MVP looks the way it does | [docs/solution-options.md](docs/solution-options.md), then [docs/adr](docs/adr/) |
+| Know in what order and by when | [mvp-roadmap.md](mvp-roadmap.md) |
+| Know how we work and which document belongs to which stage | [product-workflow.md](product-workflow.md) |
+| Look up a term | [GLOSSARY.md](GLOSSARY.md) |
+| See where the work stands today | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) |
+| Try the product | The prototypes under [Live pages](#live-pages) |
+| Change a document | [CLAUDE.md](CLAUDE.md) |
+
+New to the project? Read the vision, then sections 2 to 4 of the PRD,
+then section 1 of the product workflow.
+
+## How the documents fit together
+
+Each document belongs to one stage of the
+[product workflow](product-workflow.md). Solid boxes exist today;
+dashed boxes are planned and not written yet.
+
+```mermaid
+flowchart TB
+    subgraph S1["1: Discovery & Strategy"]
+        direction LR
+        vision["product-vision.md"] ~~~ discovery["docs/discovery.md"]:::planned
+    end
+    subgraph S2["2: PRD / Spec"]
+        direction LR
+        options["docs/solution-options.md"] ~~~ prd["prd.md"] ~~~ specs["docs/specs/EPIC/spec.md"]:::planned
+    end
+    subgraph S3["3: UI/UX & Architecture"]
+        direction LR
+        proto["Prototypes"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"]:::planned ~~~ arch["docs/architecture.md"]:::planned
+    end
+    subgraph S4["4: SOW / Planning"]
+        direction LR
+        roadmap["mvp-roadmap.md"] ~~~ test["docs/test-strategy.md"]:::planned
+    end
+    subgraph S5["5: AI-native SDLC"]
+        direction LR
+        dev["docs/development-flow.md"]:::planned
+    end
+    subgraph S6["6: Hardening / Launch"]
+        direction LR
+        rel["docs/release-plan.md"]:::planned
+    end
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    classDef planned stroke-dasharray: 5 5
+```
+
+- [GLOSSARY.md](GLOSSARY.md) applies to every stage.
+- Stage 7 (Maintenance & Iteration) has no document of its own; it
+  updates the roadmap, the PRD, and the discovery notes.
+- What each document answers is in the
+  [document map](product-workflow.md#6-document-map).
+
+## Live pages
+
+The files in this repository are the source of truth. These pages show
+the same content in a form that is easier to read or try.
+
+| Page | Shows |
+|------|-------|
+| [TripMate Product Workflow](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) | The seven stages as an interactive page |
+| [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) | Current stage, document versions, daily reports |
+| [PRD (English)](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) | prd.md as a document page |
+| [PRD (Vietnamese reference translation)](https://claude.ai/artifact/DzZcZN3J7kNEAf5tZLWvCs) | prd.md translated for reference |
+| [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) | Clickable Web client |
+| [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) | Clickable Mobile client |
+| [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) | Clickable Desktop client |
+
+## Repository layout
+
+```text
+README.md              This file
+CLAUDE.md              Rules for every change, by people or AI agents
+GLOSSARY.md            Domain terms
+product-vision.md      Stage 1
+prd.md                 Stage 2
+mvp-roadmap.md         Stage 4
+product-workflow.md    The process and the document map
+docs/
+  solution-options.md  Stage 2
+  adr/                 Decision records
+```
+
+Product-level documents sit at the root. Supporting documents and
+decision records sit under `docs/`.
+
+## Versions
+
+Every document has a version in its header and a Version History table
+at the end. Old versions are kept as git tags:
+
+```bash
+git show v1.6:prd.md
+```
+
+```bash
+git diff v1.5 v1.6 -- prd.md
+```
+
+The tag formats and the rules for changing a document are in
+[CLAUDE.md](CLAUDE.md).

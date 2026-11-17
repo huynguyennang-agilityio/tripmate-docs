@@ -3,7 +3,7 @@
 **Document type:** Product Vision\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.4
+**Version:** 1.5
 
 Terms follow [GLOSSARY.md](GLOSSARY.md).
 
@@ -73,22 +73,12 @@ responsibilities.
 
 ### Core personas
 
-**The Initiator** - Starts the trip and shares the Invitation. - Nudges
-the group toward Decisions but decides nothing alone. - Needs visibility
-into open Proposals, progress, and outstanding tasks. - Main pain point:
-becoming the default decision-maker for everyone.
-
-**The Explorer** - Finds places, restaurants, and activities. - Creates
-Proposals and votes. - Needs an easy way to share and compare ideas. -
-Main pain point: ideas get lost in chat.
-
-**The Booking Coordinator** - Handles flights, accommodation, transport,
-or activities. - Needs a shared record of booking details and
-documents. - Main pain point: booking information is scattered.
-
-**The Budget Keeper** - Tracks shared spending and outstanding
-balances. - Needs accurate, transparent calculations. - Main pain point:
-manually reconciling payments after the trip.
+| Persona | What they do | What they need | Main pain point |
+|---------|--------------|----------------|-----------------|
+| **The Initiator** | Starts the trip and shares the Invitation. Nudges the group toward Decisions but decides nothing alone. | Visibility into open Proposals, progress, and outstanding tasks. | Becoming the default decision-maker for everyone. |
+| **The Explorer** | Finds places, restaurants, and activities. Creates Proposals and votes. | An easy way to share and compare ideas. | Ideas get lost in chat. |
+| **The Booking Coordinator** | Handles flights, accommodation, transport, or activities. | A shared record of booking details and documents. | Booking information is scattered. |
+| **The Budget Keeper** | Tracks shared spending and outstanding balances. | Accurate, transparent calculations. | Manually reconciling payments after the trip. |
 
 One person may perform multiple personas within the same trip.
 
@@ -125,10 +115,14 @@ including the Owner, decides for the group: Decisions need a majority.
 
 ### Context-aware AI
 
-The AI assistant should use the trip's shared context, including: -
-Destination and dates. - Group size and member preferences. - Budget
-targets. - Open Proposals and Decisions. - Existing itinerary and
-constraints. - Booking and travel information where relevant.
+The AI assistant should use the trip's shared context, including:
+
+-   Destination and dates.
+-   Group size and member preferences.
+-   Budget targets.
+-   Open Proposals and Decisions.
+-   Existing itinerary and constraints.
+-   Booking and travel information where relevant.
 
 Its changes are Proposals that the group votes on, never silent edits.
 
@@ -175,12 +169,15 @@ operations, not LLM-generated answers.
 
 ## 9. Non-Goals
 
-The initial product is not intended to: - Operate as an airline, hotel,
-or travel booking marketplace. - Purchase tickets or accommodation on
-behalf of users. - Process or custody user payments. - Replace every
-messaging or social networking platform. - Guarantee availability,
-prices, opening hours, or travel conditions from AI-generated content. -
-Provide a public social feed or travel influencer marketplace.
+The initial product is not intended to:
+
+-   Operate as an airline, hotel, or travel booking marketplace.
+-   Purchase tickets or accommodation on behalf of users.
+-   Process or custody user payments.
+-   Replace every messaging or social networking platform.
+-   Guarantee availability, prices, opening hours, or travel conditions
+    from AI-generated content.
+-   Provide a public social feed or travel influencer marketplace.
 
 ## 10. Product Success
 
@@ -188,11 +185,17 @@ The proposed North Star Metric is **Successfully Organized Trips**:
 trips where a group has collaborated, completed a usable itinerary,
 recorded trip expenses, and completed settlement.
 
-Supporting metrics: - Trip creation rate. - Invitation acceptance
-rate. - Percentage of trips with at least two active members. - Planning
-completion rate. - AI proposal acceptance rate. - Booking record
-completion rate. - Expense coverage. - Settlement completion rate. -
-Repeat trip creation rate.
+Supporting metrics:
+
+-   Trip creation rate.
+-   Invitation acceptance rate.
+-   Percentage of trips with at least two active members.
+-   Planning completion rate.
+-   AI proposal acceptance rate.
+-   Booking record completion rate.
+-   Expense coverage.
+-   Settlement completion rate.
+-   Repeat trip creation rate.
 
 Targets should be established after observing beta usage rather than
 assumed before product validation.
@@ -200,6 +203,31 @@ assumed before product validation.
 ## 11. Product Experience
 
 A typical trip lifecycle:
+
+```mermaid
+flowchart TB
+    subgraph Start["Start"]
+        direction LR
+        A1["1: Create the trip"] --> A2["2: Share the Invitation"]
+    end
+    subgraph Plan["Plan together"]
+        direction LR
+        A3["3: Discuss, propose, vote"] --> A4["4: AI drafts Proposals"] --> A5["5: Decide and confirm"]
+    end
+    subgraph Prepare["Prepare"]
+        direction LR
+        B1["6: Booking and preparation tasks"] --> B2["7: Booking details in the workspace"]
+    end
+    subgraph Travel["On the road"]
+        direction LR
+        C1["8: Mark Visited or Skipped, record Expenses, watch the Budget"]
+    end
+    subgraph Settle["Settle up"]
+        direction LR
+        D1["9: Balances and Settlement plan"] --> D2["10: Trip summary"]
+    end
+    Start --> Plan --> Prepare --> Travel --> Settle
+```
 
 1.  A member creates a trip and enters the destination, dates, and
     budget.
@@ -218,10 +246,13 @@ A typical trip lifecycle:
 
 ## 12. Product Principles for Trust
 
-TripMate must distinguish between: - **Proposal:** An option open for
-Votes. - **Decision:** A Proposal that more than half of the current
-Members voted Yes on. - **Booked:** A real-world reservation or purchase
-recorded by a Member.
+TripMate must distinguish between:
+
+| State | Meaning |
+|-------|---------|
+| **Proposal** | An option open for Votes. |
+| **Decision** | A Proposal that more than half of the current Members voted Yes on. |
+| **Booked** | A real-world reservation or purchase recorded by a Member. |
 
 A Decision is not proof that a booking exists. A booking record is
 not proof that a supplier has independently verified the reservation.
@@ -229,12 +260,14 @@ The product should communicate these distinctions clearly.
 
 ## 13. Long-Term Direction
 
-After validating the core group workflow, TripMate may expand into: -
-Live travel assistance and weather-aware itinerary adjustments. - Deeper
-flight and accommodation data integrations. - Booking email and receipt
-import. - Multi-currency expense handling. - Trip memories, photo
-albums, and travel reports. - More advanced group preference and
-recommendation features.
+After validating the core group workflow, TripMate may expand into:
+
+-   Live travel assistance and weather-aware itinerary adjustments.
+-   Deeper flight and accommodation data integrations.
+-   Booking email and receipt import.
+-   Multi-currency expense handling.
+-   Trip memories, photo albums, and travel reports.
+-   More advanced group preference and recommendation features.
 
 These are future opportunities, not prerequisites for the initial
 product.
@@ -248,3 +281,4 @@ product.
 | 1.2 | 2026-11-16 | Core problem: many people plan at once but the group must still capture the right ideas; "Sensible plans" value with the Readiness checklist and Nudges. |
 | 1.3 | 2026-11-16 | Desktop added to platforms, principles and goals; removed from long-term direction. |
 | 1.4 | 2026-11-16 | Added this version history. |
+| 1.5 | 2026-11-17 | Readability only, no content changed: personas and the Proposal / Decision / Booked distinction as tables, run-together lists split into list items, and a diagram of the trip lifecycle in section 11. |
