@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.6\
+**Version:** 1.7\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language
 
@@ -81,6 +81,9 @@ and has no role.
   model.
 
 ## 4. Product Scope
+
+Why the scope looks like this, and which options were set aside, is in
+[docs/solution-options.md](docs/solution-options.md).
 
 ### 4.1 MVP In Scope
 
@@ -733,3 +736,4 @@ The MVP must also pass:
 | 1.4 | 2026-11-16 | Interface in Vietnamese and English following the device language; no in-app language setting; Member content not translated. |
 | 1.5 | 2026-11-16 | Added this version history. |
 | 1.6 | 2026-11-17 | Invitation can also be shared as an 8-character code and a QR code (TRIP-04, new TRIP-09); all three forms share expiry and revoke; code attempts are rate-limited. |
+| 1.7 | 2026-11-17 | Section 4 links to the new docs/solution-options.md for the reasons behind the MVP scope. No requirement changed. |

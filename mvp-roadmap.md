@@ -3,10 +3,10 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.6\
+**Version:** 1.7\
 **Planning horizon:** 13 weeks (initial estimate)
 
-Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md) v1.6.
+Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md) v1.7.
 
 ## 1. Roadmap Objective
 
@@ -477,3 +477,4 @@ feedback.
 | 1.4 | 2026-11-16 | Languages: Vietnamese and English following the device language; translation conventions in Phase 0; language release gate. |
 | 1.5 | 2026-11-16 | Added this version history; follows PRD v1.5. |
 | 1.6 | 2026-11-17 | Phase 1: Invitation as link, code, and QR code; follows PRD v1.6. |
+| 1.7 | 2026-11-17 | Follows PRD v1.7. |
