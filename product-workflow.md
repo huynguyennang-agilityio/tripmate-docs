@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.0\
+**Version:** 1.1\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)
 
 Terms follow [GLOSSARY.md](GLOSSARY.md). This file is the source of
@@ -57,12 +57,12 @@ Claude Code.
 
 | Stage | Status | What exists | Missing |
 |-------|--------|-------------|---------|
-| 1. Discovery | In progress | Problem statement and target users in the vision | No user interviews or tests yet; assumptions unvalidated |
-| 2. Definition | Draft done | [product-vision.md](product-vision.md) v1.4: value, goals, principles | Success metrics need numbers after beta |
-| 3. Planning | Draft done | [prd.md](prd.md) v1.5, [mvp-roadmap.md](mvp-roadmap.md) v1.5, [GLOSSARY.md](GLOSSARY.md), ADR-0001 to ADR-0004 | Backlog as issues |
+| 1. Discovery | Not started | Problem statement and target users in the vision | No user interviews or tests yet; assumptions unvalidated |
+| 2. Definition | Not started | [product-vision.md](product-vision.md) v1.4: value, goals, principles | Success metrics need numbers after beta |
+| 3. Planning | Not started | [prd.md](prd.md) v1.5, [mvp-roadmap.md](mvp-roadmap.md) v1.5, [GLOSSARY.md](GLOSSARY.md), ADR-0001 to ADR-0004 | Backlog as issues |
 | 4. UX/UI Design | In progress | Clickable prototypes for Web, Mobile and Desktop, in Vietnamese and English, including sign-in to invite | Usability test, design system |
-| 5. Technical Planning | In progress | Stack chosen; repo split; desktop on Tauri | Architecture doc, data model, API conventions, Maps provider |
-| 6. Specification | In progress | PRD has acceptance criteria, 15 business rules and requirement IDs | Per-epic specs and tasks |
+| 5. Technical Planning | Not started | Stack chosen; repo split; desktop on Tauri | Architecture doc, data model, API conventions, Maps provider |
+| 6. Specification | Not started | PRD has acceptance criteria, 15 business rules and requirement IDs | Per-epic specs and tasks |
 | 7. Development & QA | Not started | -- | Development Flow doc, repos, CI |
 | 8. Launch & Growth | Not started | Release gates and beta metrics in the roadmap | Release plan, code signing, store review |
 
@@ -287,3 +287,4 @@ version history, and is tagged in this repository.
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-17 | First version: eight stages, feedback loops, two planning levels, current status, document map, Claude Code practices. |
+| 1.1 | 2026-11-17 | Status corrected: only stage 4 (UX/UI Design) is in progress; all other stages are not started. |
