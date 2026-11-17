@@ -3,10 +3,10 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.5\
+**Version:** 1.6\
 **Planning horizon:** 13 weeks (initial estimate)
 
-Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md) v1.5.
+Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md) v1.6.
 
 ## 1. Roadmap Objective
 
@@ -130,8 +130,8 @@ High-risk product decisions are recorded.
 Features: - Authentication and session handling. - User profile. -
 Create and edit trip. - Trip lifecycle: confirm, cancel, archive, and
 undo by any Member; Ongoing and Completed by date. - Trip destination,
-dates, currency, and Budget. - Invitation link (7-day expiry, revoke,
-regenerate, 20-Member cap). - Owner membership powers: remove Members,
+dates, currency, and Budget. - Invitation as link, code, and QR code (7-day
+expiry, revoke, regenerate, 20-Member cap, code rate limits). - Owner membership powers: remove Members,
 transfer ownership. - Leaving with a Balance and rejoining as the same
 Member. - Audit log for trip changes. - Initial Web and Mobile
 navigation and shared API integration. - Desktop: Tauri shell showing
@@ -143,7 +143,8 @@ Trip list and trip detail screens. - Invitation and membership flow. -
 Database migrations and authorization tests.
 
 Exit criteria: - A user can create a trip and becomes its Owner. -
-Signed-in users can join through a valid Invitation. - Any Member can
+Signed-in users can join through a valid Invitation link, code, or
+QR code. - Any Member can
 change the trip state and undo a cancel or archive. - Non-members cannot
 access private trip data. - Web and Mobile display consistent trip
 information.
@@ -475,3 +476,4 @@ feedback.
 | 1.3 | 2026-11-16 | Desktop in the MVP: 13-week plan, desktop work in each phase, Phase 6 Desktop Release, milestone M6, EPIC-12, desktop release gate. |
 | 1.4 | 2026-11-16 | Languages: Vietnamese and English following the device language; translation conventions in Phase 0; language release gate. |
 | 1.5 | 2026-11-16 | Added this version history; follows PRD v1.5. |
+| 1.6 | 2026-11-17 | Phase 1: Invitation as link, code, and QR code; follows PRD v1.6. |

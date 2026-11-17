@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.5\
+**Version:** 1.6\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language
 
@@ -155,8 +155,9 @@ release.
 |---------|----------------------------------------------------------------------------------------------|----------|
 | TRIP-01 | A user can create a trip.                                                                    | P0       |
 | TRIP-02 | Any Member can edit the trip name, destination, dates, currency, Budget, and Day window.     | P0       |
-| TRIP-03 | The Owner can create, revoke, and regenerate the trip's Invitation link.                     | P0       |
-| TRIP-04 | A signed-in user with a valid Invitation link can join the trip.                             | P0       |
+| TRIP-03 | The Owner can create, revoke, and regenerate the trip's Invitation.                          | P0       |
+| TRIP-04 | A signed-in user can join the trip with a valid Invitation link, code, or QR code.           | P0       |
+| TRIP-09 | Members can see the Invitation as a link, a short code, and a QR code, and share any of them. | P0       |
 | TRIP-05 | Members can view the Member list, including Former members.                                  | P0       |
 | TRIP-06 | The Owner can remove Members and transfer ownership.                                         | P0       |
 | TRIP-07 | Any Member can confirm, cancel, or archive the trip, and undo a cancel or archive.           | P0       |
@@ -175,10 +176,19 @@ release.
 
 **Invitation rules**
 
-- Each trip has one shared Invitation link at a time.
-- A link expires 7 days after it is created.
-- Revoking or regenerating the link invalidates the previous one
-  immediately.
+- Each trip has one shared Invitation at a time. It can be shared in
+  three forms: a link, a short Invitation code, and a QR code that
+  holds the link. All three belong to the same Invitation.
+- The Invitation code is 8 characters, upper-case letters and digits,
+  without look-alike characters (0, O, 1, I, L), shown as two groups of
+  four (for example `K7QM-4XPA`). Codes are not case-sensitive.
+- A signed-in user joins with a code from "Join with code" on the trip
+  list. Scanning the QR code opens the link, so any phone camera works.
+- An Invitation expires 7 days after it is created.
+- Revoking or regenerating the Invitation invalidates the previous link,
+  code, and QR code together, immediately.
+- Failed code attempts are rate-limited per user and per device, and
+  the response does not reveal whether a trip exists.
 - Joining requires signing in.
 - A trip has at most 20 Members.
 - A Former member who joins again is restored as the same Member with
@@ -673,7 +683,8 @@ The MVP must also pass:
 | Who can confirm group decisions? | Nobody alone: a majority of current Members ([ADR-0002](docs/adr/0002-equal-rights-for-members.md)). |
 | Can an Expense be edited after settlement has started? | Yes, by any Member; Balances are recalculated and the change is audited. |
 | What is the policy for currency precision and rounding? | One currency per trip in smallest units; remainders by join order ([ADR-0001](docs/adr/0001-single-currency-and-rounding.md)). |
-| How long do Invitation links remain valid? | 7 days; revocable and regenerable by the Owner. |
+| How long do Invitation links remain valid? | 7 days; revocable and regenerable by the Owner. The code and QR code share the same expiry. |
+| How can friends join? | With the Invitation link, the 8-character code, or the QR code; all three are the same Invitation. |
 | Which notifications are in-app, push, or email? | In-app on every client, plus native notifications on desktop; no mobile push in the MVP; email only for authentication. |
 | Is the desktop app in the MVP? | Yes: a Tauri app with all seven DESK requirements, built alongside each phase plus one release week. |
 | How does the group know what the trip is still missing? | A Readiness checklist of Gaps from deterministic rules, pinned in the discussion, with timed Nudges that never block. |
@@ -721,3 +732,4 @@ The MVP must also pass:
 | 1.3 | 2026-11-16 | Desktop app (Tauri) in the MVP: DESK-01 to DESK-07, native notifications on desktop, desktop tests and risks. |
 | 1.4 | 2026-11-16 | Interface in Vietnamese and English following the device language; no in-app language setting; Member content not translated. |
 | 1.5 | 2026-11-16 | Added this version history. |
+| 1.6 | 2026-11-17 | Invitation can also be shared as an 8-character code and a QR code (TRIP-04, new TRIP-09); all three forms share expiry and revoke; code attempts are rate-limited. |
