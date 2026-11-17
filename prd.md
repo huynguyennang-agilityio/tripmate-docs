@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.9\
+**Version:** 1.10\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language
 
@@ -810,11 +810,11 @@ How each group of requirements is measured. The metrics are defined in
 | FR-01, FR-02: accounts, trips, Invitation | Trip creation rate; Invitation acceptance rate; percentage of trips with at least two active members |
 | FR-03: discussion, Proposals, voting | Planning completion rate |
 | FR-04: AI assistant, idea capture | AI proposal acceptance rate |
-| FR-05: Itinerary, map, progress | Planning completion rate; share of Itinerary items marked Visited or Skipped (proposed metric) |
+| FR-05: Itinerary, map, progress | Planning completion rate; share of Itinerary items marked Visited or Skipped |
 | FR-06, FR-07: bookings and tasks | Booking record completion rate |
 | FR-08: Expenses and Settlement | Expense coverage; Settlement completion rate |
 | FR-10: Readiness checklist and Nudges | Planning completion rate |
-| Section 6: Web, Mobile, Desktop | Share of trips used on two or more platforms (proposed metric) |
+| Section 6: Web, Mobile, Desktop | None in the MVP; a metric is chosen after the MVP |
 | All of the above | Successfully Organized Trips (North Star); repeat trip creation rate |
 
 FR-09 (Trip Summary and Memories) is planned for after the MVP and has
@@ -889,3 +889,4 @@ no metric yet.
 | 1.7 | 2026-11-17 | Section 4 links to the new docs/solution-options.md for the reasons behind the MVP scope. No requirement changed. |
 | 1.8 | 2026-11-17 | Readability only, no requirement changed: rights-at-a-glance table (section 3.2), priorities as a table, diagrams for the trip lifecycle (FR-02), the Proposal lifecycle (FR-03), a Settlement plan example (FR-08), and the Nudge flow (FR-10). |
 | 1.9 | 2026-11-17 | Status: Approved. A trip in Planning also becomes Ongoing on its start date. Confirm can be undone (TRIP-07). A Former member with a Balance keeps read-only access to their own money records. The acceptance scenario uses only P0: idea capture (AI-09) and Saved places (ITN-07) become P0, Saved places are shared by the trip, in-app notifications stay P1 and DESK-03 requires native notifications for Nudges only. Acceptance criteria for the desktop client. Requirements-to-metric table. Section 6 and Compatibility now name Desktop. |
+| 1.10 | 2026-11-17 | Requirements and success metrics: the Visited or Skipped metric is agreed; the cross-platform metric is left until after the MVP. No requirement changed. |
