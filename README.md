@@ -13,6 +13,7 @@ separate repositories.
 |--------------|------|
 | Understand what TripMate is and why we build it | [product-vision.md](product-vision.md) |
 | Know what the MVP must do | [prd.md](prd.md) |
+| See what we still need to learn from real groups | [docs/discovery.md](docs/discovery.md) |
 | Know why the MVP looks the way it does | [docs/solution-options.md](docs/solution-options.md), then [docs/adr](docs/adr/) |
 | Know in what order and by when | [mvp-roadmap.md](mvp-roadmap.md) |
 | Know how we work and which document belongs to which stage | [product-workflow.md](product-workflow.md) |
@@ -34,7 +35,7 @@ dashed boxes are planned and not written yet.
 flowchart TB
     subgraph S1["1: Discovery & Strategy"]
         direction LR
-        vision["product-vision.md"] ~~~ discovery["docs/discovery.md"]:::planned
+        vision["product-vision.md"] ~~~ discovery["docs/discovery.md"]
     end
     subgraph S2["2: PRD / Spec"]
         direction LR
@@ -91,6 +92,7 @@ prd.md                 Stage 2
 mvp-roadmap.md         Stage 4
 product-workflow.md    The process and the document map
 docs/
+  discovery.md         Stage 1
   solution-options.md  Stage 2
   adr/                 Decision records
 ```

@@ -3,7 +3,7 @@
 **Document type:** Product Vision\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.5
+**Version:** 1.6
 
 Terms follow [GLOSSARY.md](GLOSSARY.md).
 
@@ -200,6 +200,22 @@ Supporting metrics:
 Targets should be established after observing beta usage rather than
 assumed before product validation.
 
+How each goal in section 8 is measured:
+
+| Goal | Metric |
+|------|--------|
+| Reduce the effort required to organize a group trip | Planning completion rate |
+| Keep trip decisions and operational information in one place | Percentage of trips with at least two active members |
+| Help groups discover relevant places and build practical itineraries | AI proposal acceptance rate |
+| Make booking responsibilities visible | Booking record completion rate |
+| Show progress during the trip | Proposed: share of Itinerary items marked Visited or Skipped by the end of the trip |
+| Make shared expenses transparent and settlement straightforward | Expense coverage; settlement completion rate |
+| Deliver a consistent experience across Web, iOS, Android, and Desktop | Proposed: share of trips used on two or more platforms |
+
+The two metrics marked Proposed are new and not agreed yet. Trip
+creation rate, Invitation acceptance rate, and repeat trip creation
+rate measure adoption as a whole, together with the North Star Metric.
+
 ## 11. Product Experience
 
 A typical trip lifecycle:
@@ -282,3 +298,4 @@ product.
 | 1.3 | 2026-11-16 | Desktop added to platforms, principles and goals; removed from long-term direction. |
 | 1.4 | 2026-11-16 | Added this version history. |
 | 1.5 | 2026-11-17 | Readability only, no content changed: personas and the Proposal / Decision / Booked distinction as tables, run-together lists split into list items, and a diagram of the trip lifecycle in section 11. |
+| 1.6 | 2026-11-17 | Section 10: a table that gives every goal a metric, with two proposed metrics for progress during the trip and consistency across platforms. |
