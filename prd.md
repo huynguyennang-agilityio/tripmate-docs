@@ -3,9 +3,10 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.10\
+**Version:** 1.11\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
-**Languages:** Vietnamese and English, following the device language
+**Languages:** Vietnamese and English, following the device language\
+**Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
 
 Terms in this document follow [GLOSSARY.md](GLOSSARY.md). Decisions
 with lasting consequences are recorded in [docs/adr](docs/adr/).
@@ -890,3 +891,4 @@ no metric yet.
 | 1.8 | 2026-11-17 | Readability only, no requirement changed: rights-at-a-glance table (section 3.2), priorities as a table, diagrams for the trip lifecycle (FR-02), the Proposal lifecycle (FR-03), a Settlement plan example (FR-08), and the Nudge flow (FR-10). |
 | 1.9 | 2026-11-17 | Status: Approved. A trip in Planning also becomes Ongoing on its start date. Confirm can be undone (TRIP-07). A Former member with a Balance keeps read-only access to their own money records. The acceptance scenario uses only P0: idea capture (AI-09) and Saved places (ITN-07) become P0, Saved places are shared by the trip, in-app notifications stay P1 and DESK-03 requires native notifications for Nudges only. Acceptance criteria for the desktop client. Requirements-to-metric table. Section 6 and Compatibility now name Desktop. |
 | 1.10 | 2026-11-17 | Requirements and success metrics: the Visited or Skipped metric is agreed; the cross-platform metric is left until after the MVP. No requirement changed. |
+| 1.11 | 2026-11-17 | Header links to the page version of this document. No requirement changed. |
