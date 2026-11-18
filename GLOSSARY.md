@@ -1,6 +1,6 @@
 # TripMate
 
-**Version:** 1.7
+**Version:** 1.8
 
 A shared workspace where a group of friends plan a trip together as equals, track progress while travelling, and settle shared costs fairly at the end.
 
@@ -96,7 +96,7 @@ The Member responsible for a Proposal: whoever wrote it, or whoever asked the AI
 _Avoid_: Creator, Proposer, Owner (of a Proposal)
 
 **Vote**:
-A Member's Yes or No on a Proposal. Each Member has one Vote per Proposal.
+A Member's Yes or No on a Proposal. Each Member has one Vote per Proposal; the Author's Vote starts as Yes and can be changed.
 _Avoid_: Like, Reaction
 
 **Decision**:
@@ -104,7 +104,7 @@ A Proposal that more than half of the current Members voted Yes on. A Decision i
 _Avoid_: Confirmed suggestion, Approved, Accepted
 
 **Rejected**:
-A Proposal that more than half of the current Members voted No on.
+A Proposal that more than half of the current Members voted No on, or that ended in a tie once every current Member had voted.
 _Avoid_: Declined, Denied
 
 **Withdrawn**:
@@ -194,7 +194,7 @@ The single currency in which every Expense and Settlement of a trip is recorded.
 _Avoid_: Base currency, Default currency
 
 **Budget**:
-The amount the group expects to spend on the trip, in the Trip currency, compared against actual spending while travelling.
+The amount each Member expects to spend on the trip, set per person in the Trip currency. The group Budget is that amount times the number of current Members. Both are compared against actual spending while travelling.
 _Avoid_: Limit, Cap
 
 **Expense**:
@@ -228,3 +228,4 @@ _Avoid_: Payment, Transfer, Repayment
 | 1.5 | 2026-11-17 | Added a map of how the main terms relate. No definition changed. |
 | 1.6 | 2026-11-17 | New terms: Saved place, Booking, Task, Audit log, Participant. Confirmed can be undone; Ongoing starts on the start date whether or not the trip was Confirmed; a Former member with a Balance can still read their own money records. |
 | 1.7 | 2026-11-18 | Booking statuses (To book, Booked, Cancelled) and Task statuses; a booking amount counts as an Estimated cost until it is added as an Expense. |
+| 1.8 | 2026-11-18 | Budget is set per person, with a group Budget computed from current Members. The Author's Vote starts as Yes. A tie once everyone has voted makes a Proposal Rejected. |

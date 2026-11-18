@@ -2,13 +2,16 @@
 
 Every Member can change the trip's state (Confirm, Cancel, Archive, and undo those), and can edit or delete any Expense, Settlement, booking or task; every such change is written to an audit log. The Owner keeps only membership management: removing Members, creating and revoking the Invitation, and handing ownership to another Member. The Owner has no extra say in decisions. Why: TripMate is for groups of friends who trust each other, and the goal is that nobody is "the one who decides". Mistakes are covered by undoable Confirm, Cancel and Archive, and by the audit log showing who did what, not by restricting who can act. Undoing Confirm returns the trip to Planning, where Members edit the Itinerary directly again; plans change in a group of friends, and the audit log shows who reopened the plan.
 
-A Proposal becomes a Decision when more than half of the current Members vote Yes, and becomes Rejected when more than half vote No. The threshold is recomputed whenever someone joins or leaves. Proposals never expire; the Author can withdraw one. When a Proposal about an Itinerary item becomes a Decision, other open Proposals about the same item become Outdated. AI-drafted Proposals are authored by the Member who asked for them, and nobody gets a Vote automatically.
+A Proposal becomes a Decision when more than half of the current Members vote Yes, and becomes Rejected when more than half vote No. The threshold is recomputed whenever someone joins or leaves. Proposals never expire; the Author can withdraw one. When a Proposal about an Itinerary item becomes a Decision, other open Proposals about the same item become Outdated. AI-drafted Proposals are authored by the Member who asked for them. The Author's Vote is Yes from the start and can be changed; nobody else gets a Vote automatically. When every current Member has voted and neither side has more than half, the Proposal is Rejected and the Itinerary stays as it was: a change needs a majority, and nobody, including the Owner, breaks a tie.
 
 The Itinerary is edited directly in every state except Confirmed. While Confirmed, every change must go through a Proposal, so the agreed plan cannot shift under the group before departure. Once the trip is Ongoing, Members edit directly again, because changes on the road (a closed restaurant, rain) cannot wait for a vote.
 
 ## Considered Options
 
 - Owner can decide a Proposal early: rejected; it contradicts the equal-rights goal.
+- Owner breaks a tie: rejected for the same reason.
+- A tie stays Open until someone changes their Vote: rejected; Proposals never expire, so a tie could block the group indefinitely.
+- Nobody votes automatically, the Author included: replaced on 2026-11-18; the Author clearly supports what they propose, and pressing Yes on one's own Proposal was an extra step. The Author can still change the Vote, for example after publishing an Idea draft they only passed on.
 - Only the Owner can Cancel or Archive: rejected; undo plus audit log is enough protection.
 - Lock Expenses once Settlements exist: rejected; fixing mistakes easily matters more, and Balances are always recalculated.
 - Only the two people in a Settlement may edit it: rejected for consistency with equal rights.
