@@ -1,6 +1,6 @@
 # TripMate
 
-**Version:** 1.6
+**Version:** 1.7
 
 A shared workspace where a group of friends plan a trip together as equals, track progress while travelling, and settle shared costs fairly at the end.
 
@@ -138,7 +138,7 @@ The hours of each trip day during which the group is out and about, used to judg
 _Avoid_: Opening hours, Schedule
 
 **Estimated cost**:
-The expected cost of an Itinerary item, entered by a Member or prefilled by the AI assistant and always shown as an estimate.
+The expected cost of an Itinerary item, entered by a Member or prefilled by the AI assistant and always shown as an estimate. The amount of a booking also counts as an Estimated cost until it is added as an Expense.
 _Avoid_: Price, Cost (unqualified)
 
 **Feasibility warning**:
@@ -162,11 +162,11 @@ _Avoid_: Cancelled, Removed
 These three are written in lower case in running text, like "trip".
 
 **Booking**:
-A real-world reservation or purchase that a Member recorded in the trip: a flight, accommodation, transport, an activity, a restaurant, or something else. It is entered by hand, and it is not proof that the supplier confirmed anything.
+A real-world reservation or purchase that a Member recorded in the trip: a flight, accommodation, transport, an activity, a restaurant, or something else. It is entered by hand, and it is not proof that the supplier confirmed anything. Its status is To book, Booked or Cancelled; only a Booked booking closes a Gap.
 _Avoid_: Reservation, Order, Ticket
 
 **Task**:
-A piece of preparation work for the trip that can be assigned to one Member, with a status and an optional due date.
+A piece of preparation work for the trip that can be assigned to one Member, with a status (To Do, In Progress, Completed or Cancelled) and an optional due date.
 _Avoid_: To-do, Job, Action item
 
 **Audit log**:
@@ -227,3 +227,4 @@ _Avoid_: Payment, Transfer, Repayment
 | 1.4 | 2026-11-17 | Invitation: shared as a link, a short code, or a QR code. |
 | 1.5 | 2026-11-17 | Added a map of how the main terms relate. No definition changed. |
 | 1.6 | 2026-11-17 | New terms: Saved place, Booking, Task, Audit log, Participant. Confirmed can be undone; Ongoing starts on the start date whether or not the trip was Confirmed; a Former member with a Balance can still read their own money records. |
+| 1.7 | 2026-11-18 | Booking statuses (To book, Booked, Cancelled) and Task statuses; a booking amount counts as an Estimated cost until it is added as an Expense. |
