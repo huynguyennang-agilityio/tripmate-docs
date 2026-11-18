@@ -2,8 +2,8 @@
 
 **Document type:** Information Architecture\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.1\
+**Status:** Approved\
+**Version:** 1.2\
 **Visual version:** [TripMate Information Architecture artifact](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS)\
 **Stage:** 3. UI/UX & Software Architecture Design
 
@@ -329,3 +329,4 @@ flowchart TD
 |---------|------|---------|
 | 1.0 | 2026-11-17 | First version: places, Navigation Map, navigation rules (Bookings and Tasks live in Plan), and platform presentation, with an interactive artifact. |
 | 1.1 | 2026-11-18 | Added the Global User Journey (section 6) and six High-level User Flow Diagrams (section 7); status set to Proposed. |
+| 1.2 | 2026-11-18 | Status: Approved by the product owner. No content changes. |
