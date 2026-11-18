@@ -251,6 +251,20 @@ the paths; the table below is the rule.
   total against the group Budget and each Member's own share of
   Expenses against the Budget per person.
 
+**Trip detail rules**
+
+- The Trip currency can be changed only while the trip has no Expense
+  and no Settlement. After the first one is recorded, the currency is
+  locked (ADR-0001).
+- When new dates leave a day with Itinerary items outside the trip,
+  those items move to Saved places before the change is saved, and a
+  line in the discussion says which ones moved, for example "Chi
+  shortened the trip to Dec 20–22; Vinpearl Safari moved to Saved
+  places". Nothing is deleted.
+- While the trip is Confirmed, a date change that would move Itinerary
+  items goes through a Proposal, like every other Itinerary change. A
+  date change that moves no item is saved directly.
+
 **Invitation rules**
 
 - Each trip has one shared Invitation at a time. It can be shared in
@@ -967,4 +981,4 @@ planned for after the MVP and have no metric yet.
 | 1.11 | 2026-11-17 | Header links to the page version of this document. No requirement changed. |
 | 1.12 | 2026-11-17 | New AUTH-06 (P1, after the MVP): reset a forgotten password by email, with rules that keep accounts private and sign out other sessions. |
 | 1.13 | 2026-11-18 | MVP scope (section 4.1) now matches FR-05: route and travel-time estimates are in scope (ITN-06, P0); map display is P1 (ITN-05). Bookings and Tasks: booking status is To book, Booked or Cancelled, and only Booked closes a Gap (BOOK-06, Gaps 8 to 10). Bookings need no vote in any trip state and post a status line. The first hotel or flight booked while Planning suggests Confirm once and starts Preparation Nudges. Booking amounts count as Estimated costs until added as an Expense, with a prefilled Expense form. Task statuses; unassigned tasks open Gap 10, due dates do not nudge. |
-| 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. New COL-11: in a Confirmed trip, Propose a change on an Itinerary item opens a Proposal to remove or replace it; a closed Proposal is never reopened. |
+| 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. New COL-11: in a Confirmed trip, Propose a change on an Itinerary item opens a Proposal to remove or replace it; a closed Proposal is never reopened. Trip detail rules: the Trip currency locks once an Expense or Settlement exists; items on days that new dates leave out move to Saved places, and in a Confirmed trip such a change needs a Proposal. |
