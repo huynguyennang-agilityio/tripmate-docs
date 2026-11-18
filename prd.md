@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.14\
+**Version:** 1.15\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
@@ -458,6 +458,11 @@ Suggested tools/capabilities: `get_trip_context`, `search_places`,
 | Confirmed                        | Every change goes through a Proposal; each item offers Propose a change, which opens a new Proposal to remove or replace it (COL-11). |
 | Ongoing                          | Any Member edits directly, so plans can adapt on the road. |
 | Completed, Cancelled, Archived   | Any Member edits directly.                        |
+
+- When a Member edits, reorders or removes an Itinerary item that a
+  Decision added, a line in the discussion says what changed and how
+  the group decided it, for example "Chi removed Vinpearl Safari from
+  Day 2 (decided 3 of 4)". Changes to other items post no line.
 
 **Acceptance criteria**
 
@@ -982,3 +987,4 @@ planned for after the MVP and have no metric yet.
 | 1.12 | 2026-11-17 | New AUTH-06 (P1, after the MVP): reset a forgotten password by email, with rules that keep accounts private and sign out other sessions. |
 | 1.13 | 2026-11-18 | MVP scope (section 4.1) now matches FR-05: route and travel-time estimates are in scope (ITN-06, P0); map display is P1 (ITN-05). Bookings and Tasks: booking status is To book, Booked or Cancelled, and only Booked closes a Gap (BOOK-06, Gaps 8 to 10). Bookings need no vote in any trip state and post a status line. The first hotel or flight booked while Planning suggests Confirm once and starts Preparation Nudges. Booking amounts count as Estimated costs until added as an Expense, with a prefilled Expense form. Task statuses; unassigned tasks open Gap 10, due dates do not nudge. |
 | 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. New COL-11: in a Confirmed trip, Propose a change on an Itinerary item opens a Proposal to remove or replace it; a closed Proposal is never reopened. Trip detail rules: the Trip currency locks once an Expense or Settlement exists; items on days that new dates leave out move to Saved places, and in a Confirmed trip such a change needs a Proposal. |
+| 1.15 | 2026-11-18 | Editing rules: editing, reordering or removing an Itinerary item that a Decision added posts a line in the discussion with what changed and the original vote. |
