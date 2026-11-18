@@ -42,7 +42,7 @@ only finish one action (for example "Mark paid") are not places.
 | Join with code | Enter an Invitation code; also reached by scanning a QR code | TRIP-04 |
 | Invitation preview | The trip a valid Invitation leads to, and Join | TRIP-04 |
 | Trip | One trip, with four tabs: Plan, Chat, Money, Members | |
-| Trip · Plan | Itinerary by day with each Booking on the day it applies, Feasibility warnings, Visited and Skipped, progress, Saved places, map | ITN-01 to ITN-11 |
+| Trip · Plan | Itinerary by day with each Booking on the day it applies, Feasibility warnings, Visited and Skipped, progress, Saved places, map, Propose a change on an item while Confirmed | ITN-01 to ITN-11, COL-11 |
 | Trip · Chat | The trip discussion, the Readiness checklist pinned on top, Nudges, Proposal cards, Idea drafts, the assistant | COL-01 to COL-10, AI-01 to AI-09, RDY-01 to RDY-08 |
 | Trip · Money | Balance, spending against the Budget, Settlement plan, Expenses | EXP-01 to EXP-12 |
 | Trip · Members | Member list with Balances, Former members, leave, remove, transfer ownership | TRIP-05, TRIP-06, TRIP-08 |
@@ -247,6 +247,9 @@ flowchart TD
   leaves the Itinerary as it was.
 - A Member can mark a Proposal as a Duplicate of an earlier open one;
   the Author can withdraw it while it is open (COL-08, COL-10).
+- A Decision is never reopened. To change its items later, Members edit
+  them in Plan; while the trip is Confirmed, Propose a change on the item
+  opens a new Proposal to remove or replace it (COL-11).
 
 ### 7.3 AI draft Itinerary
 
@@ -333,4 +336,4 @@ flowchart TD
 | 1.0 | 2026-11-17 | First version: places, Navigation Map, navigation rules (Bookings and Tasks live in Plan), and platform presentation, with an interactive artifact. |
 | 1.1 | 2026-11-18 | Added the Global User Journey (section 6) and six High-level User Flow Diagrams (section 7); status set to Proposed. |
 | 1.2 | 2026-11-18 | Status: Approved by the product owner. No content changes. |
-| 1.3 | 2026-11-18 | Flow 7.2 follows the new voting rules in prd.md: the Author's Vote starts as Yes, and a tie once everyone has voted is Rejected. |
+| 1.3 | 2026-11-18 | Flow 7.2 follows the new voting rules in prd.md: the Author's Vote starts as Yes, and a tie once everyone has voted is Rejected. A Decision is changed later by editing in Plan or, while Confirmed, by Propose a change on the item (COL-11). |

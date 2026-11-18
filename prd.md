@@ -302,6 +302,7 @@ the paths; the table below is the rule.
 | COL-08 | The Author can withdraw a Proposal that has not been decided.                | P0       |
 | COL-09 | When creating a Proposal, the Member is warned about similar open Proposals. | P0       |
 | COL-10 | Any Member can mark a Proposal as a Duplicate of an earlier open Proposal.   | P0       |
+| COL-11 | In a Confirmed trip, any Member can start a Proposal to remove or replace an Itinerary item from the item itself. | P0       |
 
 **Voting rules** ([ADR-0002](docs/adr/0002-equal-rights-for-members.md))
 
@@ -321,6 +322,10 @@ the paths; the table below is the rule.
   can decide or reject an open Proposal without a new Vote, including
   by leaving a tie among the remaining Members.
 - Proposals never expire. The Author can withdraw one (**Withdrawn**).
+- A closed Proposal is never reopened and its Votes cannot change. To
+  change what a Decision added, Members edit the Itinerary directly when
+  the trip state allows it, or post a new Proposal while it is Confirmed
+  (COL-11).
 - When a Proposal about an Itinerary item becomes a Decision, other open
   Proposals about the same item become **Outdated**.
 - A Proposal marked as a **Duplicate** closes; its Votes do not carry
@@ -436,7 +441,7 @@ Suggested tools/capabilities: `get_trip_context`, `search_places`,
 | Trip state                       | How the Itinerary changes                         |
 |----------------------------------|---------------------------------------------------|
 | Planning                         | Any Member edits directly.                        |
-| Confirmed                        | Every change goes through a Proposal.             |
+| Confirmed                        | Every change goes through a Proposal; each item offers Propose a change, which opens a new Proposal to remove or replace it (COL-11). |
 | Ongoing                          | Any Member edits directly, so plans can adapt on the road. |
 | Completed, Cancelled, Archived   | Any Member edits directly.                        |
 
@@ -962,4 +967,4 @@ planned for after the MVP and have no metric yet.
 | 1.11 | 2026-11-17 | Header links to the page version of this document. No requirement changed. |
 | 1.12 | 2026-11-17 | New AUTH-06 (P1, after the MVP): reset a forgotten password by email, with rules that keep accounts private and sign out other sessions. |
 | 1.13 | 2026-11-18 | MVP scope (section 4.1) now matches FR-05: route and travel-time estimates are in scope (ITN-06, P0); map display is P1 (ITN-05). Bookings and Tasks: booking status is To book, Booked or Cancelled, and only Booked closes a Gap (BOOK-06, Gaps 8 to 10). Bookings need no vote in any trip state and post a status line. The first hotel or flight booked while Planning suggests Confirm once and starts Preparation Nudges. Booking amounts count as Estimated costs until added as an Expense, with a prefilled Expense form. Task statuses; unassigned tasks open Gap 10, due dates do not nudge. |
-| 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. |
+| 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. New COL-11: in a Confirmed trip, Propose a change on an Itinerary item opens a Proposal to remove or replace it; a closed Proposal is never reopened. |
