@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.12\
+**Version:** 1.13\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
@@ -122,8 +122,8 @@ Why the scope looks like this, and which options were set aside, is in
 - Saved places, shared by the whole trip.
 - Trip progress: marking Itinerary items Visited or Skipped, and
   spending against the Budget.
-- Map display and basic route information where provider coverage
-  permits.
+- Route and travel-time estimates between Itinerary items, from the
+  map provider where its coverage permits; map display (P1).
 - Manual booking records.
 - Task assignment and status tracking.
 - Expense recording and split rules.
@@ -403,7 +403,9 @@ Suggested tools/capabilities: `get_trip_context`, `search_places`,
   between them do not fit in the trip's Day window (default 08:00–22:00,
   editable by any Member). Travel time comes from the map provider.
 - **Budget:** the trip is flagged when the sum of Estimated costs, plus
-  Expenses already recorded, exceeds the Budget.
+  Expenses already recorded, exceeds the Budget. Estimated costs include
+  the amounts of bookings that have not been added as an Expense yet
+  (see FR-06).
 - Warnings show on the affected day and on any Proposal that would
   cause or worsen them, before Members vote.
 - Warnings inform; they never block editing, voting, or a Decision.
@@ -446,10 +448,33 @@ Suggested tools/capabilities: `get_trip_context`, `search_places`,
 | BOOK-03 | A booking records the responsible Member and payer.                                          | P0       |
 | BOOK-04 | A booking can store provider, booking reference, dates, amount, currency, and notes.         | P0       |
 | BOOK-05 | Members can attach confirmation documents or images.                                         | P1       |
-| BOOK-06 | Members can track booking status.                                                            | P0       |
+| BOOK-06 | Members can track booking status: To book, Booked, or Cancelled.                             | P0       |
 | BOOK-07 | The product can link to an external booking provider.                                        | P1       |
 | BOOK-08 | Direct booking API integration is supported.                                                 | P2       |
 | BOOK-09 | Accommodation bookings record check-in and check-out dates; transport bookings record departure and arrival times and places. | P0 |
+
+**Booking rules**
+
+- Any Member can record or edit a booking in any trip state, Confirmed
+  included. A booking is not part of the Itinerary, so it needs no
+  Proposal or vote.
+- Every new or changed booking is written to the Audit log and posts a
+  status line in the trip discussion, for example "Chi recorded a hotel
+  booking: Sol Beach House, 20–23 Dec".
+- Only a Booked booking closes a Gap. A To book booking shows the group
+  that someone is on it; a Cancelled one is kept on record and covers
+  nothing.
+- The first hotel or flight booking marked Booked while the trip is in
+  Planning posts one suggestion in the discussion: "Chi just booked Sol
+  Beach House. Is the plan settled? [Confirm the trip] [Not yet]". It is
+  posted once per trip and never confirms the trip by itself.
+- A booking amount counts as an Estimated cost in the Budget
+  Feasibility warning until it is added as an Expense.
+- When a Booked booking with a payer and an amount is saved, the app
+  asks whether to also add that amount as an Expense paid by the payer.
+  Yes opens the Expense form prefilled with the amount and payer, and
+  the Member can still change the Participants. From then on the
+  booking no longer counts as an Estimated cost.
 
 **Acceptance criteria**
 
@@ -474,7 +499,10 @@ Task statuses: To Do, In Progress, Completed, Cancelled.
 
 **Acceptance criteria**
 
+- Task status is To Do, In Progress, Completed, or Cancelled.
 - Assignees must be current Members of the trip.
+- A To Do or In Progress task with no assignee opens Gap 10 (FR-10).
+  Due dates do not trigger Nudges in the MVP.
 - Any Member can edit any task; changes are visible to all Members.
 - When an assignee leaves, the task becomes unassigned.
 - Completing a task does not automatically mark a related booking as
@@ -537,6 +565,9 @@ flowchart LR
 - Expense splits must sum exactly to the Expense total.
 - Only selected Participants are charged for an Expense.
 - The payer is not automatically assumed to be the only Participant.
+- An Expense added from a booking stays linked to it, and the booking
+  stops counting as an Estimated cost, so the Budget check never counts
+  the same money twice.
 - The system must prevent duplicate Expense submissions through
   idempotency or equivalent safeguards.
 - The Settlement plan never creates real payments.
@@ -581,9 +612,9 @@ flowchart LR
 | 5  | Too much travel              | Itinerary   | Travel time between cities exceeds 30% of the trip's total Day window hours (threshold editable by any Member). Depends on ITN-06. |
 | 6  | Day does not fit             | Itinerary   | The time Feasibility warning for a day is active. |
 | 7  | Over Budget                  | Itinerary   | The Budget Feasibility warning is active. |
-| 8  | Night without accommodation  | Preparation | A night of the trip is not covered by an accommodation booking or an overnight transport booking. |
-| 9  | Missing transfer             | Preparation | The Itinerary moves to another city with no transport booking covering the move. |
-| 10 | Unowned work                 | Preparation | A booking has no responsible Member, or a task is unassigned. |
+| 8  | Night without accommodation  | Preparation | A night of the trip is not covered by a Booked accommodation booking or a Booked overnight transport booking. An accommodation booking covers each night from its check-in date up to the night before its check-out date. |
+| 9  | Missing transfer             | Preparation | The Itinerary moves to another city with no Booked transport booking covering the move. |
+| 10 | Unowned work                 | Preparation | A booking that is not Cancelled has no responsible Member, or a To Do or In Progress task has no assignee. |
 
 Nights needed = end date − start date. A trip from 16 to 18 November
 needs two nights (16 and 17).
@@ -599,8 +630,9 @@ needs two nights (16 and 17).
   - **Foundation:** from trip creation.
   - **Itinerary:** once a related Proposal exists, or the Itinerary
     covers at least half of the trip days.
-  - **Preparation:** when a Member presses Confirm, or 14 days before
-    the start date (editable by any Member). Before then these Gaps
+  - **Preparation:** when a Member presses Confirm, 14 days before
+    the start date (editable by any Member), or when the first booking
+    is recorded, whichever comes first. Before then these Gaps
     appear only in the checklist.
 - Each Gap is nudged once. A snoozed Gap is nudged again after one day
   or at the next stage milestone, whichever comes first.
@@ -907,3 +939,4 @@ planned for after the MVP and have no metric yet.
 | 1.10 | 2026-11-17 | Requirements and success metrics: the Visited or Skipped metric is agreed; the cross-platform metric is left until after the MVP. No requirement changed. |
 | 1.11 | 2026-11-17 | Header links to the page version of this document. No requirement changed. |
 | 1.12 | 2026-11-17 | New AUTH-06 (P1, after the MVP): reset a forgotten password by email, with rules that keep accounts private and sign out other sessions. |
+| 1.13 | 2026-11-18 | MVP scope (section 4.1) now matches FR-05: route and travel-time estimates are in scope (ITN-06, P0); map display is P1 (ITN-05). Bookings and Tasks: booking status is To book, Booked or Cancelled, and only Booked closes a Gap (BOOK-06, Gaps 8 to 10). Bookings need no vote in any trip state and post a status line. The first hotel or flight booked while Planning suggests Confirm once and starts Preparation Nudges. Booking amounts count as Estimated costs until added as an Expense, with a prefilled Expense form. Task statuses; unassigned tasks open Gap 10, due dates do not nudge. |
