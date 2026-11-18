@@ -3,7 +3,7 @@
 **Document type:** Information Architecture\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.2\
+**Version:** 1.3\
 **Visual version:** [TripMate Information Architecture artifact](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS)\
 **Stage:** 3. UI/UX & Software Architecture Design
 
@@ -232,16 +232,19 @@ flowchart TD
     ID -->|"publish"| NP["New Proposal"]
     NP --> SIM{"Similar open Proposal?"}
     SIM -->|"Yes: vote on it instead"| PV
-    SIM -->|"No, or create anyway"| PV["Proposal card in Chat<br/>with Feasibility warnings and Gaps"]
+    SIM -->|"No, or create anyway"| PV["Proposal card in Chat<br/>with Feasibility warnings and Gaps,<br/>the Author's Vote already Yes"]
     PV --> VO["Members vote Yes or No"]
     VO --> T{"More than half of current Members?"}
     T -->|"Yes votes"| D["Decision: the Itinerary changes"]
     T -->|"No votes"| R["Rejected"]
+    T -->|"neither, and everyone has voted: a tie"| R
     T -->|"not yet"| VO
 ```
 
-- Nobody votes automatically, the Author included; there is no approve
-  button (COL-05, ADR-0002).
+- The Author's Vote starts as Yes and can be changed; nobody else votes
+  automatically, and there is no approve button (COL-05, ADR-0002).
+- A tie once every current Member has voted rejects the Proposal and
+  leaves the Itinerary as it was.
 - A Member can mark a Proposal as a Duplicate of an earlier open one;
   the Author can withdraw it while it is open (COL-08, COL-10).
 
@@ -330,3 +333,4 @@ flowchart TD
 | 1.0 | 2026-11-17 | First version: places, Navigation Map, navigation rules (Bookings and Tasks live in Plan), and platform presentation, with an interactive artifact. |
 | 1.1 | 2026-11-18 | Added the Global User Journey (section 6) and six High-level User Flow Diagrams (section 7); status set to Proposed. |
 | 1.2 | 2026-11-18 | Status: Approved by the product owner. No content changes. |
+| 1.3 | 2026-11-18 | Flow 7.2 follows the new voting rules in prd.md: the Author's Vote starts as Yes, and a tie once everyone has voted is Rejected. |

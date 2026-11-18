@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.13\
+**Version:** 1.14\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
@@ -238,6 +238,19 @@ the paths; the table below is the rule.
 | Cancelled | Any Member cancels from Planning or Confirmed. Undo returns the trip to the state it was in. |
 | Archived  | Any Member archives a Completed or Cancelled trip. Unarchiving returns it to that state. |
 
+**Budget rules**
+
+- The Budget is entered and shown per person, in the Trip currency, for
+  example 3,000,000 ₫ per person.
+- The group Budget is the Budget per person times the number of current
+  Members, and is recomputed whenever a Member joins or leaves. A group
+  of five at 3,000,000 ₫ has a group Budget of 15,000,000 ₫; when a
+  sixth Member joins it becomes 18,000,000 ₫.
+- The Budget Feasibility warning (FR-05) compares against the group
+  Budget. Spending against the Budget (EXP-12) shows both the group
+  total against the group Budget and each Member's own share of
+  Expenses against the Budget per person.
+
 **Invitation rules**
 
 - Each trip has one shared Invitation at a time. It can be shared in
@@ -293,13 +306,20 @@ the paths; the table below is the rule.
 **Voting rules** ([ADR-0002](docs/adr/0002-equal-rights-for-members.md))
 
 - Each current Member has one Vote per Proposal and can change it until
-  the Proposal closes. Nobody votes automatically, including the Author.
+  the Proposal closes. The Author's Vote is Yes as soon as the
+  Proposal is created or published, including an AI draft or an Idea
+  draft; the Author can change it like any other Vote. Nobody else
+  votes automatically.
 - A Proposal becomes a **Decision** when more than half of the current
   Members vote Yes.
 - A Proposal becomes **Rejected** when more than half of the current
-  Members vote No.
+  Members vote No, or when every current Member has voted and neither
+  side has more than half (a tie, for example 2 Yes and 2 No in a group
+  of four). The Itinerary stays as it was; any Member can post a new
+  Proposal.
 - The threshold is recomputed whenever a Member joins or leaves, which
-  can decide or reject an open Proposal without a new Vote.
+  can decide or reject an open Proposal without a new Vote, including
+  by leaving a tie among the remaining Members.
 - Proposals never expire. The Author can withdraw one (**Withdrawn**).
 - When a Proposal about an Itinerary item becomes a Decision, other open
   Proposals about the same item become **Outdated**.
@@ -321,7 +341,7 @@ stateDiagram-v2
     Draft --> Open: a Member publishes it and becomes its Author
     Draft --> [*]: dismissed
     Open --> Decision: more than half of current Members vote Yes
-    Open --> Rejected: more than half of current Members vote No
+    Open --> Rejected: more than half vote No, or a tie once every current Member has voted
     Open --> Withdrawn: the Author withdraws it
     Open --> Outdated: another Proposal about the same Itinerary item becomes a Decision
     Open --> Duplicate: a Member marks it as a Duplicate
@@ -403,7 +423,8 @@ Suggested tools/capabilities: `get_trip_context`, `search_places`,
   between them do not fit in the trip's Day window (default 08:00–22:00,
   editable by any Member). Travel time comes from the map provider.
 - **Budget:** the trip is flagged when the sum of Estimated costs, plus
-  Expenses already recorded, exceeds the Budget. Estimated costs include
+  Expenses already recorded, exceeds the group Budget (FR-02).
+  Estimated costs include
   the amounts of bookings that have not been added as an Expense yet
   (see FR-06).
 - Warnings show on the affected day and on any Proposal that would
@@ -523,7 +544,7 @@ Task statuses: To Do, In Progress, Completed, Cancelled.
 | EXP-09 | The system generates a Settlement plan.                           | P0       |
 | EXP-10 | Any Member can record a Settlement.                               | P0       |
 | EXP-11 | Multiple currencies can be reconciled.                            | P2       |
-| EXP-12 | Members can see actual spending against the Budget during the trip. | P0     |
+| EXP-12 | Members can see actual spending against the Budget during the trip, for the group and for their own share. | P0     |
 
 Core calculation:
 `Balance(member) = AmountPaid(member) - AmountOwed(member)`
@@ -769,7 +790,8 @@ backend and shared domain rules.
    Balance is zero.
 4. All Members have equal rights over trip content and state; the Owner
    only manages membership.
-5. A Proposal becomes a Decision only by a majority of current Members.
+5. A Proposal becomes a Decision only by a majority of current Members;
+   a tie once everyone has voted rejects it.
 6. A Proposal is not a Decision, and a Decision is not a booking.
 7. A booking record is not proof of supplier-side confirmation unless
    independently verified.
@@ -940,3 +962,4 @@ planned for after the MVP and have no metric yet.
 | 1.11 | 2026-11-17 | Header links to the page version of this document. No requirement changed. |
 | 1.12 | 2026-11-17 | New AUTH-06 (P1, after the MVP): reset a forgotten password by email, with rules that keep accounts private and sign out other sessions. |
 | 1.13 | 2026-11-18 | MVP scope (section 4.1) now matches FR-05: route and travel-time estimates are in scope (ITN-06, P0); map display is P1 (ITN-05). Bookings and Tasks: booking status is To book, Booked or Cancelled, and only Booked closes a Gap (BOOK-06, Gaps 8 to 10). Bookings need no vote in any trip state and post a status line. The first hotel or flight booked while Planning suggests Confirm once and starts Preparation Nudges. Booking amounts count as Estimated costs until added as an Expense, with a prefilled Expense form. Task statuses; unassigned tasks open Gap 10, due dates do not nudge. |
+| 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. |

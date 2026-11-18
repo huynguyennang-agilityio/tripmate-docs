@@ -3,7 +3,7 @@
 **Document type:** Discovery\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.2\
+**Version:** 1.3\
 **Stage:** 1. Discovery & Strategy
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). This document answers
@@ -67,6 +67,7 @@ designed. Status is one of **Open**, **Validated**, or **Rejected**.
 | A9 | "Pay whoever paid the most" is seen as fair and easy to follow. | The Settlement plan is disputed. | Show a Settlement plan for a sample trip and ask each Member to explain what they owe. | Open |
 | A10 | Groups will enter booking details by hand. | Booking records stay empty and Preparation Gaps are wrong. | Ask the group to record one real booking and time it. | Open |
 | A11 | Members plan on a computer often enough for a desktop app to matter. | Desktop work in every phase is spent on few users. | Ask which device each Member used to plan their last trip. | Open |
+| A12 | Groups think about a trip's Budget per person, not as a group total. | Members misread the Budget and the warnings against it. | Ask the group how much the trip should cost before showing the Create trip screen, and note whether they answer per person or in total. | Open |
 
 ## 4. Conversations and Tests
 
@@ -114,3 +115,4 @@ The workflow lists these Stage 1 deliverables. None of them is written.
 | 1.0 | 2026-11-17 | First version: Stage 1 conditions and where they stand, assumptions A1 to A11 (all open), an empty log for five sessions, and the deliverables not covered yet. |
 | 1.1 | 2026-11-17 | Stage 1 closed by the product owner, who waived the five sessions. Assumptions stay open and are tested in prototype tests and the beta. Status: Approved. |
 | 1.2 | 2026-11-17 | Metrics settled: six goals have an agreed metric; the cross-platform metric is left until after the MVP. |
+| 1.3 | 2026-11-18 | New assumption A12: groups think about the Budget per person, which prd.md now follows. |
