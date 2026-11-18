@@ -20,6 +20,7 @@ separate repositories.
 | Look up a term | [GLOSSARY.md](GLOSSARY.md) |
 | See where the work stands today | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) |
 | See which screens exist and how they connect | [docs/information-architecture.md](docs/information-architecture.md), or its [page version](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) |
+| See what screens look like: colours, type, components | [TripMate Design System](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) |
 | Try the product | The prototypes under [Live pages](#live-pages) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
@@ -44,7 +45,7 @@ flowchart TB
     end
     subgraph S3["3: UI/UX & Architecture"]
         direction LR
-        proto["Prototypes"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"]:::planned ~~~ arch["docs/architecture.md"]:::planned
+        proto["Prototypes"] ~~~ ds["Design system"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"]:::planned ~~~ arch["docs/architecture.md"]:::planned
     end
     subgraph S4["4: SOW / Planning"]
         direction LR
@@ -80,6 +81,7 @@ that has a page version also links to it in its own header.
 | [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU) | Current stage, document versions, daily reports |
 | [TripMate Information Architecture](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) | The Navigation Map as an interactive page: places, links, journeys, platforms |
 | [PRD (English)](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) | prd.md as a document page |
+| [TripMate Design System](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) | Design System Foundation: tokens, rules, and components for every client |
 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) | Clickable Web client |
 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) | Clickable Mobile client |
 | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) | Clickable Desktop client |

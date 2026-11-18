@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.4\
+**Version:** 2.5\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -150,7 +150,8 @@ the product is consistent, feasible, and able to grow.
   Document, Component / Module Design, Database ERD, API Contracts,
   Integration Design, Security Architecture, Deployment /
   Infrastructure Overview, ADRs.
-- **Documents:** prototype canvases;
+- **Documents:** prototype canvases; the
+  [design system](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) artifact;
   [docs/information-architecture.md](docs/information-architecture.md);
   `docs/ux-review.md`;
   `docs/architecture.md`; [docs/adr](docs/adr/); the technical design
@@ -348,6 +349,7 @@ exist today, and their versions, is shown in the Build Tracker.
 | [prd.md](prd.md) | What must it do? MVP scope, requirements, business rules, acceptance criteria | 2 |
 | `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, tasks | 2--4 |
 | Prototype canvases | How will people use it? | 3 |
+| [Design system](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) (artifact) | What do screens look like? Colour, type, spacing tokens, usage rules, and components, the same for every client | 3 |
 | [docs/information-architecture.md](docs/information-architecture.md) | Where do things live and how do people move between them? Places, Navigation Map, user journey, high-level flows, the same for every platform | 3 |
 | `docs/ux-review.md` | What did testing show and what changed? | 3 |
 | `docs/architecture.md` | How is the system organised? Modules, data model, API contracts, security, infrastructure | 3 |
@@ -405,3 +407,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.2 | 2026-11-17 | Diagrams only, no process changed: the overview no longer shows "Unsupported markdown: list" in the stage boxes (labels now read "Stage 1: ..."), and the overview and the epic loop are laid out so they stay readable at page width. |
 | 2.3 | 2026-11-17 | docs/discovery.md now exists and is linked. Two rules added to the document map: the Status values Draft, Proposed, and Approved, and cross-references that name the document without its version. |
 | 2.4 | 2026-11-17 | Document map: added docs/information-architecture.md for stage 3 (places, Navigation Map, user journey, and high-level flows, shared by all platforms). |
+| 2.5 | 2026-11-18 | Document map: added the design system artifact for stage 3 (Design System Foundation: tokens, usage rules, and components for every client). It is the source of truth, like the prototype canvases; there is no .md copy. |
