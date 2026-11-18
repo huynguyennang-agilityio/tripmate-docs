@@ -18,6 +18,7 @@ by AI agents such as Claude Code.
 | [docs/solution-options.md](docs/solution-options.md) | Which options were considered for each problem, and why features are in or out of the MVP. |
 | [docs/information-architecture.md](docs/information-architecture.md) | Where things live in the product and how people move between them, for every platform: places, Navigation Map, navigation rules. |
 | [docs/ux-review.md](docs/ux-review.md) | Usability problems found in the prototypes, how serious they are, and the fixes. |
+| [docs/architecture.md](docs/architecture.md) | How the system is organised: modules, data model, API and realtime conventions, security, integrations, hosting. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
 
 When a document is created, add it here and turn its box in the

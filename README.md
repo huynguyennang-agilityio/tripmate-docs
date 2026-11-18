@@ -23,6 +23,7 @@ separate repositories.
 | See what screens look like: colours, type, components | [TripMate Design System](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) |
 | Try the product | The prototypes under [Live pages](#live-pages) |
 | See what testing found and what changed | [docs/ux-review.md](docs/ux-review.md) |
+| Know how the system is built: modules, data, API, security, hosting | [docs/architecture.md](docs/architecture.md) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
 New to the project? Read the vision, then sections 2 to 4 of the PRD,
@@ -46,7 +47,7 @@ flowchart TB
     end
     subgraph S3["3: UI/UX & Architecture"]
         direction LR
-        proto["Prototypes"] ~~~ ds["Design system"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"] ~~~ arch["docs/architecture.md"]:::planned
+        proto["Prototypes"] ~~~ ds["Design system"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"] ~~~ arch["docs/architecture.md"]
     end
     subgraph S4["4: SOW / Planning"]
         direction LR
@@ -102,6 +103,7 @@ docs/
   solution-options.md  Stage 2
   information-architecture.md  Stage 3
   ux-review.md         Stage 3
+  architecture.md      Stage 3
   adr/                 Decision records
 ```
 
