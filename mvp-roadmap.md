@@ -4,7 +4,8 @@
 **Product:** TripMate\
 **Status:** Proposed\
 **Version:** 1.12\
-**Planning horizon:** 13 weeks (initial estimate)
+**Planning horizon:** 13 weeks (initial estimate)\
+**Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
 
 Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md).
 
@@ -719,4 +720,4 @@ feedback.
 | 1.9 | 2026-11-17 | Aligned with the decisions in PRD v1.9: idea capture and Saved places are P0 in Phase 3, with the P1 items to defer first; in-app notifications are P1 and Desktop notifies for Nudges; undo of Confirm and automatic Ongoing in Phase 1; Former member read access in Phase 5. New EPIC-13 for Readiness and Nudges; FR-09 after the MVP. Stages and phases explained. The MVP list and the development workflow now link to prd.md and product-workflow.md instead of repeating them. Cross-references no longer name a version. |
 | 1.10 | 2026-11-19 | Desktop also ships for Linux, following prd.md: the platforms, the Phase 6 features and exit criteria, and Phase 7 cross-platform testing name Linux. The schedule is not changed. |
 | 1.11 | 2026-11-19 | Epics and tasks live on the Trello board instead of an issue tracker, following product-workflow.md. The schedule is not changed. |
-| 1.12 | 2026-11-19 | New section 6.1, Epic Dependencies: a dependency diagram by phase, what each epic needs and why, the Desktop features, and the critical path. Three ordering fixes, the 13 weeks unchanged: the Itinerary core (EPIC-05) moves into Phase 2, before voting, because a Decision changes the Itinerary; adding a booking as an Expense is built in Phase 5 with Expenses; EPIC-11 is split, with its platform foundation in Phase 1 and hardening and release in Phase 7. New risk: Phase 2 overload. |
+| 1.12 | 2026-11-19 | New section 6.1, Epic Dependencies: a dependency diagram by phase, what each epic needs and why, the Desktop features, and the critical path. Three ordering fixes, the 13 weeks unchanged: the Itinerary core (EPIC-05) moves into Phase 2, before voting, because a Decision changes the Itinerary; adding a booking as an Expense is built in Phase 5 with Expenses; EPIC-11 is split, with its platform foundation in Phase 1 and hardening and release in Phase 7. New risk: Phase 2 overload. The roadmap now has a page version, linked from the header. |
