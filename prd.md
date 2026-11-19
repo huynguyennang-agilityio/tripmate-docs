@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.17\
+**Version:** 1.18\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows, Linux)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
@@ -245,6 +245,21 @@ the paths; the table below is the rule.
 | Completed | Automatically, after the end date.                         |
 | Cancelled | Any Member cancels from Planning or Confirmed. Undo returns the trip to the state it was in. |
 | Archived  | Any Member archives a Completed or Cancelled trip. Unarchiving returns it to that state. |
+
+**Trip time zone**
+
+- The start date and the end date are read in the time zone of the place
+  the group departs from and returns to. A group that leaves Đà Nẵng
+  for Tokyo on 10 December is Ongoing from 00:00 on 10 December, Đà
+  Nẵng time.
+- TripMate takes that time zone from the device of the Member who
+  creates the trip and keeps it for the trip. Trip details have no
+  field for it in the MVP.
+- Every date TripMate acts on uses the same time zone: the start and
+  the end of the trip, the start of Preparation Nudges, and the Nudge
+  the day before departure.
+- Times in the Itinerary and the Day window are local times at the
+  place and are not converted.
 
 **Budget rules**
 
@@ -955,6 +970,7 @@ planned for after the MVP and have no metric yet.
 | When may TripMate nudge the group? | After 10 quiet minutes, by stage group, batched, at most once per day. Gaps on a Proposal show immediately. |
 | How do Members answer a Nudge or assistant question? | Up to four quick choices plus "Other…"; free text that changes the plan becomes a Proposal. |
 | Does a trip that nobody confirmed still start? | Yes. A trip in Planning or Confirmed becomes Ongoing on its start date; Confirm is not required. |
+| In which time zone does a trip start and end? | In the time zone of the place the group departs from and returns to, taken from the device of the Member who creates the trip. Times in the Itinerary stay local to the place. |
 | Can Confirm be undone? | Yes, by any Member; the trip returns to Planning and the change is audited ([ADR-0002](docs/adr/0002-equal-rights-for-members.md)). |
 | What can a Former member still see? | While their Balance is not zero: the Expenses they took part in, their own Balance, and the Settlement plan, read-only. Nothing after that ([ADR-0003](docs/adr/0003-members-may-leave-with-a-balance.md)). |
 | Can the MVP acceptance scenario include a requirement that may be deferred? | No, only P0. Idea capture (AI-09) and Saved places (ITN-07) are therefore P0. In-app notifications (COL-07) stay P1, so the desktop app must notify for Nudges only. |
@@ -1014,3 +1030,4 @@ planned for after the MVP and have no metric yet.
 | 1.15 | 2026-11-18 | Editing rules: editing, reordering or removing an Itinerary item that a Decision added posts a line in the discussion with what changed and the original vote. |
 | 1.16 | 2026-11-19 | Desktop also ships for Linux in the MVP, as an AppImage and a `.deb` package: the platforms, the Desktop client, DESK-07, its acceptance criteria, Compatibility, desktop tests, and dependencies name Linux. A new table gives the Linux limits for the tray icon (DESK-04), the global shortcut (DESK-05), and updates and signing (DESK-07). Section 10 records the decision. |
 | 1.17 | 2026-11-19 | AUTH-05: social sign-in is Google and Sign in with Apple, shipped together and offered on every client, as App Store Review Guideline 4.8 requires. The password reset rules cover accounts created with Apple. |
+| 1.18 | 2026-11-19 | Trip time zone (FR-02): the start and end dates, and every date TripMate acts on, are read in the time zone of the place the group departs from and returns to, taken from the device of the Member who creates the trip. Times in the Itinerary and the Day window are local times at the place. Section 10 records the decision. |

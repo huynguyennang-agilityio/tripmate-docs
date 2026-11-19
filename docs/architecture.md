@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.4\
+**Version:** 1.5\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -580,7 +580,6 @@ written, following [CLAUDE.md](../CLAUDE.md).
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| In which time zone does a trip start and end? The PRD says "on the start date" | The destination's time zone, from the place data; the creating Member's device time zone when there is no destination yet | EPIC-02 spec |
 | Which PaaS? | Chosen in Phase 0 against section 9.1 | Phase 0 |
 | Which job queue library runs the worker? | Celery on Redis is the candidate; chosen in Phase 0 with the PaaS | Phase 0 |
 | Which weather source for `get_weather`? | None in the MVP; the assistant says weather is not checked | EPIC-04 spec |
@@ -596,3 +595,4 @@ written, following [CLAUDE.md](../CLAUDE.md).
 | 1.2 | 2026-11-19 | Shorter, with nothing repeated from the companion documents. Removed: the Data Model, API and Realtime, and Security summaries; the non-functional requirements table, whose rows only pointed at other sections; the hosting diagram; the security rows of the assistant and Desktop tables. Idempotency is one rule in section 5.1. Sections renumbered. Corrected: the scheduler reads PostgreSQL in the containers diagram; the API process calls no provider inside a transaction, and place search is its only provider call; the job queue library is an open question, no longer named as chosen; prd.md and mvp-roadmap.md do not name Linux yet. |
 | 1.3 | 2026-11-19 | Linux on Desktop is now recorded in prd.md and mvp-roadmap.md, so the follow-up in section 12.2 is closed and removed, and driver D9 cites the PRD's Desktop client section. |
 | 1.4 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
+| 1.5 | 2026-11-19 | The time zone question in section 12.2 is closed: prd.md now says a trip starts and ends in the time zone of the place the group departs from, taken from the creating Member's device. |

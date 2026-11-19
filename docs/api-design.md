@@ -3,7 +3,7 @@
 **Document type:** API Design\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.2\
+**Version:** 1.3\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -49,7 +49,7 @@ that the backend generates and publishes to `tripmate-contracts`
 | Idempotency | `Idempotency-Key: <uuid>` required on every `POST` that creates a record; the key is made once per user action and reused on retry ([data-model.md](data-model.md), section 6.3) |
 | Concurrency | Records that Members edit carry a version ([data-model.md](data-model.md), section 3), returned in `ETag`. `PATCH`, `PUT`, and `DELETE` on such a record send `If-Match`: a missing one returns `428 request.version_required`, a stale one returns `409 conflict.stale_version` with the current record. Records with no version take no `If-Match`, because only the caller changes them or repeating the request gives the same result: the caller's own profile, session, and Vote; a membership; the Invitation; a Saved place; an Idea draft; a Gap acknowledgement or snooze. |
 | Money | `{ "amount": 3000000, "currency": "VND" }`; `amount` is an integer in the smallest unit of the Trip currency |
-| Dates and times | ISO 8601. Trip dates as `YYYY-MM-DD`, Day window and planned times as `HH:MM` in the trip's time zone, moments in UTC with `Z` |
+| Dates and times | ISO 8601. Trip dates as `YYYY-MM-DD`, read in the trip's time zone; Day window and planned times as `HH:MM`, local time at the place; moments in UTC with `Z`. A time zone is an IANA name such as `Asia/Ho_Chi_Minh` |
 | Lists | Cursor pagination: `?cursor=<opaque>&limit=<1..100>`; the response has `items` and `nextCursor` |
 | Partial updates | `PATCH` with only the fields that change |
 | Actions that are not edits | `POST` to a named sub-resource, for example `POST /v1/trips/{tripId}/confirm` |
@@ -78,7 +78,7 @@ written from `/v1/trips/{tripId}`.
 
 | Method and path | Does | PRD |
 |-----------------|------|-----|
-| `GET /v1/trips`, `POST /v1/trips` | List my trips; create a trip | TRIP-01 |
+| `GET /v1/trips`, `POST /v1/trips` | List my trips; create a trip. The create request carries the device's time zone as `timeZone`, which becomes the trip's time zone | TRIP-01 |
 | `GET`, `PATCH /v1/trips/{tripId}` | Read and edit trip details. A date change that leaves out days with items returns the items it moved to Saved places; in a Confirmed trip it returns `422 itinerary.confirmed_needs_proposal` | TRIP-02 |
 | `POST .../confirm`, `.../undo-confirm`, `.../cancel`, `.../undo-cancel`, `.../archive`, `.../unarchive` | Change the trip state | TRIP-07 |
 | `GET .../members` | Members and Former members | TRIP-05 |
@@ -294,3 +294,4 @@ they depend on each other). Everything they must agree on lives in
 | 1.0 | 2026-11-19 | First version: principles, REST conventions, resources by module with their requirements, error format and status codes with the first codes, product rules that show in the API, realtime protocol and events, how the contract moves between repositories. Header links to the page version of this document. |
 | 1.1 | 2026-11-19 | Shorter: the first error codes by area and the Change Rules section are removed, because the status-code table and the resource tables carry the same rules; the methods table is one row of the conventions; the repository diagram stays in architecture.md only. Sections renumbered. Corrected: `If-Match` applies only to records that have a version, and the requests that need none are listed. |
 | 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
+| 1.3 | 2026-11-19 | Follows the Trip time zone rules in prd.md: creating a trip sends the device's time zone, trip dates are read in the trip's time zone, and the Day window and planned times are local at the place. |
