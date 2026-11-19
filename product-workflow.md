@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.7\
+**Version:** 2.8\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -192,7 +192,7 @@ tracked, estimated, and controlled.
   Requirements-to-Test Matrix, AI Evaluation Plan, Golden Dataset
   (initial version), Release Plan.
 - **Documents:** [mvp-roadmap.md](mvp-roadmap.md);
-  `docs/test-strategy.md`; tasks as issues.
+  `docs/test-strategy.md`; tasks as cards on the Trello board.
 - **Ready to move on when:** every epic is ordered with its
   dependencies; every task for the next epic has scope, dependencies,
   and a test; the Definition of Done and AI release gates are written.
@@ -204,7 +204,7 @@ human oversight, independent verification, and quality gates.
 
 ```mermaid
 flowchart TD
-    A[Backlog issue / task] --> B[AI analyses and plans]
+    A[Trello card / task] --> B[AI analyses and plans]
     B --> C{Human approves plan?}
     C -->|No| D[Revise plan] --> B
     C -->|Yes| E[AI implementation] --> F[Automated tests & verification]
@@ -217,7 +217,8 @@ flowchart TD
 - **Activities:**
   - *Task preparation:* pick a task with clear scope, linked to its
     epic, feature spec, design, and acceptance criteria; note
-    dependencies and test expectations; create the issue and branch.
+    dependencies and test expectations; create the Trello card and the
+    branch.
   - *AI analysis and planning:* the AI reads the requirement, the
     codebase, and conventions; analyses impact; proposes a plan with the
     files to change and a test plan. A person approves the plan before
@@ -231,7 +232,7 @@ flowchart TD
   - *Review:* an independent AI review, then a human code review, for
     correctness, tests, readability, security, and scope. Reviewers do
     not change code during a review-only pass.
-  - *Git workflow:* issue → branch → commit → merge request; tests and
+  - *Git workflow:* Trello card → branch → commit → merge request; tests and
     lint run before a merge request is opened or updated.
 - **Quality gates:** acceptance criteria met; related tests pass; no
   open Critical or High defect; security checks pass; AI evaluation
@@ -297,7 +298,7 @@ keep improving from real data and feedback.
   Updated Product Roadmap, Iteration Plan.
 - **Documents:** updates to [mvp-roadmap.md](mvp-roadmap.md),
   [prd.md](prd.md), and [docs/discovery.md](docs/discovery.md); backlog
-  as issues.
+  as cards on the Trello board.
 
 ## 4. Recommended Approach for TripMate
 
@@ -362,7 +363,7 @@ exist today, and their versions, is shown in the Build Tracker.
 | [docs/adr](docs/adr/) | Why this decision over the alternatives? | 3 |
 | [mvp-roadmap.md](mvp-roadmap.md) | In what order and by when? Phases, milestones, risks, release gates | 4 |
 | `docs/test-strategy.md` | How is TripMate tested? Test levels, requirements-to-test mapping, AI evaluation plan and golden dataset | 4 |
-| `docs/development-flow.md` | How does a task go from issue to merged? Definition of Done | 5 |
+| `docs/development-flow.md` | How does a task go from Trello card to merged? Definition of Done | 5 |
 | `docs/release-plan.md` | How do we harden, ship, roll back, and measure? | 6 |
 
 **Rules**
@@ -388,9 +389,28 @@ exist today, and their versions, is shown in the Build Tracker.
 
 **Give it the right context**
 
+- Every repository is cloned side by side in one `tripmate/` folder,
+  so a code repository reads the documents at `../tripmate-docs/`
+  without copying them. The layout is in
+  [docs/architecture.md](docs/architecture.md), section 11.
 - Each code repository has a `CLAUDE.md` that points to the glossary,
-  the PRD, and the current epic spec.
-- Tasks link to the spec section and requirement IDs they implement.
+  the PRD, and the current epic spec under `../tripmate-docs/`.
+- Tasks are cards on the Trello board. The documents stay in this
+  repository; a card only links to them.
+- The requirement ID ties a card to its code, as the table below
+  shows.
+
+| Where | Carries the requirement ID | Example |
+|-------|----------------------------|---------|
+| Trello card title | At the start | `INV-01 Create an Invitation` |
+| Trello card description | A link to the spec section | `docs/specs/epic-02/spec.md`, INV-01 |
+| Branch name | After the type | `feat/INV-01-create-invitation` |
+| Test name | In the name | `test_INV_01_invitation_expires_after_7_days` |
+| Pull request | Attached to the card by Trello's GitHub Power-Up | -- |
+
+- Claude Code does not read the Trello board. A task starts by giving
+  it the card's text or its requirement ID; it reads the spec from
+  `../tripmate-docs/`.
 - If a task needs a decision the spec does not make, Claude Code stops
   and asks instead of guessing.
 
@@ -416,3 +436,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.5 | 2026-11-18 | Document map: added the design system artifact for stage 3 (Design System Foundation: tokens, usage rules, and components for every client). It is the source of truth, like the prototype canvases; there is no .md copy. |
 | 2.6 | 2026-11-18 | docs/ux-review.md now exists and is linked from the Stage 3 documents and the document map. |
 | 2.7 | 2026-11-19 | docs/architecture.md now exists and is linked from the Stage 3 documents, the feedback loops, and the document map. Three companion documents added for stage 3: docs/data-model.md (Database ERD), docs/api-design.md (API Contracts), and docs/security.md (Security Architecture). |
+| 2.8 | 2026-11-19 | Tasks are tracked as cards on a Trello board instead of issues (Stages 4, 5 and 7, the SDLC loop, the document map). Section 7: repositories are cloned side by side so code reads the documents at `../tripmate-docs/`, and the requirement ID ties a Trello card to its branch, tests and pull request. |

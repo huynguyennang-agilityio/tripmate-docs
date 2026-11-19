@@ -3,7 +3,7 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.10\
+**Version:** 1.11\
 **Planning horizon:** 13 weeks (initial estimate)
 
 Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md).
@@ -420,7 +420,7 @@ owes whom.
 
 ## 6. Suggested Epic Breakdown
 
-Use these Epics in the issue tracker:
+Use these Epics on the Trello board:
 
 1.  **EPIC-01: Authentication and User Profiles**
 2.  **EPIC-02: Trip Management and Membership**
@@ -466,7 +466,7 @@ Each Epic should be decomposed into user stories with:
 
 ## 7. Development Workflow
 
-How a task goes from issue to merged is described once, in
+How a task goes from Trello card to merged is described once, in
 [product-workflow.md](product-workflow.md), Stage 5 (AI-native SDLC):
 the AI plans, a person approves the plan, the AI implements, tests and
 an independent AI review run, a person reviews, and nothing merges
@@ -614,3 +614,4 @@ feedback.
 | 1.8 | 2026-11-17 | Readability only, no scope or schedule changed: run-together lists split into list items, milestone and risk tables fixed, a 13-week chart in section 4, and a table of phases, PRD requirements, and epics in section 6 (with two open points noted). Follows PRD v1.8. |
 | 1.9 | 2026-11-17 | Aligned with the decisions in PRD v1.9: idea capture and Saved places are P0 in Phase 3, with the P1 items to defer first; in-app notifications are P1 and Desktop notifies for Nudges; undo of Confirm and automatic Ongoing in Phase 1; Former member read access in Phase 5. New EPIC-13 for Readiness and Nudges; FR-09 after the MVP. Stages and phases explained. The MVP list and the development workflow now link to prd.md and product-workflow.md instead of repeating them. Cross-references no longer name a version. |
 | 1.10 | 2026-11-19 | Desktop also ships for Linux, following prd.md: the platforms, the Phase 6 features and exit criteria, and Phase 7 cross-platform testing name Linux. The schedule is not changed. |
+| 1.11 | 2026-11-19 | Epics and tasks live on the Trello board instead of an issue tracker, following product-workflow.md. The schedule is not changed. |
