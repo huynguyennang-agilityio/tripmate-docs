@@ -3,7 +3,7 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.9\
+**Version:** 1.10\
 **Planning horizon:** 13 weeks (initial estimate)
 
 Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md).
@@ -28,8 +28,8 @@ depth may change the schedule.
 
 -   **Web:** Next.js App Router + TypeScript.
 -   **Mobile:** Flutter for iOS and Android.
--   **Desktop:** Tauri 2 (Rust) wrapping the Web client, for macOS and
-    Windows, in a separate `tripmate-desktop` repository; also the
+-   **Desktop:** Tauri 2 (Rust) wrapping the Web client, for macOS,
+    Windows, and Linux, in a separate `tripmate-desktop` repository; also the
     team's Rust learning track.
 -   **Backend:** FastAPI.
 -   **Database:** PostgreSQL.
@@ -361,17 +361,22 @@ owes whom.
 **Features**
 
 -   Auto-update (DESK-07).
--   Code signing for macOS and Windows.
--   Installer packaging.
+-   Code signing for macOS and Windows; a checksum and a signature for
+    the Linux packages.
+-   Installer packaging, including an AppImage and a `.deb` package for
+    Linux.
 -   Desktop polish of DESK-01 to DESK-06.
 
 **Exit criteria**
 
 -   Signed installers install on clean macOS and Windows machines.
+-   The AppImage and `.deb` package install on a clean Ubuntu LTS
+    machine, on X11 and Wayland.
 -   Invitation deep links, Nudge notifications, tray count, quick-add
     Expense,
     and offline Itinerary work end to end.
--   An update published to the update channel installs automatically.
+-   An update published to the update channel installs automatically;
+    on Linux this holds for the AppImage.
 -   No business logic lives in the Desktop client.
 
 ### Phase 7 -- Beta and MVP Release (Week 13)
@@ -381,7 +386,8 @@ owes whom.
 **Activities**
 
 -   End-to-end testing of the full trip lifecycle.
--   Cross-platform testing on Web, iOS, Android, macOS, and Windows.
+-   Cross-platform testing on Web, iOS, Android, macOS, Windows, and
+    Linux.
 -   Authorization and file access testing.
 -   Expense calculation and settlement verification.
 -   Voting threshold and audit log verification.
@@ -607,3 +613,4 @@ feedback.
 | 1.7 | 2026-11-17 | Follows PRD v1.7. |
 | 1.8 | 2026-11-17 | Readability only, no scope or schedule changed: run-together lists split into list items, milestone and risk tables fixed, a 13-week chart in section 4, and a table of phases, PRD requirements, and epics in section 6 (with two open points noted). Follows PRD v1.8. |
 | 1.9 | 2026-11-17 | Aligned with the decisions in PRD v1.9: idea capture and Saved places are P0 in Phase 3, with the P1 items to defer first; in-app notifications are P1 and Desktop notifies for Nudges; undo of Confirm and automatic Ongoing in Phase 1; Former member read access in Phase 5. New EPIC-13 for Readiness and Nudges; FR-09 after the MVP. Stages and phases explained. The MVP list and the development workflow now link to prd.md and product-workflow.md instead of repeating them. Cross-references no longer name a version. |
+| 1.10 | 2026-11-19 | Desktop also ships for Linux, following prd.md: the platforms, the Phase 6 features and exit criteria, and Phase 7 cross-platform testing name Linux. The schedule is not changed. |
