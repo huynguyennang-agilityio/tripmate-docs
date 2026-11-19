@@ -4,7 +4,8 @@
 **Product:** TripMate\
 **Status:** Proposed\
 **Version:** 1.0\
-**Stage:** 3. UI/UX & Software Architecture Design
+**Stage:** 3. UI/UX & Software Architecture Design\
+**Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). Requirements and their IDs
 are in [prd.md](../prd.md). How the system around this data is
@@ -453,4 +454,4 @@ moment a Proposal closes. Once closed it never changes (FR-03).
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-11-19 | First version: every entity with its module and requirements, four entity relationship diagrams, naming and storage conventions, constraints the database keeps, values computed instead of stored, Audit log, outbox and idempotency records, what is stored where, migrations. |
+| 1.0 | 2026-11-19 | First version: every entity with its module and requirements, four entity relationship diagrams, naming and storage conventions, constraints the database keeps, values computed instead of stored, Audit log, outbox and idempotency records, what is stored where, migrations. Header links to the page version of this document. |

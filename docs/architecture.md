@@ -4,7 +4,8 @@
 **Product:** TripMate\
 **Status:** Proposed\
 **Version:** 1.1\
-**Stage:** 3. UI/UX & Software Architecture Design
+**Stage:** 3. UI/UX & Software Architecture Design\
+**Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). Requirements and their IDs
 are in [prd.md](../prd.md); this document does not repeat the product
@@ -690,4 +691,4 @@ written, following [CLAUDE.md](../CLAUDE.md).
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-18 | First version: drivers, system context, containers, backend modules and where each domain rule lives, data model, command and event flow, API and realtime conventions, security, AI and Maps integration, languages, clients, deployment, background work, repositories, non-functional requirements, decisions and open questions. Authentication built in, PaaS in Singapore, Claude, and Google Maps chosen by the product owner. |
-| 1.1 | 2026-11-19 | Data model, API, and security details moved to the new data-model.md, api-design.md, and security.md; this document keeps a summary of each. Desktop also runs on Linux, with a per-platform table (packages, signing, auto-update, Wayland shortcut and GNOME tray limits). Files stored in Cloudflare R2. Every part in its own repository, with shared contracts and translations in tripmate-contracts. Vote path and event names match api-design.md. |
+| 1.1 | 2026-11-19 | Data model, API, and security details moved to the new data-model.md, api-design.md, and security.md; this document keeps a summary of each. Desktop also runs on Linux, with a per-platform table (packages, signing, auto-update, Wayland shortcut and GNOME tray limits). Files stored in Cloudflare R2. Every part in its own repository, with shared contracts and translations in tripmate-contracts. Vote path and event names match api-design.md. Header links to the page version of this document. |

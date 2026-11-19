@@ -4,7 +4,8 @@
 **Product:** TripMate\
 **Status:** Proposed\
 **Version:** 1.0\
-**Stage:** 3. UI/UX & Software Architecture Design
+**Stage:** 3. UI/UX & Software Architecture Design\
+**Page version:** [TripMate Security Architecture artifact](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA)
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). Requirements and their IDs
 are in [prd.md](../prd.md). How the system is organised is in
@@ -241,4 +242,4 @@ The main threats, grouped by what an attacker would want.
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-11-19 | First version: assets, trust boundaries, authentication and token storage per client including Linux, rate limits, access guard and capabilities, authorization tests, data protection, Desktop and AI assistant security, third parties, threats and controls, security checks. |
+| 1.0 | 2026-11-19 | First version: assets, trust boundaries, authentication and token storage per client including Linux, rate limits, access guard and capabilities, authorization tests, data protection, Desktop and AI assistant security, third parties, threats and controls, security checks. Header links to the page version of this document. |

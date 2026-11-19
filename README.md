@@ -87,6 +87,10 @@ that has a page version also links to it in its own header.
 | [TripMate Information Architecture](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) | The Navigation Map as an interactive page: places, links, journeys, platforms |
 | [PRD (English)](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) | prd.md as a document page |
 | [TripMate Design System](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) | Design System Foundation: tokens, rules, and components for every client |
+| [TripMate Software Architecture](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB) | docs/architecture.md as a document page |
+| [TripMate Data Model](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H) | docs/data-model.md as a document page |
+| [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) | docs/api-design.md as a document page |
+| [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) | docs/security.md as a document page |
 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) | Clickable Web client |
 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) | Clickable Mobile client |
 | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) | Clickable Desktop client |

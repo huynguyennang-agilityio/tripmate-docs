@@ -4,7 +4,8 @@
 **Product:** TripMate\
 **Status:** Proposed\
 **Version:** 1.0\
-**Stage:** 3. UI/UX & Software Architecture Design
+**Stage:** 3. UI/UX & Software Architecture Design\
+**Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). Requirements and their IDs
 are in [prd.md](../prd.md). How the system is organised is in
@@ -335,4 +336,4 @@ flowchart LR
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-11-19 | First version: principles, REST conventions, resources by module with their requirements, error format and status codes with the first codes, product rules that show in the API, realtime protocol and events, how the contract moves between repositories. |
+| 1.0 | 2026-11-19 | First version: principles, REST conventions, resources by module with their requirements, error format and status codes with the first codes, product rules that show in the API, realtime protocol and events, how the contract moves between repositories. Header links to the page version of this document. |

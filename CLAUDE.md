@@ -88,12 +88,18 @@ Only the product owner moves a document to Approved.
 
 Some documents also have an artifact view. The file in this repository
 is the source of truth; the artifact is updated in the same change.
+Every new document gets an artifact view when it is created, listed
+here and linked from the document's header as its page version.
 
 | Document | Artifact |
 |----------|----------|
 | prd.md | [English PRD](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) |
 | product-workflow.md | [TripMate Product Workflow](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) |
 | docs/information-architecture.md | [TripMate Information Architecture](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) |
+| docs/architecture.md | [TripMate Software Architecture](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB) |
+| docs/data-model.md | [TripMate Data Model](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H) |
+| docs/api-design.md | [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) |
+| docs/security.md | [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) |
 
 ## Git workflow
 
