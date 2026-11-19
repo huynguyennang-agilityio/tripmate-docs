@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.6\
+**Version:** 1.7\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -556,6 +556,29 @@ flowchart LR
   per repository for a cross-cutting feature, which the contract order
   above keeps safe.
 
+On a developer's machine every repository is cloned side by side in
+one folder, so the code repositories read the documents in place
+instead of copying them.
+
+```text
+tripmate/
+├── tripmate-docs/
+├── tripmate-backend/
+├── tripmate-contracts/
+├── tripmate-web/
+├── tripmate-mobile/
+└── tripmate-desktop/
+```
+
+- Each code repository's `CLAUDE.md` points to `../tripmate-docs/`:
+  the glossary, prd.md, this document, and the spec of the epic being
+  built.
+- Product documents are never copied into a code repository. A code
+  repository keeps only what is about its own code: setup, commands,
+  and coding conventions.
+- Tasks are tracked on a Trello board; how a card links to its code is
+  in [product-workflow.md](../product-workflow.md), section 7.
+
 ## 12. Decisions and Open Questions
 
 ### 12.1 Decisions made in this document
@@ -598,3 +621,4 @@ the table.
 | 1.4 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
 | 1.5 | 2026-11-19 | The time zone question in section 12.2 is closed: prd.md now says a trip starts and ends in the time zone of the place the group departs from, taken from the creating Member's device. |
 | 1.6 | 2026-11-19 | The three ADR candidates in section 12.1 are written and linked: ADR-0005 (authentication built into the backend), ADR-0006 (Google Maps Platform behind a provider interface), ADR-0007 (the Web client is a static build). |
+| 1.7 | 2026-11-19 | Section 11: every repository is cloned side by side in one `tripmate/` folder, and code repositories read the documents at `../tripmate-docs/` instead of copying them; tasks are tracked on a Trello board. |
