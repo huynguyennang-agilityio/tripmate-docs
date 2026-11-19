@@ -22,6 +22,7 @@ by AI agents such as Claude Code.
 | [docs/data-model.md](docs/data-model.md) | What TripMate stores: entities, ERD, conventions, database constraints. |
 | [docs/api-design.md](docs/api-design.md) | How clients talk to the backend: REST conventions, resources, error codes, realtime protocol, the contract across repositories. |
 | [docs/security.md](docs/security.md) | How accounts, trips, and money records are kept safe: authentication, capabilities, data protection, threats. |
+| [docs/test-strategy.md](docs/test-strategy.md) | How TripMate is tested: test levels, the requirements-to-test matrix, the AI evaluation plan, the golden dataset. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
 
 When a document is created, add it here and turn its box in the
@@ -100,6 +101,7 @@ here and linked from the document's header as its page version.
 | docs/data-model.md | [TripMate Data Model](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H) |
 | docs/api-design.md | [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) |
 | docs/security.md | [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) |
+| docs/test-strategy.md | [TripMate Test Strategy](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9) |
 | docs/adr/0005-authentication-built-into-the-backend.md | [TripMate ADR-0005 Authentication](https://claude.ai/artifact/AnngZQmwf1Ax8GWodXwcvz) |
 | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) |
 | docs/adr/0007-web-client-is-a-static-build.md | [TripMate ADR-0007 Static Web Build](https://claude.ai/artifact/F2Xm35mpu9KMUtjechuCdm) |
