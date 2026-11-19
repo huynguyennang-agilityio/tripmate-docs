@@ -3,7 +3,7 @@
 **Document type:** API Design\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.0\
+**Version:** 1.1\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -18,7 +18,7 @@ conventions, the resources, the error codes, the realtime protocol,
 and how the contract moves between repositories. The exact request and
 response shapes are not written here: they are the OpenAPI document
 that the backend generates and publishes to `tripmate-contracts`
-(section 7). Each epic's spec lists the endpoints it adds.
+(section 6). Each epic's spec lists the endpoints it adds.
 
 ## 1. Principles
 
@@ -47,22 +47,14 @@ that the backend generates and publishes to `tripmate-contracts`
 | Device | `X-Device-Id: <uuid>` on every request, created once per install; used for rate limits and session names only |
 | Request ID | The server returns `X-Request-Id` on every response; clients send it when reporting a problem |
 | Idempotency | `Idempotency-Key: <uuid>` required on every `POST` that creates a record; the key is made once per user action and reused on retry ([data-model.md](data-model.md), section 6.3) |
-| Concurrency | Responses carry the record's version in `ETag`; `PATCH`, `PUT`, and `DELETE` send `If-Match`. A missing `If-Match` returns `428 request.version_required`; a stale one returns `409 conflict.stale_version` with the current record. |
+| Concurrency | Records that Members edit carry a version ([data-model.md](data-model.md), section 3), returned in `ETag`. `PATCH`, `PUT`, and `DELETE` on such a record send `If-Match`: a missing one returns `428 request.version_required`, a stale one returns `409 conflict.stale_version` with the current record. Records with no version take no `If-Match`, because only the caller changes them or repeating the request gives the same result: the caller's own profile, session, and Vote; a membership; the Invitation; a Saved place; an Idea draft; a Gap acknowledgement or snooze. |
 | Money | `{ "amount": 3000000, "currency": "VND" }`; `amount` is an integer in the smallest unit of the Trip currency |
 | Dates and times | ISO 8601. Trip dates as `YYYY-MM-DD`, Day window and planned times as `HH:MM` in the trip's time zone, moments in UTC with `Z` |
 | Lists | Cursor pagination: `?cursor=<opaque>&limit=<1..100>`; the response has `items` and `nextCursor` |
 | Partial updates | `PATCH` with only the fields that change |
 | Actions that are not edits | `POST` to a named sub-resource, for example `POST /v1/trips/{tripId}/confirm` |
+| Success status | `200` for a read, a change, or an action; `201` with the record for a create; `202` for work that finishes later (assistant requests); `204` for a `DELETE`, which is a soft delete for Expenses, Settlements, bookings, and tasks |
 | Empty values | A field with no value is `null`, never left out, so generated clients see one shape |
-
-### 2.1 Methods and status codes
-
-| Method | Used for | Success |
-|--------|----------|---------|
-| `GET` | Read a record or a list | `200` |
-| `POST` | Create a record, or run an action | `201` with the record, or `200` for an action; `202` for work that finishes later (assistant requests) |
-| `PATCH` | Change some fields of a record | `200` with the record |
-| `DELETE` | Remove a record (soft delete for money, bookings, tasks) | `204` |
 
 ## 3. Resources
 
@@ -87,7 +79,7 @@ written from `/v1/trips/{tripId}`.
 | Method and path | Does | PRD |
 |-----------------|------|-----|
 | `GET /v1/trips`, `POST /v1/trips` | List my trips; create a trip | TRIP-01 |
-| `GET`, `PATCH /v1/trips/{tripId}` | Read and edit trip details | TRIP-02 |
+| `GET`, `PATCH /v1/trips/{tripId}` | Read and edit trip details. A date change that leaves out days with items returns the items it moved to Saved places; in a Confirmed trip it returns `422 itinerary.confirmed_needs_proposal` | TRIP-02 |
 | `POST .../confirm`, `.../undo-confirm`, `.../cancel`, `.../undo-cancel`, `.../archive`, `.../unarchive` | Change the trip state | TRIP-07 |
 | `GET .../members` | Members and Former members | TRIP-05 |
 | `DELETE .../members/{memberId}` | Remove a Member (Owner) | TRIP-06 |
@@ -116,7 +108,7 @@ written from `/v1/trips/{tripId}`.
 | Method and path | Does | PRD |
 |-----------------|------|-----|
 | `GET`, `POST .../days` | List and create Itinerary days | ITN-01 |
-| `POST .../days/{dayId}/items`, `PATCH`, `DELETE .../items/{id}` | Add, edit, remove items (direct edits, outside Confirmed) | ITN-02 to ITN-04 |
+| `POST .../days/{dayId}/items`, `PATCH`, `DELETE .../items/{id}` | Add, edit, remove items directly. In a Confirmed trip these return `422 itinerary.confirmed_needs_proposal`, and the change goes through a Proposal (COL-11) | ITN-02 to ITN-04 |
 | `PUT .../days/{dayId}/order` | Reorder a day's items; sends the full ordered list and the day's version | ITN-03 |
 | `PUT .../items/{id}/progress` | Mark Visited or Skipped, or clear it | ITN-08 |
 | `GET .../progress` | Visited, Skipped, and remaining counts | ITN-09 |
@@ -139,7 +131,7 @@ written from `/v1/trips/{tripId}`.
 | `POST .../bookings/{id}/files` | Get a presigned upload URL for a booking document (P1) | BOOK-05 |
 | `GET .../files/{fileId}` | Get a presigned download URL | BOOK-05 |
 | `GET`, `POST .../tasks`, `PATCH`, `DELETE .../tasks/{id}` | Tasks | TASK-01 to TASK-05 |
-| `GET`, `POST .../expenses`, `PATCH`, `DELETE .../expenses/{id}` | Expenses with their split | EXP-01 to EXP-06 |
+| `GET`, `POST .../expenses`, `PATCH`, `DELETE .../expenses/{id}` | Expenses with their split; `bookingId` links an Expense added from a booking | EXP-01 to EXP-06 |
 | `GET`, `POST .../settlements`, `PATCH`, `DELETE .../settlements/{id}` | Settlements | EXP-10 |
 | `GET .../balances` | Balances of every Member and Former member | EXP-08 |
 | `GET .../settlement-plan` | The Settlement plan | EXP-09 |
@@ -187,7 +179,7 @@ written from `/v1/trips/{tripId}`.
 | `409` | The request conflicts with the current state | `conflict.stale_version`, `proposal.already_closed`, `trip.currency_locked` |
 | `410` | The thing existed but is no longer usable | `invitation.expired`, `invitation.revoked` |
 | `422` | The request is valid but a business rule refuses it | `trip.member_limit_reached`, `trip.owner_must_transfer`, `itinerary.confirmed_needs_proposal` |
-| `428` | `If-Match` is missing on a change | `request.version_required` |
+| `428` | `If-Match` is missing on a change to a record that has a version | `request.version_required` |
 | `429` | A rate limit or quota is reached; `Retry-After` says when to try again | `rate.limited`, `assistant.quota_reached` |
 | `503` | A provider the request needs is down | `assistant.unavailable`, `places.unavailable` |
 
@@ -196,40 +188,10 @@ trip.not_found`, never `403`, so the response never reveals that a
 trip exists. A wrong Invitation code returns `404 invitation.not_found`
 whether or not any trip uses a similar code (PRD FR-02).
 
-### 4.3 First codes by area
-
-| Area | Codes |
-|------|-------|
-| `auth` | `not_signed_in`, `token_expired`, `invalid_credentials`, `email_taken`, `session_revoked` |
-| `trip` | `not_found`, `owner_only`, `former_member_read_only`, `owner_must_transfer`, `member_limit_reached`, `invalid_dates`, `currency_locked`, `state_transition_not_allowed` |
-| `invitation` | `not_found`, `expired`, `revoked`, `already_member` |
-| `proposal` | `already_closed`, `not_author`, `duplicate_of_closed`, `duplicate_of_self` |
-| `itinerary` | `confirmed_needs_proposal`, `day_outside_trip`, `no_trip_dates` |
-| `money` | `split_mismatch`, `not_positive`, `participant_not_member`, `pay_self` |
-| `booking`, `task` | `assignee_not_member` |
-| `assistant` | `unavailable`, `quota_reached`, `invalid_output`, `failed` |
-| `places` | `unavailable`, `not_found` |
-| `file` | `too_large`, `type_not_allowed` |
-| `conflict`, `request`, `rate` | `stale_version`, `invalid`, `version_required`, `idempotency_mismatch`, `limited` |
-
 Each epic spec adds the codes it needs; the published contract holds
 the full list.
 
-## 5. Change Rules That Show in the API
-
-Some product rules decide which endpoint a client must call. The
-backend enforces them; this table tells client developers what to
-expect.
-
-| Situation | What the client does | What the backend returns otherwise |
-|-----------|----------------------|------------------------------------|
-| The trip is Confirmed and a Member changes the Itinerary | Create a Proposal with a change set (COL-11) | `422 itinerary.confirmed_needs_proposal` on a direct item edit |
-| A date change would move Itinerary items while Confirmed | Create a Proposal | `422 itinerary.confirmed_needs_proposal` |
-| A date change leaves days with items outside the trip, outside Confirmed | Send the change; the response lists the items moved to Saved places | -- |
-| A booking is saved as Booked with a payer and an amount | Offer to add an Expense; `POST .../expenses` with `bookingId` | -- |
-| A Vote decides a Proposal | Nothing extra; the response and events show the Decision and the changed Itinerary | -- |
-
-## 6. Realtime Protocol
+## 5. Realtime Protocol
 
 One WebSocket per client at `wss://<api host>/v1/ws`. Messages are JSON
 objects with a `type`.
@@ -251,7 +213,7 @@ sequenceDiagram
     A-->>C: unsubscribed tripId, reason left
 ```
 
-### 6.1 Messages
+### 5.1 Messages
 
 | Direction | Type | Fields | Meaning |
 |-----------|------|--------|---------|
@@ -266,7 +228,7 @@ sequenceDiagram
 | Server to client | `error` | `code` | For example `auth.token_expired`; the client refreshes and sends `auth` again |
 | Server to client | `pong` | -- | Answer to `ping` |
 
-### 6.2 Events
+### 5.2 Events
 
 Events are thin: they name what changed, not its new content. The
 client fetches the record over REST, so access rules and field
@@ -293,25 +255,18 @@ money events only.
 - Desktop shows a native notification for `nudge.posted` (DESK-03);
   Mobile has no push in the MVP.
 
-## 7. The Contract Across Repositories
+## 6. The Contract Across Repositories
 
 Backend, Web, Mobile, and Desktop live in separate repositories
-([architecture.md](architecture.md), section 14). Everything they must
-agree on lives in `tripmate-contracts`.
+([architecture.md](architecture.md), section 11, which also draws how
+they depend on each other). Everything they must agree on lives in
+`tripmate-contracts`.
 
 | In `tripmate-contracts` | Written by |
 |-------------------------|------------|
 | `openapi.json`, the REST contract | Generated by `tripmate-backend`, never edited by hand |
 | `events.schema.json`, the realtime messages and events | Written with the backend change that adds an event |
 | `translations/en.json`, `translations/vi.json` | Anyone; every interface text, error code, and message key |
-
-```mermaid
-flowchart LR
-    BE["tripmate-backend<br/>change merged"] -->|"CI opens a pull request"| CT["tripmate-contracts<br/>new version tag"]
-    CT -->|"pinned version"| WEB["tripmate-web<br/>generated TypeScript client,<br/>next-intl messages"]
-    CT -->|"pinned version"| MOB["tripmate-mobile<br/>generated Dart client,<br/>ARB files"]
-    WEB -->|"tagged Web release"| DSK["tripmate-desktop"]
-```
 
 - When a backend change touches the contract, its CI opens a pull
   request in `tripmate-contracts` with the new `openapi.json`. Merging
@@ -332,8 +287,9 @@ flowchart LR
   published schema; Web and Mobile test against the same pinned
   version (PRD section 9, cross-client API contract tests).
 
-## 8. Version History
+## 7. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-19 | First version: principles, REST conventions, resources by module with their requirements, error format and status codes with the first codes, product rules that show in the API, realtime protocol and events, how the contract moves between repositories. Header links to the page version of this document. |
+| 1.1 | 2026-11-19 | Shorter: the first error codes by area and the Change Rules section are removed, because the status-code table and the resource tables carry the same rules; the methods table is one row of the conventions; the repository diagram stays in architecture.md only. Sections renumbered. Corrected: `If-Match` applies only to records that have a version, and the requests that need none are listed. |

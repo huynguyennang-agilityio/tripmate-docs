@@ -3,7 +3,7 @@
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.0\
+**Version:** 1.1\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -51,7 +51,7 @@ Only the owning module writes to its tables
 | Notifications | `notifications` | Personal in-app notifications (P1) | `notifications` | COL-07 |
 | Assistant | `assistant_requests` | Each assistant request, its status, token use and cost | `assistant` | FR-04 |
 | System | `audit_entries` | The Audit log | `audit` | PRD section 3.2 |
-| System | `outbox_events` | Domain events waiting to be published | `platform` | [architecture.md](architecture.md), section 6.3 |
+| System | `outbox_events` | Domain events waiting to be published | `platform` | [architecture.md](architecture.md), section 5.2 |
 | System | `idempotency_keys` | Keys of recent create requests and their responses | `platform` | FR-08 |
 
 ## 2. Entity Relationship Diagrams
@@ -374,21 +374,22 @@ second line of defence for the rules that must never break.
 These values are computed from the records each time they are read. A
 trip has at most 20 Members and a few hundred records, so computing is
 cheap, and there is no stored total that can drift away from the
-records.
+records. The rule behind each value, and the module it lives in, are
+in [architecture.md](architecture.md), section 4.
 
-| Value | Computed from | Function |
-|-------|---------------|----------|
-| Group Budget | `budget_per_person` times current Members | `itinerary.feasibility.group_budget` |
-| Balances | `expenses`, `expense_shares`, `settlements` not deleted | `money.balances.compute` |
-| Settlement plan | Balances | `money.settlement.hub_plan` |
-| Spending against the Budget | Expenses and the group Budget, also per Member | `money.spending.summary` |
-| Feasibility warnings | Items, planned times, travel times, Estimated costs, bookings not yet added as an Expense, the Day window, the group Budget | `itinerary.feasibility.evaluate` |
-| Gaps and the Readiness checklist | Trip details, Itinerary, bookings, tasks, Feasibility warnings, `gap_states` | `readiness.gaps.compute` |
-| Proposal outcome | Votes and current Members | `decisions.voting.outcome` |
-| Visited, Skipped, and remaining counts | `itinerary_items.progress` | `itinerary.progress.summary` |
+| Value | Computed from |
+|-------|---------------|
+| Group Budget | `budget_per_person` times current Members |
+| Balances | `expenses`, `expense_shares`, `settlements` not deleted |
+| Settlement plan | Balances |
+| Spending against the Budget | Expenses and the group Budget, also per Member |
+| Feasibility warnings | Items, planned times, travel times, Estimated costs, bookings not yet added as an Expense, the Day window, the group Budget |
+| Gaps and the Readiness checklist | Trip details, Itinerary, bookings, tasks, Feasibility warnings, `gap_states` |
+| Proposal outcome | Votes and current Members |
+| Visited, Skipped, and remaining counts | `itinerary_items.progress` |
 
-The stored Proposal `status` is the result of `voting.outcome` at the
-moment a Proposal closes. Once closed it never changes (FR-03).
+The stored Proposal `status` is the outcome at the moment a Proposal
+closes. Once closed it never changes (FR-03).
 
 ## 6. System Records
 
@@ -410,9 +411,9 @@ moment a Proposal closes. Once closed it never changes (FR-03).
 
 - `outbox_events` gets one row per domain event, in the same
   transaction as the change ([architecture.md](architecture.md),
-  section 6.3).
+  section 5.2).
 - `trip_seq` numbers a trip's events without gaps, so a client can tell
-  whether it missed any ([api-design.md](api-design.md), section 6).
+  whether it missed any ([api-design.md](api-design.md), section 5).
 - The worker publishes rows in `id` order and sets `published_at`.
   Published rows are deleted after 7 days.
 
@@ -455,3 +456,4 @@ moment a Proposal closes. Once closed it never changes (FR-03).
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-19 | First version: every entity with its module and requirements, four entity relationship diagrams, naming and storage conventions, constraints the database keeps, values computed instead of stored, Audit log, outbox and idempotency records, what is stored where, migrations. Header links to the page version of this document. |
+| 1.1 | 2026-11-19 | Section 5 no longer names the function behind each computed value; architecture.md owns that list. References follow the new section numbers of architecture.md and api-design.md. |

@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.1\
+**Version:** 1.2\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -43,7 +43,7 @@ this document follows from them.
 | D6 | External services fail without corrupting data, and planning works without AI | PRD section 8, Reliability; FR-04 | Maps and AI sit behind adapters with timeouts, run outside the request transaction, and degrade to "could not be checked". |
 | D7 | Time-based behaviour: trip states change by date, Nudges wait for a quiet chat | PRD FR-02, FR-10 | A worker and a scheduler next to the API, with due work derived from the database so it survives restarts. |
 | D8 | Every Member sees TripMate's own messages in their device language | PRD section 6, shared requirements | The backend stores and sends message keys with parameters and error codes, never text. |
-| D9 | Desktop reuses the Web client, reads the Itinerary offline, and runs on macOS, Windows, and Linux | PRD DESK-01, DESK-06; Linux decided on 2026-11-19 (section 16.2) | The Web client is a static build with no server-side code; Rust only bridges to the operating system. |
+| D9 | Desktop reuses the Web client, reads the Itinerary offline, and runs on macOS, Windows, and Linux | PRD DESK-01, DESK-06; Linux decided on 2026-11-19 (section 12.1) | The Web client is a static build with no server-side code; Rust only bridges to the operating system. |
 | D10 | A small team, 13 weeks, learning Rust on the side | mvp-roadmap.md | A modular monolith, managed hosting, and no infrastructure the team must run by hand. |
 
 ## 2. System Context
@@ -113,6 +113,7 @@ flowchart TB
     API --> RD
     WK --> PG
     WK --> RD
+    SC --> PG
     SC --> RD
     API -->|"presigned URLs"| OS
     W & MO & DW -.->|"upload and download with presigned URL"| OS
@@ -123,7 +124,7 @@ flowchart TB
 | Web client | Next.js App Router, TypeScript, static export | All screens for browsers; the same build runs inside Desktop | Hold domain rules or call external providers directly |
 | Mobile client | Flutter | Screens optimised for use while travelling | Hold domain rules |
 | Desktop client | Tauri 2, Rust; macOS, Windows, Linux | Runs the Web build; DESK-02 to DESK-07 | Run money, voting, or Gap logic |
-| API process | FastAPI on Uvicorn | Authentication, authorization, every read and write, WebSocket connections | Call the LLM or wait for slow providers inside a request |
+| API process | FastAPI on Uvicorn | Authentication, authorization, every read and write, WebSocket connections | Call the LLM, or call any provider inside a database transaction. Place search is its only provider call (section 6.2) |
 | Worker process | Same codebase, job runner | AI requests, Nudge evaluation, travel-time lookups, publishing committed events | Accept client connections |
 | Scheduler process | Same codebase, periodic trigger | Finds due work in PostgreSQL every minute and enqueues it | Hold state of its own |
 | PostgreSQL | Managed PostgreSQL 16+ | The only source of truth | -- |
@@ -202,7 +203,7 @@ An arrow means "calls the public interface of". `audit`, `files`, and
   own.
 - When a module must react to another module's change without
   depending on it (for example `readiness` after a booking changes), it
-  listens to a domain event (section 6.3) instead of being called.
+  listens to a domain event (section 5.2) instead of being called.
 
 **Where each domain rule lives**
 
@@ -221,25 +222,9 @@ An arrow means "calls the public interface of". `audit`, `files`, and
 | When a Nudge may be posted | `readiness` | `nudges.due` | FR-10 |
 | Who may do what | `platform` | `access.capabilities` | PRD section 3.2 |
 
-## 5. Data Model
+## 5. How a Change Flows Through the System
 
-The whole model, with entity relationship diagrams, conventions, and
-the constraints the database keeps, is in
-[data-model.md](data-model.md). The choices that shape the rest of the
-architecture:
-
-| Choice | Why |
-|--------|-----|
-| PostgreSQL is the only source of truth; Redis holds nothing that cannot be rebuilt | Restarts and Redis loss never lose trip or money data |
-| Every trip-scoped table has a `trip_id`, and every query goes through a repository that requires it | A missing scope check cannot be written by accident |
-| Money as `bigint` in the smallest unit of the Trip currency | ADR-0001 |
-| A `version` on every record Members edit | No silent overwrite (PRD business rule 14) |
-| Balances, the Settlement plan, Feasibility warnings, and Gaps are computed from the records, never stored | One source of truth; a trip is small enough to compute on each read |
-| Money records, bookings, and tasks are soft-deleted; the Audit log is append-only | Nothing financial is lost and every change is traceable (PRD business rules 12 and 13) |
-
-## 6. How a Change Flows Through the System
-
-### 6.1 Commands
+### 5.1 Commands
 
 Every write follows the same path. The example is a Member casting the
 Vote that turns a Proposal into a Decision.
@@ -274,7 +259,7 @@ sequenceDiagram
 **Rules for every command**
 
 - Authorization happens before any read of trip data
-  ([security.md](security.md), section 4).
+  ([security.md](security.md), section 3).
 - Domain rules, the change, its Audit log entries, and its outbox
   events are written in one transaction. If any part fails, nothing
   is written.
@@ -285,24 +270,18 @@ sequenceDiagram
   threshold changes (ADR-0002).
 - Nothing slow happens inside the transaction: no LLM call, no Maps
   call. Those run in the worker.
+- A create is safe to retry. Every `POST` that creates a record carries
+  an `Idempotency-Key`, and the same key returns the stored response
+  instead of writing twice ([api-design.md](api-design.md), section 2;
+  [data-model.md](data-model.md), section 6.3). Casting a Vote is a
+  `PUT` of the caller's own Vote, so repeating it changes nothing.
 
-### 6.2 Idempotency
-
-Clients send an `Idempotency-Key` header (a UUID created once per user
-action) on every `POST` that creates something: Expenses, Settlements,
-bookings, tasks, messages, Proposals. The API stores the key with the
-response for 24 hours and returns the stored response if the same key
-arrives again ([data-model.md](data-model.md), section 6.3). This is
-how a double tap or a retry on a weak mobile connection never records
-an Expense twice (FR-08 acceptance criteria). Casting a Vote is a `PUT`
-of the caller's own Vote, so repeating it changes nothing.
-
-### 6.3 Events and the outbox
+### 5.2 Events and the outbox
 
 - Every committed change produces domain events (for example
   `expense.changed`, `proposal.closed`, `member.left`), written to
   the `outbox_events` table in the same transaction. The full list is
-  in [api-design.md](api-design.md), section 6.2.
+  in [api-design.md](api-design.md), section 5.2.
 - The worker reads the outbox in order and publishes each event to the
   trip's Redis channel. A client is told about a change only after it
   is committed.
@@ -312,45 +291,9 @@ of the caller's own Vote, so repeating it changes nothing.
   notifications.
 - Handlers are idempotent, so an event delivered twice does no harm.
 
-## 7. API and Realtime
+## 6. External Integrations
 
-The conventions, resources, error codes, realtime protocol, and the way
-the contract moves between repositories are in
-[api-design.md](api-design.md). In short:
-
-- One versioned REST API (`/v1`) for every client, described by the
-  OpenAPI document the backend generates and publishes to
-  `tripmate-contracts`; Web and Mobile use clients generated from it.
-- Errors and TripMate's own messages are codes and message keys, never
-  text (D8).
-- Writes send `If-Match` with the version they read, and every create
-  sends an `Idempotency-Key`.
-- One WebSocket per client carries thin events (type, ID, version, and
-  a per-trip sequence number) after each change is committed; the
-  client fetches the record over REST, so access rules live in one
-  place.
-
-## 8. Security
-
-Authentication, the capability table, data protection, Desktop and AI
-security, third parties, and the threat model are in
-[security.md](security.md). In short:
-
-- TripMate runs its own authentication: Argon2id passwords, 15-minute
-  access tokens, and rotating refresh tokens stored as hashes in
-  `sessions`, so any device can be signed out.
-- Each client keeps its refresh token where its platform keeps secrets:
-  an `HttpOnly` cookie on Web, the operating system's credential store
-  on Desktop, Keychain or Keystore on Mobile.
-- One access guard loads the caller's membership on every trip-scoped
-  request and checks the capability the endpoint declares; a trip the
-  caller cannot see returns `404`.
-- Files sit in a private Cloudflare R2 bucket and are reached only
-  through short-lived presigned URLs issued after the guard passes.
-
-## 9. External Integrations
-
-### 9.1 AI assistant
+### 6.1 AI assistant
 
 The assistant runs in the worker through LangChain, using Anthropic
 Claude models: a larger model for place suggestions and Itinerary
@@ -385,11 +328,12 @@ sequenceDiagram
 |------|--------------------|
 | AI never changes the trip (FR-04, business rule 8) | Tools are read-only. Only backend code creates a Proposal or an Idea draft, after validation, through the same `decisions` service a Member uses. |
 | Outputs match a schema (FR-04) | Every output is parsed into a Pydantic model; invalid output is retried once, then the request fails with `assistant.invalid_output`. |
-| Tools stay inside the trip | The trip ID is bound by the backend when the tools are created; the model cannot choose another trip. |
-| Chat text cannot steer the assistant (prompt injection) | Discussion messages are passed as quoted data, never as instructions; the tools can do no harm even if the model is misled. |
 | Estimates are labelled (AI-08, AI-10) | Schemas have explicit fields for source, fetch time, and "estimate"; the client labels them. |
 | AI down does not stop planning (FR-04) | Assistant endpoints return `assistant.unavailable`; every other endpoint is unaffected. |
 | Cost stays bounded | Per-user and per-trip daily request quotas in Redis, a token limit per request, prompt caching for the fixed part of prompts, and token and cost metrics per request. |
+
+Prompt injection, keeping the tools inside one trip, and what data
+reaches the provider are in [security.md](security.md), section 6.
 
 `get_weather` from the PRD's suggested tools is not built until a
 weather provider is chosen; the assistant says weather is not checked.
@@ -397,7 +341,7 @@ weather provider is chosen; the assistant says weather is not checked.
 How AI quality is measured (golden dataset, metrics, release gates) is
 owned by `docs/test-strategy.md`.
 
-### 9.2 Maps and places
+### 6.2 Maps and places
 
 TripMate uses Google Maps Platform: Places API for search and details,
 Routes API for travel time between consecutive Itinerary items.
@@ -421,7 +365,7 @@ Routes API for travel time between consecutive Itinerary items.
 - Usage is capped with daily quotas and a billing alert on the Google
   Cloud project.
 
-### 9.3 Failure handling
+### 6.3 Failure handling
 
 | Provider | Timeout | When it fails |
 |----------|---------|---------------|
@@ -430,7 +374,7 @@ Routes API for travel time between consecutive Itinerary items.
 | Routes API | 5 s | Warning says "could not be checked"; retried with backoff |
 | Cloudflare R2 | 10 s | Upload fails; the booking itself is saved |
 
-## 10. Languages
+## 7. Languages
 
 - One shared translation source, `translations/en.json` and
   `translations/vi.json` in `tripmate-contracts`, in ICU message
@@ -447,9 +391,9 @@ Routes API for travel time between consecutive Itinerary items.
   locale and the Trip currency.
 - CI fails if any key is missing in either language.
 
-## 11. Clients
+## 8. Clients
 
-### 11.1 Web
+### 8.1 Web
 
 - Next.js App Router, TypeScript, static export (section 3).
 - Server data through the generated API client and a query cache
@@ -459,16 +403,16 @@ Routes API for travel time between consecutive Itinerary items.
   (notifications, offline cache, keychain); on the plain Web it does
   nothing or uses browser features.
 
-### 11.2 Mobile
+### 8.2 Mobile
 
 - Flutter, with the Dart API client generated from the pinned
   contracts version.
 - Invitation links open the app through iOS Universal Links and
   Android App Links on the same `https://` join URL as the Web.
 - No offline mode and no push in the MVP. Expense entry on a weak
-  connection is safe to retry because of idempotency keys (section 6.2).
+  connection is safe to retry because of idempotency keys (section 5.1).
 
-### 11.3 Desktop
+### 8.3 Desktop
 
 The Rust shell does only what the PRD lists; the screens are the Web
 build. Desktop ships for macOS, Windows, and Linux.
@@ -489,54 +433,27 @@ build. Desktop ships for macOS, Windows, and Linux.
 |---|-------|---------|-------|
 | Webview | WKWebView | WebView2 (Chromium) | WebKitGTK |
 | Packages | `.dmg` | `.msi` and `.exe` installer | AppImage and `.deb` |
-| Signing | Apple Developer ID, notarized | Authenticode | Checksum and detached signature; no operating-system signing step |
 | Auto-update (DESK-07) | Yes | Yes | AppImage only; `.deb` users update by installing the new package |
 | Global shortcut (DESK-05) | Yes | Yes | On X11. Wayland, the default on current Ubuntu and Fedora, does not allow global shortcuts; users there add an Expense from the tray menu |
 | Tray (DESK-04) | Menu bar | Notification area | AppIndicator; GNOME shows it only with the AppIndicator extension, KDE shows it by default |
-| Refresh token | Keychain | Credential Manager | Secret Service (GNOME Keyring or KWallet) |
 | Release check | Clean macOS machine | Clean Windows machine | Clean Ubuntu LTS, on both X11 and Wayland |
 
+- How installers are signed and where each platform keeps the refresh
+  token are in [security.md](security.md), sections 5 and 2.1.
 - `tripmate-desktop` builds from a tagged release of `tripmate-web`, so
   Desktop always ships a known Web version.
 - WebKitGTK renders slightly differently from the other two webviews,
   so the Desktop UI checks run on Linux too.
 - The offline cache is cleared at sign-out.
 
-## 12. Deployment and Operations
+## 9. Deployment and Operations
 
-### 12.1 Hosting
+### 9.1 Hosting
 
 The backend runs on a managed platform-as-a-service in the Singapore
-region, the closest region to the first users in Vietnam.
-
-```mermaid
-flowchart TB
-    subgraph Users
-        B["Browsers"]
-        P["Phones"]
-        DK["Desktop apps"]
-    end
-    CDN["CDN<br/>static Web build"]
-    subgraph PaaS["PaaS, Singapore region"]
-        LB["HTTPS load balancer"]
-        API1["API instance"]
-        API2["API instance"]
-        WK["Worker"]
-        SC["Scheduler"]
-        PG[("Managed PostgreSQL<br/>daily backups, point-in-time recovery")]
-        RD[("Managed Redis")]
-    end
-    OBJ[("Cloudflare R2")]
-    REL["Desktop update channel"]
-
-    B --> CDN
-    B & P & DK --> LB
-    LB --> API1 & API2
-    API1 & API2 & WK & SC --> PG
-    API1 & API2 & WK & SC --> RD
-    API1 & API2 --> OBJ
-    DK --> REL
-```
+region, the closest region to the first users in Vietnam. It runs the
+containers of section 3: at least two API instances behind the
+platform's HTTPS load balancer, one worker, and one scheduler.
 
 The platform is chosen in Phase 0 against these needs:
 
@@ -550,7 +467,7 @@ The platform is chosen in Phase 0 against these needs:
 | Preview environment per pull request | Review in the AI-native SDLC |
 | Container images | Moving to AWS later needs no code change |
 
-### 12.2 Environments
+### 9.2 Environments
 
 | Environment | Purpose | Data |
 |-------------|---------|------|
@@ -559,7 +476,7 @@ The platform is chosen in Phase 0 against these needs:
 | Staging | Release candidates, Desktop update tests, beta | Test data only |
 | Production | Real groups | Real data |
 
-### 12.3 Delivery
+### 9.3 Delivery
 
 - CI on GitHub Actions: lint, type checks, unit and property tests,
   integration tests against real PostgreSQL and Redis, contract
@@ -572,26 +489,26 @@ The platform is chosen in Phase 0 against these needs:
 - How releases, rollbacks, and launch checks are run day to day is
   owned by `docs/release-plan.md`.
 
-### 12.4 Observability
+### 9.4 Observability
 
 | Signal | Design |
 |--------|--------|
-| Logs | Structured JSON with request ID, user ID, and trip ID; no personal data ([security.md](security.md), section 5) |
+| Logs | Structured JSON with request ID, user ID, and trip ID; no personal data ([security.md](security.md), section 4) |
 | Traces | OpenTelemetry across API, worker, database, Redis, and outgoing calls to Claude and Google |
 | Metrics | Request rate, errors, and latency per endpoint (P95 target 500 ms, PRD section 8); queue depth and job age; WebSocket connections; LLM tokens and cost; Maps calls and cost; Nudges posted |
 | Errors | Error reporting with release tags for backend, Web, Mobile, and Desktop |
 | Alerts | P95 over target, error rate, job age over 5 minutes, outbox not draining, AI or Maps spend over budget |
 
-## 13. Background Work
+## 10. Background Work
 
-The worker runs jobs from a Redis-backed queue (Celery). The scheduler
+The worker runs jobs from a Redis-backed queue. The scheduler
 does not keep timers of its own: every minute it asks PostgreSQL what
 is due and enqueues it. Losing Redis therefore loses no work, only a
 minute of delay.
 
 | Job | Trigger | Rules from |
 |-----|---------|------------|
-| Publish outbox events | New outbox rows; also every few seconds | Section 6.3 |
+| Publish outbox events | New outbox rows; also every few seconds | Section 5.2 |
 | Start and complete trips | Scheduler: trips whose start date or the day after their end date has begun in the trip's time zone | FR-02 |
 | Evaluate Nudges | 10 minutes after the last message of a trip, at Confirm, the day before departure, and when a snooze ends | FR-10 |
 | Start Preparation Nudges | Scheduler: 14 days before the start date (as set on the trip) | FR-10 |
@@ -607,7 +524,7 @@ minute of delay.
 - Invitation expiry needs no job: an Invitation is checked against its
   expiry time when it is used.
 
-## 14. Repositories
+## 11. Repositories
 
 Every part has its own repository.
 
@@ -631,7 +548,7 @@ flowchart LR
 - A feature that touches the API lands in order: backend first, kept
   backward compatible; then the contract; then each client in its own
   pull request. How the contract is versioned and checked is in
-  [api-design.md](api-design.md), section 7.
+  [api-design.md](api-design.md), section 6.
 - Each repository has its own CI, its own `CLAUDE.md` pointing to the
   glossary and these documents, and its own release tags.
 - Separate repositories keep each client's tooling (Python, Node,
@@ -639,25 +556,9 @@ flowchart LR
   per repository for a cross-cutting feature, which the contract order
   above keeps safe.
 
-## 15. How the Non-Functional Requirements Are Met
+## 12. Decisions and Open Questions
 
-| PRD requirement | Met by |
-|-----------------|--------|
-| Performance: API P95 under 500 ms | Slow work (LLM, Maps) moved to the worker; small trips (at most 20 Members) so derived values are computed per request; indexes on `trip_id`; P95 metric and alert |
-| Realtime | WebSocket with Redis fan-out, sequence numbers, and catch-up ([api-design.md](api-design.md), section 6) |
-| Security | Own authentication with rotating refresh tokens; access guard with declared capabilities; rate limits ([security.md](security.md)) |
-| Privacy | 404 for trips a user cannot see; presigned file URLs after the guard; no personal data in logs |
-| Integrity | One transaction per command with row locks; idempotency keys; integer money; property tests for splits and the Settlement plan |
-| Auditability | Audit log entry written in the same transaction as every change |
-| Reliability | Provider adapters with timeouts outside transactions; outbox; jobs derived from the database |
-| Compatibility | Static Web build for browsers and Desktop; Flutter for iOS and Android; Tauri for macOS, Windows, and Linux |
-| Observability | Logs, traces, metrics, error reporting, alerts (section 12.4) |
-| AI safety | Read-only tools bound to one trip; schema validation; Proposals instead of changes; quotas (section 9.1) |
-| Accessibility | Owned by the design system and each epic's design; no architectural constraint |
-
-## 16. Decisions and Open Questions
-
-### 16.1 Decisions made in this document
+### 12.1 Decisions made in this document
 
 | Decision | Alternatives set aside | ADR |
 |----------|------------------------|-----|
@@ -670,25 +571,27 @@ flowchart LR
 | Balances and Gaps computed, not stored | Stored running totals | No |
 | One repository per part, with shared contracts and translations in `tripmate-contracts` | One repository for backend, Web, and Mobile | No |
 | Cloudflare R2 for files, through the S3 API | AWS S3, Backblaze B2, a Vietnamese provider | No: any S3-compatible store works with a configuration change |
-| Desktop on Linux in the MVP, with the Wayland and GNOME limits in section 11.3 | Linux after the MVP | No: a scope decision, recorded in prd.md |
+| Desktop on Linux in the MVP, with the Wayland and GNOME limits in section 8.3 | Linux after the MVP | No: a scope decision. prd.md and mvp-roadmap.md still name macOS and Windows only (section 12.2) |
 
 ADR candidates are proposed to the product owner before they are
 written, following [CLAUDE.md](../CLAUDE.md).
 
-### 16.2 Open questions
+### 12.2 Open questions and follow-ups
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
 | In which time zone does a trip start and end? The PRD says "on the start date" | The destination's time zone, from the place data; the creating Member's device time zone when there is no destination yet | EPIC-02 spec |
-| Which PaaS? | Chosen in Phase 0 against section 12.1 | Phase 0 |
+| Which PaaS? | Chosen in Phase 0 against section 9.1 | Phase 0 |
+| Which job queue library runs the worker? | Celery on Redis is the candidate; chosen in Phase 0 with the PaaS | Phase 0 |
 | Which weather source for `get_weather`? | None in the MVP; the assistant says weather is not checked | EPIC-04 spec |
 | Which email service for password reset? | Chosen with AUTH-06, after the MVP | AUTH-06 |
 | What happens to a user's data when they delete their account? | Not in the MVP; needs a product rule because Expenses must keep the person | Before public launch |
-| Linux in prd.md and mvp-roadmap.md | The PRD's platforms, DESK-07, Compatibility, and desktop tests, and the roadmap's Desktop release week, add Linux with the limits in section 11.3 | Next PRD version |
+| prd.md and mvp-roadmap.md do not name Linux yet | A follow-up, not a question: the PRD's platforms line, Desktop scope, DESK-07 and its acceptance criteria, Compatibility, and desktop tests, and the roadmap's stack and Desktop release tasks, add Linux with the limits in section 8.3 | Next PRD version |
 
-## 17. Version History
+## 13. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-18 | First version: drivers, system context, containers, backend modules and where each domain rule lives, data model, command and event flow, API and realtime conventions, security, AI and Maps integration, languages, clients, deployment, background work, repositories, non-functional requirements, decisions and open questions. Authentication built in, PaaS in Singapore, Claude, and Google Maps chosen by the product owner. |
 | 1.1 | 2026-11-19 | Data model, API, and security details moved to the new data-model.md, api-design.md, and security.md; this document keeps a summary of each. Desktop also runs on Linux, with a per-platform table (packages, signing, auto-update, Wayland shortcut and GNOME tray limits). Files stored in Cloudflare R2. Every part in its own repository, with shared contracts and translations in tripmate-contracts. Vote path and event names match api-design.md. Header links to the page version of this document. |
+| 1.2 | 2026-11-19 | Shorter, with nothing repeated from the companion documents. Removed: the Data Model, API and Realtime, and Security summaries; the non-functional requirements table, whose rows only pointed at other sections; the hosting diagram; the security rows of the assistant and Desktop tables. Idempotency is one rule in section 5.1. Sections renumbered. Corrected: the scheduler reads PostgreSQL in the containers diagram; the API process calls no provider inside a transaction, and place search is its only provider call; the job queue library is an open question, no longer named as chosen; prd.md and mvp-roadmap.md do not name Linux yet. |
