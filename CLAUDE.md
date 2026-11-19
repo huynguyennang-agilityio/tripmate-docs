@@ -18,7 +18,10 @@ by AI agents such as Claude Code.
 | [docs/solution-options.md](docs/solution-options.md) | Which options were considered for each problem, and why features are in or out of the MVP. |
 | [docs/information-architecture.md](docs/information-architecture.md) | Where things live in the product and how people move between them, for every platform: places, Navigation Map, navigation rules. |
 | [docs/ux-review.md](docs/ux-review.md) | Usability problems found in the prototypes, how serious they are, and the fixes. |
-| [docs/architecture.md](docs/architecture.md) | How the system is organised: modules, data model, API and realtime conventions, security, integrations, hosting. |
+| [docs/architecture.md](docs/architecture.md) | How the system is organised: drivers, containers, modules, change flow, integrations, clients, hosting, repositories. |
+| [docs/data-model.md](docs/data-model.md) | What TripMate stores: entities, ERD, conventions, database constraints. |
+| [docs/api-design.md](docs/api-design.md) | How clients talk to the backend: REST conventions, resources, error codes, realtime protocol, the contract across repositories. |
+| [docs/security.md](docs/security.md) | How accounts, trips, and money records are kept safe: authentication, capabilities, data protection, threats. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
 
 When a document is created, add it here and turn its box in the

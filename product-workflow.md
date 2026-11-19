@@ -154,7 +154,10 @@ the product is consistent, feasible, and able to grow.
   [design system](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) artifact;
   [docs/information-architecture.md](docs/information-architecture.md);
   [docs/ux-review.md](docs/ux-review.md);
-  [docs/architecture.md](docs/architecture.md); [docs/adr](docs/adr/); the technical design
+  [docs/architecture.md](docs/architecture.md);
+  [docs/data-model.md](docs/data-model.md);
+  [docs/api-design.md](docs/api-design.md);
+  [docs/security.md](docs/security.md); [docs/adr](docs/adr/); the technical design
   section of each `docs/specs/<epic>/spec.md`.
 - **Ready to move on when:** every core journey can be clicked through;
   key states are designed; a usability test is done and serious issues
@@ -352,7 +355,10 @@ exist today, and their versions, is shown in the Build Tracker.
 | [Design system](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) (artifact) | What do screens look like? Colour, type, spacing tokens, usage rules, and components, the same for every client | 3 |
 | [docs/information-architecture.md](docs/information-architecture.md) | Where do things live and how do people move between them? Places, Navigation Map, user journey, high-level flows, the same for every platform | 3 |
 | [docs/ux-review.md](docs/ux-review.md) | What did testing show and what changed? | 3 |
-| [docs/architecture.md](docs/architecture.md) | How is the system organised? Modules, data model, API contracts, security, infrastructure | 3 |
+| [docs/architecture.md](docs/architecture.md) | How is the system organised? Drivers, containers, modules, change flow, integrations, clients, hosting, repositories | 3 |
+| [docs/data-model.md](docs/data-model.md) | What is stored and which rules does the database keep? Entities, ERD, conventions, constraints | 3 |
+| [docs/api-design.md](docs/api-design.md) | How do clients talk to the backend? REST conventions, resources, error codes, realtime protocol, the contract across repositories | 3 |
+| [docs/security.md](docs/security.md) | How are accounts, trips, and money records kept safe? Authentication, capabilities, data protection, threats and controls | 3 |
 | [docs/adr](docs/adr/) | Why this decision over the alternatives? | 3 |
 | [mvp-roadmap.md](mvp-roadmap.md) | In what order and by when? Phases, milestones, risks, release gates | 4 |
 | `docs/test-strategy.md` | How is TripMate tested? Test levels, requirements-to-test mapping, AI evaluation plan and golden dataset | 4 |
@@ -409,4 +415,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.4 | 2026-11-17 | Document map: added docs/information-architecture.md for stage 3 (places, Navigation Map, user journey, and high-level flows, shared by all platforms). |
 | 2.5 | 2026-11-18 | Document map: added the design system artifact for stage 3 (Design System Foundation: tokens, usage rules, and components for every client). It is the source of truth, like the prototype canvases; there is no .md copy. |
 | 2.6 | 2026-11-18 | docs/ux-review.md now exists and is linked from the Stage 3 documents and the document map. |
-| 2.7 | 2026-11-18 | docs/architecture.md now exists and is linked from the Stage 3 documents, the feedback loops, and the document map. |
+| 2.7 | 2026-11-19 | docs/architecture.md now exists and is linked from the Stage 3 documents, the feedback loops, and the document map. Three companion documents added for stage 3: docs/data-model.md (Database ERD), docs/api-design.md (API Contracts), and docs/security.md (Security Architecture). |

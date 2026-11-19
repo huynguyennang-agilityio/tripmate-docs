@@ -23,7 +23,10 @@ separate repositories.
 | See what screens look like: colours, type, components | [TripMate Design System](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) |
 | Try the product | The prototypes under [Live pages](#live-pages) |
 | See what testing found and what changed | [docs/ux-review.md](docs/ux-review.md) |
-| Know how the system is built: modules, data, API, security, hosting | [docs/architecture.md](docs/architecture.md) |
+| Know how the system is built: modules, integrations, clients, hosting | [docs/architecture.md](docs/architecture.md) |
+| Look up a table, a constraint, or what is stored where | [docs/data-model.md](docs/data-model.md) |
+| Look up an endpoint convention, an error code, or a realtime event | [docs/api-design.md](docs/api-design.md) |
+| Know who may do what and how data is protected | [docs/security.md](docs/security.md) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
 New to the project? Read the vision, then sections 2 to 4 of the PRD,
@@ -47,7 +50,7 @@ flowchart TB
     end
     subgraph S3["3: UI/UX & Architecture"]
         direction LR
-        proto["Prototypes"] ~~~ ds["Design system"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"] ~~~ arch["docs/architecture.md"]
+        proto["Prototypes"] ~~~ ds["Design system"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"] ~~~ arch["docs/architecture.md"] ~~~ dm["docs/data-model.md"] ~~~ api["docs/api-design.md"] ~~~ sec["docs/security.md"]
     end
     subgraph S4["4: SOW / Planning"]
         direction LR
@@ -104,6 +107,9 @@ docs/
   information-architecture.md  Stage 3
   ux-review.md         Stage 3
   architecture.md      Stage 3
+  data-model.md        Stage 3
+  api-design.md        Stage 3
+  security.md          Stage 3
   adr/                 Decision records
 ```
 
