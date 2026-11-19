@@ -2,8 +2,8 @@
 
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.1\
+**Status:** Approved\
+**Version:** 1.4\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -27,7 +27,7 @@ Only the owning module writes to its tables
 | Area | Entity | Holds | Module | PRD |
 |------|--------|-------|--------|-----|
 | People | `users` | A person's account and profile | `identity` | FR-01 |
-| People | `credentials` | Password hash or Google identity of a user | `identity` | AUTH-01, AUTH-05 |
+| People | `credentials` | Password hash, or the Google or Apple identity, of a user | `identity` | AUTH-01, AUTH-05 |
 | People | `sessions` | One signed-in device, with its hashed refresh token | `identity` | AUTH-02 |
 | Trips | `trips` | Trip details, state, Trip currency, Budget per person, Day window | `trips` | FR-02 |
 | Trips | `trip_members` | A user's membership of a trip: Owner or Member, current or Former member, join order | `trips` | FR-02 |
@@ -339,7 +339,7 @@ erDiagram
 | Trip scope | Every trip-scoped table has a non-null `trip_id`; every query goes through a repository that requires it | PRD business rule 2 |
 | Money | `bigint` in the smallest unit of the Trip currency; the currency lives on `trips` only | ADR-0001 |
 | Join order | `trip_members.join_seq` comes from a sequence and is kept when a Former member rejoins | Remainders and hub ties go by join order (ADR-0001, ADR-0004) |
-| Time | `timestamptz` in UTC for moments; `date` and `time` for trip days and the Day window, read in `trips.time_zone` | Trip states change on the start date where the trip happens |
+| Time | `timestamptz` in UTC for moments. Trip dates and Itinerary days are `date` values read in `trips.time_zone`, which is set from the creating Member's device when the trip is created. The Day window and planned times are `time` values, local at the place and never converted | Trip time zone rules (FR-02): a trip starts and ends in the time zone of the place the group departs from |
 | Concurrency | A `version` column on every record Members edit, raised by one on each write; a write must name the version it read | PRD business rule 14 |
 | Deletion | Expenses, Settlements, bookings, and tasks are soft-deleted with `deleted_at`; trips are never deleted, only Cancelled or Archived | PRD business rules 12 and 13 |
 | Enumerations | Stored as `text` with a `CHECK` constraint, not a PostgreSQL enum type | Adding a value needs no table rewrite |
@@ -457,3 +457,6 @@ closes. Once closed it never changes (FR-03).
 |---------|------|---------|
 | 1.0 | 2026-11-19 | First version: every entity with its module and requirements, four entity relationship diagrams, naming and storage conventions, constraints the database keeps, values computed instead of stored, Audit log, outbox and idempotency records, what is stored where, migrations. Header links to the page version of this document. |
 | 1.1 | 2026-11-19 | Section 5 no longer names the function behind each computed value; architecture.md owns that list. References follow the new section numbers of architecture.md and api-design.md. |
+| 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
+| 1.3 | 2026-11-19 | `credentials` also holds an Apple identity, following AUTH-05 in prd.md. |
+| 1.4 | 2026-11-19 | Time convention follows the Trip time zone rules in prd.md: `trips.time_zone` comes from the creating Member's device and is used for dates; the Day window and planned times are local at the place. |

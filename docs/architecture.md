@@ -2,8 +2,8 @@
 
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.3\
+**Status:** Approved\
+**Version:** 1.6\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -562,25 +562,25 @@ flowchart LR
 
 | Decision | Alternatives set aside | ADR |
 |----------|------------------------|-----|
-| Authentication built into the backend, with rotating refresh tokens | A hosted identity service (Supabase Auth, Clerk, Auth0) | Candidate |
+| Authentication built into the backend, with rotating refresh tokens | A hosted identity service (Supabase Auth, Clerk, Auth0) | [ADR-0005](adr/0005-authentication-built-into-the-backend.md) |
 | Managed PaaS in Singapore | AWS from the start; a self-managed server | No: reversible, since the backend ships as a container |
 | Anthropic Claude through LangChain | OpenAI, Google Gemini | No: models are configuration |
-| Google Maps Platform behind a provider interface | Goong, Mapbox | Candidate: the caching limits shape the data model |
-| Web client as a static export, no server rendering | Server rendering with a separate Desktop build | Candidate: hard to reverse once screens are built |
+| Google Maps Platform behind a provider interface | Goong, Mapbox | [ADR-0006](adr/0006-google-maps-platform-behind-a-provider-interface.md) |
+| Web client as a static export, no server rendering | Server rendering with a separate Desktop build | [ADR-0007](adr/0007-web-client-is-a-static-build.md) |
 | Outbox and thin events for realtime | Publishing events directly from the request | No |
 | Balances and Gaps computed, not stored | Stored running totals | No |
 | One repository per part, with shared contracts and translations in `tripmate-contracts` | One repository for backend, Web, and Mobile | No |
 | Cloudflare R2 for files, through the S3 API | AWS S3, Backblaze B2, a Vietnamese provider | No: any S3-compatible store works with a configuration change |
 | Desktop on Linux in the MVP, with the Wayland and GNOME limits in section 8.3 | Linux after the MVP | No: a scope decision, recorded in prd.md |
 
-ADR candidates are proposed to the product owner before they are
-written, following [CLAUDE.md](../CLAUDE.md).
+The three ADRs were written on 2026-11-19 with the product owner's
+agreement. The other decisions need no ADR, for the reason given in
+the table.
 
 ### 12.2 Open questions
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| In which time zone does a trip start and end? The PRD says "on the start date" | The destination's time zone, from the place data; the creating Member's device time zone when there is no destination yet | EPIC-02 spec |
 | Which PaaS? | Chosen in Phase 0 against section 9.1 | Phase 0 |
 | Which job queue library runs the worker? | Celery on Redis is the candidate; chosen in Phase 0 with the PaaS | Phase 0 |
 | Which weather source for `get_weather`? | None in the MVP; the assistant says weather is not checked | EPIC-04 spec |
@@ -595,3 +595,6 @@ written, following [CLAUDE.md](../CLAUDE.md).
 | 1.1 | 2026-11-19 | Data model, API, and security details moved to the new data-model.md, api-design.md, and security.md; this document keeps a summary of each. Desktop also runs on Linux, with a per-platform table (packages, signing, auto-update, Wayland shortcut and GNOME tray limits). Files stored in Cloudflare R2. Every part in its own repository, with shared contracts and translations in tripmate-contracts. Vote path and event names match api-design.md. Header links to the page version of this document. |
 | 1.2 | 2026-11-19 | Shorter, with nothing repeated from the companion documents. Removed: the Data Model, API and Realtime, and Security summaries; the non-functional requirements table, whose rows only pointed at other sections; the hosting diagram; the security rows of the assistant and Desktop tables. Idempotency is one rule in section 5.1. Sections renumbered. Corrected: the scheduler reads PostgreSQL in the containers diagram; the API process calls no provider inside a transaction, and place search is its only provider call; the job queue library is an open question, no longer named as chosen; prd.md and mvp-roadmap.md do not name Linux yet. |
 | 1.3 | 2026-11-19 | Linux on Desktop is now recorded in prd.md and mvp-roadmap.md, so the follow-up in section 12.2 is closed and removed, and driver D9 cites the PRD's Desktop client section. |
+| 1.4 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
+| 1.5 | 2026-11-19 | The time zone question in section 12.2 is closed: prd.md now says a trip starts and ends in the time zone of the place the group departs from, taken from the creating Member's device. |
+| 1.6 | 2026-11-19 | The three ADR candidates in section 12.1 are written and linked: ADR-0005 (authentication built into the backend), ADR-0006 (Google Maps Platform behind a provider interface), ADR-0007 (the Web client is a static build). |

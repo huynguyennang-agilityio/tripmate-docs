@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.16\
+**Version:** 1.18\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows, Linux)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
@@ -169,7 +169,7 @@ Why the scope looks like this, and which options were set aside, is in
 | AUTH-02 | Users can sign out and manage their session. | P0       |
 | AUTH-03 | Users can view and edit their profile.       | P0       |
 | AUTH-04 | Users can set a display name and avatar.     | P1       |
-| AUTH-05 | Social sign-in is supported.                 | P1       |
+| AUTH-05 | Social sign-in is supported: Google and Sign in with Apple. | P1 |
 | AUTH-06 | Users who signed up with email and password can reset a forgotten password by email. | P1 |
 
 **Acceptance criteria**
@@ -178,18 +178,26 @@ Why the scope looks like this, and which options were set aside, is in
 - The backend validates authentication on every protected request.
 - A user can update their profile without changing another user's data.
 
+**Social sign-in (AUTH-05)**
+
+- Google sign-in and Sign in with Apple ship together. App Store Review
+  Guideline 4.8 asks an app that offers a third-party sign-in such as
+  Google to also offer an equivalent option that protects privacy.
+- Both are offered on every client, so an account created with either
+  one can sign in on Web, Mobile, and Desktop.
+
 **Password reset (AUTH-06)**
 
 AUTH-06 is planned for after the MVP. Until then a user who forgets
-their password signs in with Google, if their account uses it.
+their password signs in with Google or Apple, if their account uses it.
 
 - The user asks for a reset link by entering their email.
 - The response is the same whether or not an account exists for that
   email, so the screen never reveals who has an account.
 - The reset link works once and expires after a limited time.
 - Setting a new password signs the user out of their other sessions.
-- An account created with Google sign-in has no TripMate password;
-  the reset screen points the user to Google sign-in.
+- An account created with Google or Apple sign-in has no TripMate
+  password; the reset screen points the user to that sign-in.
 
 ### FR-02 -- Trip Management
 
@@ -237,6 +245,21 @@ the paths; the table below is the rule.
 | Completed | Automatically, after the end date.                         |
 | Cancelled | Any Member cancels from Planning or Confirmed. Undo returns the trip to the state it was in. |
 | Archived  | Any Member archives a Completed or Cancelled trip. Unarchiving returns it to that state. |
+
+**Trip time zone**
+
+- The start date and the end date are read in the time zone of the place
+  the group departs from and returns to. A group that leaves Đà Nẵng
+  for Tokyo on 10 December is Ongoing from 00:00 on 10 December, Đà
+  Nẵng time.
+- TripMate takes that time zone from the device of the Member who
+  creates the trip and keeps it for the trip. Trip details have no
+  field for it in the MVP.
+- Every date TripMate acts on uses the same time zone: the start and
+  the end of the trip, the start of Preparation Nudges, and the Nudge
+  the day before departure.
+- Times in the Itinerary and the Day window are local times at the
+  place and are not converted.
 
 **Budget rules**
 
@@ -947,6 +970,7 @@ planned for after the MVP and have no metric yet.
 | When may TripMate nudge the group? | After 10 quiet minutes, by stage group, batched, at most once per day. Gaps on a Proposal show immediately. |
 | How do Members answer a Nudge or assistant question? | Up to four quick choices plus "Other…"; free text that changes the plan becomes a Proposal. |
 | Does a trip that nobody confirmed still start? | Yes. A trip in Planning or Confirmed becomes Ongoing on its start date; Confirm is not required. |
+| In which time zone does a trip start and end? | In the time zone of the place the group departs from and returns to, taken from the device of the Member who creates the trip. Times in the Itinerary stay local to the place. |
 | Can Confirm be undone? | Yes, by any Member; the trip returns to Planning and the change is audited ([ADR-0002](docs/adr/0002-equal-rights-for-members.md)). |
 | What can a Former member still see? | While their Balance is not zero: the Expenses they took part in, their own Balance, and the Settlement plan, read-only. Nothing after that ([ADR-0003](docs/adr/0003-members-may-leave-with-a-balance.md)). |
 | Can the MVP acceptance scenario include a requirement that may be deferred? | No, only P0. Idea capture (AI-09) and Saved places (ITN-07) are therefore P0. In-app notifications (COL-07) stay P1, so the desktop app must notify for Nudges only. |
@@ -1005,3 +1029,5 @@ planned for after the MVP and have no metric yet.
 | 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. New COL-11: in a Confirmed trip, Propose a change on an Itinerary item opens a Proposal to remove or replace it; a closed Proposal is never reopened. Trip detail rules: the Trip currency locks once an Expense or Settlement exists; items on days that new dates leave out move to Saved places, and in a Confirmed trip such a change needs a Proposal. |
 | 1.15 | 2026-11-18 | Editing rules: editing, reordering or removing an Itinerary item that a Decision added posts a line in the discussion with what changed and the original vote. |
 | 1.16 | 2026-11-19 | Desktop also ships for Linux in the MVP, as an AppImage and a `.deb` package: the platforms, the Desktop client, DESK-07, its acceptance criteria, Compatibility, desktop tests, and dependencies name Linux. A new table gives the Linux limits for the tray icon (DESK-04), the global shortcut (DESK-05), and updates and signing (DESK-07). Section 10 records the decision. |
+| 1.17 | 2026-11-19 | AUTH-05: social sign-in is Google and Sign in with Apple, shipped together and offered on every client, as App Store Review Guideline 4.8 requires. The password reset rules cover accounts created with Apple. |
+| 1.18 | 2026-11-19 | Trip time zone (FR-02): the start and end dates, and every date TripMate acts on, are read in the time zone of the place the group departs from and returns to, taken from the device of the Member who creates the trip. Times in the Itinerary and the Day window are local times at the place. Section 10 records the decision. |
