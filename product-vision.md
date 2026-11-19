@@ -3,7 +3,7 @@
 **Document type:** Product Vision\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.8
+**Version:** 1.9
 
 Terms follow [GLOSSARY.md](GLOSSARY.md).
 
@@ -22,7 +22,7 @@ services.
 
 **Product category:** Collaborative Group Travel Planner\
 **Target audience:** Groups of friends, typically 3--10 people\
-**Platforms:** Web, iOS, Android, and Desktop (macOS, Windows)\
+**Platforms:** Web, iOS, Android, and Desktop (macOS, Windows, Linux)\
 **Core promise:** Plan together as equals, track progress on the road,
 and settle expenses fairly.
 
@@ -303,3 +303,4 @@ product.
 | 1.6 | 2026-11-17 | Section 10: a table that gives every goal a metric, with two proposed metrics for progress during the trip and consistency across platforms. |
 | 1.7 | 2026-11-17 | Status: Approved. The product owner closed Stage 1; see docs/discovery.md for the conditions and the waiver. |
 | 1.8 | 2026-11-17 | Metrics: share of Itinerary items marked Visited or Skipped is agreed and added to the supporting metrics; the metric for consistency across platforms is left until after the MVP. |
+| 1.9 | 2026-11-19 | Platforms: Desktop also covers Linux, following prd.md. |

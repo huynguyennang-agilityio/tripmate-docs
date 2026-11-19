@@ -23,6 +23,10 @@ separate repositories.
 | See what screens look like: colours, type, components | [TripMate Design System](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) |
 | Try the product | The prototypes under [Live pages](#live-pages) |
 | See what testing found and what changed | [docs/ux-review.md](docs/ux-review.md) |
+| Know how the system is built: modules, integrations, clients, hosting | [docs/architecture.md](docs/architecture.md) |
+| Look up a table, a constraint, or what is stored where | [docs/data-model.md](docs/data-model.md) |
+| Look up an endpoint convention, an error code, or a realtime event | [docs/api-design.md](docs/api-design.md) |
+| Know who may do what and how data is protected | [docs/security.md](docs/security.md) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
 New to the project? Read the vision, then sections 2 to 4 of the PRD,
@@ -46,7 +50,7 @@ flowchart TB
     end
     subgraph S3["3: UI/UX & Architecture"]
         direction LR
-        proto["Prototypes"] ~~~ ds["Design system"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"] ~~~ arch["docs/architecture.md"]:::planned
+        proto["Prototypes"] ~~~ ds["Design system"] ~~~ ia["docs/information-architecture.md"] ~~~ adr["docs/adr"] ~~~ ux["docs/ux-review.md"] ~~~ arch["docs/architecture.md"] ~~~ dm["docs/data-model.md"] ~~~ api["docs/api-design.md"] ~~~ sec["docs/security.md"]
     end
     subgraph S4["4: SOW / Planning"]
         direction LR
@@ -83,6 +87,10 @@ that has a page version also links to it in its own header.
 | [TripMate Information Architecture](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) | The Navigation Map as an interactive page: places, links, journeys, platforms |
 | [PRD (English)](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) | prd.md as a document page |
 | [TripMate Design System](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) | Design System Foundation: tokens, rules, and components for every client |
+| [TripMate Software Architecture](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB) | docs/architecture.md as a document page |
+| [TripMate Data Model](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H) | docs/data-model.md as a document page |
+| [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) | docs/api-design.md as a document page |
+| [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) | docs/security.md as a document page |
 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) | Clickable Web client |
 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) | Clickable Mobile client |
 | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) | Clickable Desktop client |
@@ -102,6 +110,10 @@ docs/
   solution-options.md  Stage 2
   information-architecture.md  Stage 3
   ux-review.md         Stage 3
+  architecture.md      Stage 3
+  data-model.md        Stage 3
+  api-design.md        Stage 3
+  security.md          Stage 3
   adr/                 Decision records
 ```
 

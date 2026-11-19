@@ -3,8 +3,8 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.15\
-**Platforms:** Web, iOS, Android, Desktop (macOS, Windows)\
+**Version:** 1.16\
+**Platforms:** Web, iOS, Android, Desktop (macOS, Windows, Linux)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
 
@@ -753,8 +753,8 @@ backend and shared domain rules.
 ### Desktop client
 
 - A separate `tripmate-desktop` repository, built with Tauri 2: a Rust
-  shell around the static build of the Web client, for macOS and
-  Windows. It is also the team's Rust learning track.
+  shell around the static build of the Web client, for macOS,
+  Windows, and Linux. It is also the team's Rust learning track.
 - Rust handles operating-system features only:
 
 | ID      | Requirement                                                                                     | Priority |
@@ -765,16 +765,27 @@ backend and shared domain rules.
 | DESK-04 | A tray icon shows the number of open Gaps across the user's trips.                              | P0       |
 | DESK-05 | A global shortcut opens a quick-add Expense window.                                             | P0       |
 | DESK-06 | The Itinerary of each trip is cached locally (SQLite) and readable offline.                     | P0       |
-| DESK-07 | The app updates itself and is signed for macOS and Windows.                                     | P0       |
+| DESK-07 | The app updates itself. Installers are signed for macOS and Windows; Linux packages are published with a checksum and a signature. | P0 |
 
 - Money, voting, and Gap rules stay in the backend; the desktop client
   only displays, caches, and bridges to the operating system.
 - The offline cache is read-only in the MVP: changes need a connection,
   and the cache shows when it was last synced.
+- On Linux the app ships as an AppImage and a `.deb` package. Three
+  requirements have limits there that come from the Linux desktop
+  itself:
+
+| Requirement | On Linux |
+|-------------|----------|
+| DESK-04 tray icon | GNOME shows the tray icon only with its AppIndicator extension; KDE shows it by default. |
+| DESK-05 global shortcut | Works on X11. Wayland does not allow global shortcuts; there the tray menu's Add Expense entry opens the quick-add Expense window, and adding an Expense in the main window always works. |
+| DESK-07 updates and signing | The AppImage updates itself; `.deb` users install the new package. Linux has no operating-system signing step, so each package comes with a checksum and a signature. |
 
 **Acceptance criteria**
 
-- Signed installers install on clean macOS and Windows machines.
+- Signed installers install on clean macOS and Windows machines, and
+  the AppImage and `.deb` package install on a clean Ubuntu LTS
+  machine.
 - A `tripmate://join/...` link opens the desktop app at the join screen.
 - A Nudge appears as a native notification, under the same timing and
   limits as in the discussion.
@@ -784,6 +795,8 @@ backend and shared domain rules.
 - Without a connection the cached Itinerary can be read, shows when it
   was last synced, and cannot be changed.
 - An update published to the update channel installs automatically.
+- On Linux these criteria hold within the limits in the table above,
+  on both X11 and Wayland.
 - No money, voting, or Gap logic runs in the desktop client.
 
 ### Shared requirements
@@ -844,7 +857,7 @@ backend and shared domain rules.
 | Integrity     | Financial operations use database transactions and idempotency safeguards. |
 | Auditability  | Every state, Itinerary, booking, task, and financial change is recorded with who made it and when. |
 | Reliability   | External service failures must not corrupt trip data. |
-| Compatibility | Responsive Web, supported iOS/Android versions, and macOS and Windows for Desktop. |
+| Compatibility | Responsive Web, supported iOS/Android versions, and macOS, Windows, and Linux for Desktop. |
 | Observability | Structured logs, metrics, tracing, and actionable error reporting. |
 | AI safety     | Schema validation, bounded tool permissions, source/uncertainty communication, and Proposals instead of direct changes. |
 | Accessibility | Keyboard support and accessible labels on Web; platform accessibility semantics on Mobile. |
@@ -885,7 +898,8 @@ The MVP must also pass:
 - Expense calculation, rounding, and Settlement plan tests.
 - Cross-client API contract tests.
 - Desktop tests: deep links, Nudge notifications, offline cache, signed
-  installers on macOS and Windows.
+  installers on macOS and Windows, and the Linux packages on X11 and
+  Wayland.
 - Language tests: every screen in Vietnamese and English, with no
   missing translation keys and no clipped text.
 - Critical user journey end-to-end tests.
@@ -928,6 +942,7 @@ planned for after the MVP and have no metric yet.
 | How can friends join? | With the Invitation link, the 8-character code, or the QR code; all three are the same Invitation. |
 | Which notifications are in-app, push, or email? | Nudges appear in the discussion on every client and as native notifications on desktop (P0). Personal in-app notifications are P1 (COL-07). No mobile push in the MVP; email only for authentication. |
 | Is the desktop app in the MVP? | Yes: a Tauri app with all seven DESK requirements, built alongside each phase plus one release week. |
+| Does the desktop app also ship for Linux in the MVP? | Yes: as an AppImage and a `.deb` package, next to macOS and Windows, with the Linux limits listed under the Desktop client in section 6. |
 | How does the group know what the trip is still missing? | A Readiness checklist of Gaps from deterministic rules, pinned in the discussion, with timed Nudges that never block. |
 | When may TripMate nudge the group? | After 10 quiet minutes, by stage group, batched, at most once per day. Gaps on a Proposal show immediately. |
 | How do Members answer a Nudge or assistant question? | Up to four quick choices plus "Other…"; free text that changes the plan becomes a Proposal. |
@@ -945,7 +960,8 @@ planned for after the MVP and have no metric yet.
 - LLM provider selection and operational cost controls.
 - Object storage and secure file access.
 - Deployment, monitoring, and secrets management.
-- Code-signing certificates for macOS (Apple Developer ID) and Windows.
+- Code-signing certificates for macOS (Apple Developer ID) and Windows,
+  and a signing key for the Linux packages.
 - Mobile push notification providers (after the MVP).
 
 ## 12. Risks and Mitigations
@@ -988,3 +1004,4 @@ planned for after the MVP and have no metric yet.
 | 1.13 | 2026-11-18 | MVP scope (section 4.1) now matches FR-05: route and travel-time estimates are in scope (ITN-06, P0); map display is P1 (ITN-05). Bookings and Tasks: booking status is To book, Booked or Cancelled, and only Booked closes a Gap (BOOK-06, Gaps 8 to 10). Bookings need no vote in any trip state and post a status line. The first hotel or flight booked while Planning suggests Confirm once and starts Preparation Nudges. Booking amounts count as Estimated costs until added as an Expense, with a prefilled Expense form. Task statuses; unassigned tasks open Gap 10, due dates do not nudge. |
 | 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. New COL-11: in a Confirmed trip, Propose a change on an Itinerary item opens a Proposal to remove or replace it; a closed Proposal is never reopened. Trip detail rules: the Trip currency locks once an Expense or Settlement exists; items on days that new dates leave out move to Saved places, and in a Confirmed trip such a change needs a Proposal. |
 | 1.15 | 2026-11-18 | Editing rules: editing, reordering or removing an Itinerary item that a Decision added posts a line in the discussion with what changed and the original vote. |
+| 1.16 | 2026-11-19 | Desktop also ships for Linux in the MVP, as an AppImage and a `.deb` package: the platforms, the Desktop client, DESK-07, its acceptance criteria, Compatibility, desktop tests, and dependencies name Linux. A new table gives the Linux limits for the tray icon (DESK-04), the global shortcut (DESK-05), and updates and signing (DESK-07). Section 10 records the decision. |

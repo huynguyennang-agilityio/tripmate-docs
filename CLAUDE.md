@@ -18,6 +18,10 @@ by AI agents such as Claude Code.
 | [docs/solution-options.md](docs/solution-options.md) | Which options were considered for each problem, and why features are in or out of the MVP. |
 | [docs/information-architecture.md](docs/information-architecture.md) | Where things live in the product and how people move between them, for every platform: places, Navigation Map, navigation rules. |
 | [docs/ux-review.md](docs/ux-review.md) | Usability problems found in the prototypes, how serious they are, and the fixes. |
+| [docs/architecture.md](docs/architecture.md) | How the system is organised: drivers, containers, modules, change flow, integrations, clients, hosting, repositories. |
+| [docs/data-model.md](docs/data-model.md) | What TripMate stores: entities, ERD, conventions, database constraints. |
+| [docs/api-design.md](docs/api-design.md) | How clients talk to the backend: REST conventions, resources, error codes, realtime protocol, the contract across repositories. |
+| [docs/security.md](docs/security.md) | How accounts, trips, and money records are kept safe: authentication, capabilities, data protection, threats. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
 
 When a document is created, add it here and turn its box in the
@@ -84,12 +88,18 @@ Only the product owner moves a document to Approved.
 
 Some documents also have an artifact view. The file in this repository
 is the source of truth; the artifact is updated in the same change.
+Every new document gets an artifact view when it is created, listed
+here and linked from the document's header as its page version.
 
 | Document | Artifact |
 |----------|----------|
 | prd.md | [English PRD](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U) |
 | product-workflow.md | [TripMate Product Workflow](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA) |
 | docs/information-architecture.md | [TripMate Information Architecture](https://claude.ai/artifact/Uy8kTUhj6nb78edcH64pGS) |
+| docs/architecture.md | [TripMate Software Architecture](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB) |
+| docs/data-model.md | [TripMate Data Model](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H) |
+| docs/api-design.md | [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) |
+| docs/security.md | [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) |
 
 ## Git workflow
 
