@@ -3,7 +3,7 @@
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.2\
+**Version:** 1.3\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -27,7 +27,7 @@ Only the owning module writes to its tables
 | Area | Entity | Holds | Module | PRD |
 |------|--------|-------|--------|-----|
 | People | `users` | A person's account and profile | `identity` | FR-01 |
-| People | `credentials` | Password hash or Google identity of a user | `identity` | AUTH-01, AUTH-05 |
+| People | `credentials` | Password hash, or the Google or Apple identity, of a user | `identity` | AUTH-01, AUTH-05 |
 | People | `sessions` | One signed-in device, with its hashed refresh token | `identity` | AUTH-02 |
 | Trips | `trips` | Trip details, state, Trip currency, Budget per person, Day window | `trips` | FR-02 |
 | Trips | `trip_members` | A user's membership of a trip: Owner or Member, current or Former member, join order | `trips` | FR-02 |
@@ -458,3 +458,4 @@ closes. Once closed it never changes (FR-03).
 | 1.0 | 2026-11-19 | First version: every entity with its module and requirements, four entity relationship diagrams, naming and storage conventions, constraints the database keeps, values computed instead of stored, Audit log, outbox and idempotency records, what is stored where, migrations. Header links to the page version of this document. |
 | 1.1 | 2026-11-19 | Section 5 no longer names the function behind each computed value; architecture.md owns that list. References follow the new section numbers of architecture.md and api-design.md. |
 | 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
+| 1.3 | 2026-11-19 | `credentials` also holds an Apple identity, following AUTH-05 in prd.md. |

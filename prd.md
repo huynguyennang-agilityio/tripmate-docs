@@ -3,7 +3,7 @@
 **Document type:** Product Requirements Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.16\
+**Version:** 1.17\
 **Platforms:** Web, iOS, Android, Desktop (macOS, Windows, Linux)\
 **Languages:** Vietnamese and English, following the device language\
 **Page version:** [TripMate PRD artifact](https://claude.ai/artifact/Jk5fPQpKv96euPj6Kw124U)
@@ -169,7 +169,7 @@ Why the scope looks like this, and which options were set aside, is in
 | AUTH-02 | Users can sign out and manage their session. | P0       |
 | AUTH-03 | Users can view and edit their profile.       | P0       |
 | AUTH-04 | Users can set a display name and avatar.     | P1       |
-| AUTH-05 | Social sign-in is supported.                 | P1       |
+| AUTH-05 | Social sign-in is supported: Google and Sign in with Apple. | P1 |
 | AUTH-06 | Users who signed up with email and password can reset a forgotten password by email. | P1 |
 
 **Acceptance criteria**
@@ -178,18 +178,26 @@ Why the scope looks like this, and which options were set aside, is in
 - The backend validates authentication on every protected request.
 - A user can update their profile without changing another user's data.
 
+**Social sign-in (AUTH-05)**
+
+- Google sign-in and Sign in with Apple ship together. App Store Review
+  Guideline 4.8 asks an app that offers a third-party sign-in such as
+  Google to also offer an equivalent option that protects privacy.
+- Both are offered on every client, so an account created with either
+  one can sign in on Web, Mobile, and Desktop.
+
 **Password reset (AUTH-06)**
 
 AUTH-06 is planned for after the MVP. Until then a user who forgets
-their password signs in with Google, if their account uses it.
+their password signs in with Google or Apple, if their account uses it.
 
 - The user asks for a reset link by entering their email.
 - The response is the same whether or not an account exists for that
   email, so the screen never reveals who has an account.
 - The reset link works once and expires after a limited time.
 - Setting a new password signs the user out of their other sessions.
-- An account created with Google sign-in has no TripMate password;
-  the reset screen points the user to Google sign-in.
+- An account created with Google or Apple sign-in has no TripMate
+  password; the reset screen points the user to that sign-in.
 
 ### FR-02 -- Trip Management
 
@@ -1005,3 +1013,4 @@ planned for after the MVP and have no metric yet.
 | 1.14 | 2026-11-18 | The Author's Vote is Yes when a Proposal is created or published, and can be changed. A tie once every current Member has voted rejects the Proposal. The Budget is per person; the group Budget is per person times current Members and is what the Feasibility warning uses; EXP-12 also shows each Member's own share. New COL-11: in a Confirmed trip, Propose a change on an Itinerary item opens a Proposal to remove or replace it; a closed Proposal is never reopened. Trip detail rules: the Trip currency locks once an Expense or Settlement exists; items on days that new dates leave out move to Saved places, and in a Confirmed trip such a change needs a Proposal. |
 | 1.15 | 2026-11-18 | Editing rules: editing, reordering or removing an Itinerary item that a Decision added posts a line in the discussion with what changed and the original vote. |
 | 1.16 | 2026-11-19 | Desktop also ships for Linux in the MVP, as an AppImage and a `.deb` package: the platforms, the Desktop client, DESK-07, its acceptance criteria, Compatibility, desktop tests, and dependencies name Linux. A new table gives the Linux limits for the tray icon (DESK-04), the global shortcut (DESK-05), and updates and signing (DESK-07). Section 10 records the decision. |
+| 1.17 | 2026-11-19 | AUTH-05: social sign-in is Google and Sign in with Apple, shipped together and offered on every client, as App Store Review Guideline 4.8 requires. The password reset rules cover accounts created with Apple. |

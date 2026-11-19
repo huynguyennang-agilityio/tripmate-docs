@@ -3,7 +3,7 @@
 **Document type:** Security Architecture\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.2\
+**Version:** 1.3\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Security Architecture artifact](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA)
 
@@ -65,7 +65,7 @@ TripMate runs its own authentication inside the `identity` module of
 | Part | Design |
 |------|--------|
 | Sign-up and sign-in | Email and password (AUTH-01). Passwords hashed with Argon2id, at least 10 characters, checked against a list of common passwords. |
-| Social sign-in (P1) | Google through OpenID Connect (AUTH-05). An existing account is linked only when Google reports the email as verified. |
+| Social sign-in (P1) | Google through OpenID Connect, and Sign in with Apple, whose ID token the backend verifies the same way (AUTH-05). The two ship together on every client, as App Store Review Guideline 4.8 requires. An existing account is linked only when the provider reports the email as verified and it matches; an Apple sign-in that hides the email behind a relay address creates a new account. |
 | Access token | Signed JWT (EdDSA), 15 minutes, holding only the user ID and session ID. Membership and roles are never read from the token; they are loaded per request. |
 | Refresh token | 256 random bits, opaque, stored as a hash in `sessions`, valid 30 days, replaced at every use. Presenting a refresh token that was already replaced revokes the whole session, because it means the token was copied. |
 | Sessions | One row per signed-in device. Signing out ends that session; "sign out other devices" ends the rest. A password change or reset (AUTH-06) ends every other session. |
@@ -231,3 +231,4 @@ the assistant are in section 6.
 | 1.0 | 2026-11-19 | First version: assets, trust boundaries, authentication and token storage per client including Linux, rate limits, access guard and capabilities, authorization tests, data protection, Desktop and AI assistant security, third parties, threats and controls, security checks. Header links to the page version of this document. |
 | 1.1 | 2026-11-19 | Shorter: the What Is Protected table is removed, because every asset appears in Threats and Controls. Three threat rows are removed: a doubled Expense and an overwritten change are integrity rules owned by api-design.md, and the assistant threats are in section 6. Sections renumbered. |
 | 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
+| 1.3 | 2026-11-19 | Social sign-in is Google and Sign in with Apple, shipped together on every client (App Store Review Guideline 4.8); the account linking rule covers Apple's relay email. |
