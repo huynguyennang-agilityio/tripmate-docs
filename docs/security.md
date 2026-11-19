@@ -2,8 +2,8 @@
 
 **Document type:** Security Architecture\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.1\
+**Status:** Approved\
+**Version:** 1.2\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Security Architecture artifact](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA)
 
@@ -230,3 +230,4 @@ the assistant are in section 6.
 |---------|------|---------|
 | 1.0 | 2026-11-19 | First version: assets, trust boundaries, authentication and token storage per client including Linux, rate limits, access guard and capabilities, authorization tests, data protection, Desktop and AI assistant security, third parties, threats and controls, security checks. Header links to the page version of this document. |
 | 1.1 | 2026-11-19 | Shorter: the What Is Protected table is removed, because every asset appears in Threats and Controls. Three threat rows are removed: a doubled Expense and an overwritten change are integrity rules owned by api-design.md, and the assistant threats are in section 6. Sections renumbered. |
+| 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |

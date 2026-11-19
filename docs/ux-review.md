@@ -3,7 +3,7 @@
 **Document type:** UX Review\
 **Product:** TripMate\
 **Status:** Draft\
-**Version:** 1.1\
+**Version:** 1.2\
 **Stage:** 3. UI/UX Design
 
 Terms follow [GLOSSARY.md](../GLOSSARY.md). This document answers
@@ -54,9 +54,23 @@ The product owner walked through the Mobile prototype on the Phú Quốc
 |-------|----------|-----------|--------|
 | 1 | UX-01 to UX-07 | Mobile, Web, Desktop | Fixed on 2026-11-18: Mobile prototype version 20, Web version 13, Desktop version 7. New boards: Itinerary item and Confirmed: Propose a change. |
 
-## 4. Version History
+## 4. Stage 3 Usability Condition
+
+Stage 3 of the [product workflow](../product-workflow.md) asks that a
+usability test is done and that serious issues are fixed or decided.
+
+| Condition | Today |
+|-----------|-------|
+| A usability test is done | Session 1 on 2026-11-18, recorded in section 4 of [docs/discovery.md](discovery.md). On 2026-11-19 the product owner decided that one session is enough for Stage 3. |
+| Serious issues are fixed or decided | Both Blockers (UX-01, UX-02) and the five Major findings (UX-03 to UX-07) are Fixed in batch 1. |
+
+Sessions that happen later are still recorded in docs/discovery.md, and
+their findings in section 2 of this document.
+
+## 5. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2 | 2026-11-19 | New section 4: the product owner decided that one usability session is enough for Stage 3; every finding so far is Fixed. |
 | 1.1 | 2026-11-18 | Fix batch 1 shipped on Mobile, Web and Desktop: UX-01 to UX-07 are Fixed. UX-06 now follows the editing rule added to prd.md. |
 | 1.0 | 2026-11-18 | First version: how findings are recorded, seven findings from the product owner's review of the Mobile prototype (UX-01 to UX-07), and fix batch 1. |

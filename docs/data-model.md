@@ -2,8 +2,8 @@
 
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.1\
+**Status:** Approved\
+**Version:** 1.2\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -457,3 +457,4 @@ closes. Once closed it never changes (FR-03).
 |---------|------|---------|
 | 1.0 | 2026-11-19 | First version: every entity with its module and requirements, four entity relationship diagrams, naming and storage conventions, constraints the database keeps, values computed instead of stored, Audit log, outbox and idempotency records, what is stored where, migrations. Header links to the page version of this document. |
 | 1.1 | 2026-11-19 | Section 5 no longer names the function behind each computed value; architecture.md owns that list. References follow the new section numbers of architecture.md and api-design.md. |
+| 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |

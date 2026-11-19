@@ -2,8 +2,8 @@
 
 **Document type:** API Design\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.1\
+**Status:** Approved\
+**Version:** 1.2\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -293,3 +293,4 @@ they depend on each other). Everything they must agree on lives in
 |---------|------|---------|
 | 1.0 | 2026-11-19 | First version: principles, REST conventions, resources by module with their requirements, error format and status codes with the first codes, product rules that show in the API, realtime protocol and events, how the contract moves between repositories. Header links to the page version of this document. |
 | 1.1 | 2026-11-19 | Shorter: the first error codes by area and the Change Rules section are removed, because the status-code table and the resource tables carry the same rules; the methods table is one row of the conventions; the repository diagram stays in architecture.md only. Sections renumbered. Corrected: `If-Match` applies only to records that have a version, and the requests that need none are listed. |
+| 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
