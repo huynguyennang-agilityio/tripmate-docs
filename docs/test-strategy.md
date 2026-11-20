@@ -2,8 +2,8 @@
 
 **Document type:** Test Strategy and AI Evaluation Plan\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.1\
+**Status:** Approved\
+**Version:** 1.2\
 **Stage:** 4. SOW / Planning\
 **Page version:** [TripMate Test Strategy artifact](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9)
 
@@ -490,3 +490,4 @@ proved.
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: principles, test levels and types, environments and test data, what runs when, the requirements-to-test matrix for every P0 requirement, end-to-end journeys (automated on Web only in the MVP), the AI evaluation plan with hard checks, graded metrics and the AI release gate, required suites and release gates, ownership, decisions and open questions. The golden dataset is its own document, ai-golden-dataset.md. |
 | 1.1 | 2026-11-20 | The Definition of Done is linked now that development-flow.md exists. |
+| 1.2 | 2026-11-20 | Approved by the product owner. No content changed. |

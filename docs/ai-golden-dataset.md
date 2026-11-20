@@ -2,8 +2,8 @@
 
 **Document type:** AI Golden Dataset\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.0\
+**Status:** Approved\
+**Version:** 1.1\
 **Stage:** 4. SOW / Planning\
 **Page version:** [TripMate AI Golden Dataset artifact](https://claude.ai/artifact/Lib799999zYpM9xTnkLzNh)
 
@@ -109,10 +109,10 @@ slash.
 
 ## 8. What the Dataset Covers
 
-[mvp-roadmap.md](../mvp-roadmap.md), section 8, lists what the golden
-dataset must cover.
+This table is the list of what the dataset must cover, and which cases
+cover each item.
 
-| The roadmap asks for | Cases |
+| The dataset must cover | Cases |
 |----------------------|-------|
 | Different destinations and trip durations | T1 to T6: 3 to 6 days, in Việt Nam and abroad, one city and three |
 | Different group sizes and Budgets | 3 to 20 Members; 1,500,000 ₫ to 25,000,000 ₫ per person; PL-06, IT-05 |
@@ -130,3 +130,4 @@ dataset must cover.
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: six trips and 32 cases (7 place suggestions, 9 Itinerary drafts, 3 revisions, 6 idea capture, 7 safety and limits), ten of them the AI smoke set, and what the dataset covers. |
+| 1.1 | 2026-11-20 | Approved by the product owner. Section 8 now owns the list of what the dataset must cover, since mvp-roadmap.md no longer repeats it. |
