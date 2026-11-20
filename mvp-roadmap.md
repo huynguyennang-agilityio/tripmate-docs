@@ -3,7 +3,7 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.12\
+**Version:** 1.13\
 **Planning horizon:** 13 weeks (initial estimate)\
 **Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
 
@@ -566,7 +566,8 @@ Each Epic should be decomposed into user stories with:
 -   API and UI impact.
 -   Test requirements.
 -   Dependencies.
--   Definition of Done.
+-   Definition of Done, following
+    [docs/development-flow.md](docs/development-flow.md), section 3.
 
 ## 7. Development Workflow
 
@@ -574,7 +575,9 @@ How a task goes from Trello card to merged is described once, in
 [product-workflow.md](product-workflow.md), Stage 5 (AI-native SDLC):
 the AI plans, a person approves the plan, the AI implements, tests and
 an independent AI review run, a person reviews, and nothing merges
-until every quality gate passes.
+until every quality gate passes. The board, the steps, and the
+Definition of Done for one task are in
+[docs/development-flow.md](docs/development-flow.md).
 
 For a small team, Web, Mobile, and Backend work can proceed in parallel
 after API contracts and domain behavior are agreed. Avoid parallel
@@ -582,43 +585,17 @@ implementation against unstable contracts.
 
 ## 8. Evaluation Strategy
 
-### Conventional software tests
+How TripMate is tested is owned by
+[docs/test-strategy.md](docs/test-strategy.md): the test levels, which
+test proves which requirement, and the AI evaluation plan. The cases
+the assistant is evaluated on are in
+[docs/ai-golden-dataset.md](docs/ai-golden-dataset.md). When a single
+task is Done is in
+[docs/development-flow.md](docs/development-flow.md), section 3.
 
--   Unit tests for domain rules and calculations.
--   Integration tests for database and service behavior.
--   API/contract tests for Web and Mobile clients.
--   End-to-end tests for primary user journeys.
--   Authorization tests for every trip-scoped domain.
--   Property-based tests for expense splits and settlement invariants.
--   Concurrency tests for important shared updates.
-
-### AI evaluation
-
-Create a small golden dataset covering:
-
--   Different destinations and trip durations.
--   Different group sizes and budgets.
--   Conflicting preferences.
--   Requests to modify an existing itinerary.
--   Chat excerpts with ideas to capture, including an idea raised
-    twice and messages that contain no idea.
--   Missing or ambiguous information.
--   Unsupported or unverifiable place claims.
--   Attempts to change the Itinerary directly instead of through a
-    Proposal.
-
-**Measure**
-
--   Structured output validity.
--   Place relevance.
--   Constraint satisfaction.
--   Itinerary feasibility.
--   Grounding and source attribution.
--   Proposal acceptance rate.
--   Latency and cost.
-
-AI quality must not be assessed only by whether an answer sounds
-plausible.
+How many AI Proposals are accepted is measured with real groups in the
+beta ("AI Proposals generated and decided", section 9); it is not a
+release gate.
 
 ### Release gates
 
@@ -627,6 +604,8 @@ plausible.
 -   All critical end-to-end journeys pass.
 -   Authorization tests pass.
 -   AI outputs are validated and become Proposals, never direct changes.
+-   The AI release gate passes
+    ([docs/test-strategy.md](docs/test-strategy.md), section 7.5).
 -   Voting threshold tests pass, including Members joining and leaving.
 -   Every state and financial change is audited.
 -   Gap rules are deterministic and Nudge timing tests pass.
@@ -721,3 +700,4 @@ feedback.
 | 1.10 | 2026-11-19 | Desktop also ships for Linux, following prd.md: the platforms, the Phase 6 features and exit criteria, and Phase 7 cross-platform testing name Linux. The schedule is not changed. |
 | 1.11 | 2026-11-19 | Epics and tasks live on the Trello board instead of an issue tracker, following product-workflow.md. The schedule is not changed. |
 | 1.12 | 2026-11-19 | New section 6.1, Epic Dependencies: a dependency diagram by phase, what each epic needs and why, the Desktop features, and the critical path. Three ordering fixes, the 13 weeks unchanged: the Itinerary core (EPIC-05) moves into Phase 2, before voting, because a Decision changes the Itinerary; adding a booking as an Expense is built in Phase 5 with Expenses; EPIC-11 is split, with its platform foundation in Phase 1 and hardening and release in Phase 7. New risk: Phase 2 overload. The roadmap now has a page version, linked from the header. |
+| 1.13 | 2026-11-20 | Section 8 now links to docs/test-strategy.md for the tests and the AI evaluation instead of repeating them, and adds the AI release gate to the release gates. AI Proposal acceptance is measured in the beta, not used as a gate. The Definition of Done links to docs/development-flow.md. The schedule is not changed. |

@@ -3,7 +3,7 @@
 **Document type:** Test Strategy and AI Evaluation Plan\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.0\
+**Version:** 1.1\
 **Stage:** 4. SOW / Planning\
 **Page version:** [TripMate Test Strategy artifact](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9)
 
@@ -19,7 +19,7 @@ The cases the assistant is evaluated on are in
 [ai-golden-dataset.md](ai-golden-dataset.md). Each epic's
 `docs/specs/<epic>/spec.md` lists its own tests by requirement ID and
 must stay within this document. The Definition of Done is owned by
-`docs/development-flow.md`.
+[development-flow.md](development-flow.md).
 
 ## 1. Principles
 
@@ -489,3 +489,4 @@ proved.
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: principles, test levels and types, environments and test data, what runs when, the requirements-to-test matrix for every P0 requirement, end-to-end journeys (automated on Web only in the MVP), the AI evaluation plan with hard checks, graded metrics and the AI release gate, required suites and release gates, ownership, decisions and open questions. The golden dataset is its own document, ai-golden-dataset.md. |
+| 1.1 | 2026-11-20 | The Definition of Done is linked now that development-flow.md exists. |

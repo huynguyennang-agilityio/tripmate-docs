@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.9\
+**Version:** 2.10\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -243,8 +243,8 @@ flowchart TD
 - **Deliverables:** Implemented Code, Automated Tests, Test /
   Evaluation Results, AI Review Findings, Human Review Approval, Merge
   Request, Updated Technical Documentation.
-- **Documents:** `docs/development-flow.md` (the detailed loop and the
-  Definition of Done); code repositories.
+- **Documents:** [docs/development-flow.md](docs/development-flow.md)
+  (the detailed loop and the Definition of Done); code repositories.
 
 ### Stage 6 -- Hardening / Deployment / Launching
 
@@ -366,7 +366,7 @@ exist today, and their versions, is shown in the Build Tracker.
 | [mvp-roadmap.md](mvp-roadmap.md) | In what order and by when? Phases, milestones, risks, release gates | 4 |
 | [docs/test-strategy.md](docs/test-strategy.md) | How is TripMate tested? Test levels, requirements-to-test mapping, AI evaluation plan | 4 |
 | [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) | Which cases is the assistant evaluated on, and what is expected in each? | 4 |
-| `docs/development-flow.md` | How does a task go from Trello card to merged? Definition of Done | 5 |
+| [docs/development-flow.md](docs/development-flow.md) | How does a task go from Trello card to merged? Definition of Done | 5 |
 | `docs/release-plan.md` | How do we harden, ship, roll back, and measure? | 6 |
 
 **Rules**
@@ -441,3 +441,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.7 | 2026-11-19 | docs/architecture.md now exists and is linked from the Stage 3 documents, the feedback loops, and the document map. Three companion documents added for stage 3: docs/data-model.md (Database ERD), docs/api-design.md (API Contracts), and docs/security.md (Security Architecture). |
 | 2.8 | 2026-11-19 | Tasks are tracked as cards on a Trello board instead of issues (Stages 4, 5 and 7, the SDLC loop, the document map). Section 7: repositories are cloned side by side so code reads the documents at `../tripmate-docs/`, and the requirement ID ties a Trello card to its branch, tests and pull request. |
 | 2.9 | 2026-11-20 | docs/test-strategy.md and docs/ai-golden-dataset.md now exist and are linked from the Stage 4 documents and the document map. The golden dataset has its own document, so the test strategy holds only what changes rarely. |
+| 2.10 | 2026-11-20 | docs/development-flow.md now exists and is linked from the Stage 5 documents and the document map: the Trello board and Definition of Ready, the steps from card to merge, the Definition of Done, and defect severities. |
