@@ -3,7 +3,7 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.13\
+**Version:** 1.14\
 **Planning horizon:** 13 weeks (initial estimate)\
 **Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
 
@@ -71,6 +71,75 @@ without relying on a separate spreadsheet for the core workflow.
 The list of what the MVP includes and what is deferred is kept in one
 place: [prd.md](prd.md), sections 4.1 and 4.2. The reasons are in
 [docs/solution-options.md](docs/solution-options.md).
+
+### Project scope
+
+TripMate is a small internal project, so this short scope replaces a
+formal SOW ([product-workflow.md](product-workflow.md), Stage 4). What
+the product must do is in [prd.md](prd.md); the schedule is section 4
+and the milestones are section 5.
+
+**Deliverables**
+
+| Deliverable | Where it lives | Accepted when |
+|-------------|----------------|---------------|
+| Backend API, worker, and scheduler | `tripmate-backend` | Its phase exit criteria and the release gates (section 8) pass |
+| Published API contract and shared translations | `tripmate-contracts` | Every client builds against a pinned version |
+| Web client | `tripmate-web` | Its phase exit criteria pass on the supported browsers |
+| Mobile app for iOS and Android | `tripmate-mobile` | Store builds are installed by the beta groups |
+| Desktop app for macOS, Windows, and Linux | `tripmate-desktop` | The Phase 6 exit criteria pass |
+| Product documents, up to date with the code | `tripmate-docs` | Every merged change that alters a rule, an endpoint, or a table has updated its owning document |
+| Beta feedback, recorded and prioritized | `docs/discovery.md` and the Trello board | Phase 7 exit criteria |
+
+**Responsibilities**
+
+| Role | Responsible for |
+|------|-----------------|
+| Product owner | Approving documents, stage gates, plans, and scope changes (section 12); accepting each milestone and the release; recruiting the beta groups |
+| Developer, working with AI coding tools | Specs, code, and tests for each card, following [docs/development-flow.md](docs/development-flow.md) |
+| AI reviewer, in a separate session | The independent review of every pull request |
+
+Who does which test work is in
+[docs/test-strategy.md](docs/test-strategy.md), section 9.
+
+**Assumptions**
+
+- One small team or one developer, with AI coding tools, for 13 weeks
+  (section 1).
+- TripMate records money and bookings; it does not process payments
+  or buy anything ([prd.md](prd.md), section 4.2), so no payment or
+  supplier integration is in the plan.
+- Claude and Google Maps Platform stay available on their current
+  terms, with test keys for staging
+  ([docs/architecture.md](docs/architecture.md), section 6).
+- The beta can recruit 2 to 3 friend groups with a real trip during
+  Phase 7.
+
+**Constraints**
+
+- Hosting is a managed platform, with no infrastructure the team runs by
+  hand ([docs/architecture.md](docs/architecture.md), section 9).
+- Apple and Microsoft developer accounts are needed for store builds and
+  signed Desktop installers before Phase 6.
+- Scope changes follow section 12; P1 items are deferred first when a
+  phase runs late.
+
+**Acceptance**
+
+- A phase is accepted by the product owner when its exit criteria in
+  section 4 pass, together with what
+  [docs/test-strategy.md](docs/test-strategy.md), section 4, lists for
+  the end of each phase.
+- The MVP is accepted when every release gate in section 8 passes and
+  the beta groups complete a trip end to end.
+
+**Open questions**
+
+| Question | Proposed answer | Needed by |
+|----------|-----------------|-----------|
+| Who is on the team, and who owns which epic? | Set with the per-epic estimates | Phase 0 |
+| When does Week 1 start? | Set when Stage 4 closes | Phase 0 |
+| What is the monthly limit for hosting, Claude, and Google Maps costs? | Set after the PaaS is chosen | Phase 0 |
 
 ## 4. Thirteen-Week Roadmap
 
@@ -701,3 +770,4 @@ feedback.
 | 1.11 | 2026-11-19 | Epics and tasks live on the Trello board instead of an issue tracker, following product-workflow.md. The schedule is not changed. |
 | 1.12 | 2026-11-19 | New section 6.1, Epic Dependencies: a dependency diagram by phase, what each epic needs and why, the Desktop features, and the critical path. Three ordering fixes, the 13 weeks unchanged: the Itinerary core (EPIC-05) moves into Phase 2, before voting, because a Decision changes the Itinerary; adding a booking as an Expense is built in Phase 5 with Expenses; EPIC-11 is split, with its platform foundation in Phase 1 and hardening and release in Phase 7. New risk: Phase 2 overload. The roadmap now has a page version, linked from the header. |
 | 1.13 | 2026-11-20 | Section 8 now links to docs/test-strategy.md for the tests and the AI evaluation instead of repeating them, and adds the AI release gate to the release gates. AI Proposal acceptance is measured in the beta, not used as a gate. The Definition of Done links to docs/development-flow.md. The schedule is not changed. |
+| 1.14 | 2026-11-20 | New Project scope in section 3, replacing a formal SOW: deliverables with where each lives and when it is accepted, responsibilities, assumptions, constraints, acceptance of a phase and of the MVP, and three open questions. The schedule is not changed. |
