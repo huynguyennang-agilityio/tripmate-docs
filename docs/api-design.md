@@ -3,7 +3,7 @@
 **Document type:** API Design\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.3\
+**Version:** 1.4\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -70,7 +70,7 @@ written from `/v1/trips/{tripId}`.
 | `POST /v1/auth/login` | Sign in; returns an access token and a refresh token | AUTH-01 |
 | `POST /v1/auth/refresh` | Exchange a refresh token for new tokens | AUTH-02 |
 | `POST /v1/auth/logout` | End this session | AUTH-02 |
-| `GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/{id}` | List and end signed-in devices | AUTH-02 |
+| `GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/{id}`, `POST /v1/auth/sessions/end-others` | List and end signed-in devices; end every device except this one | AUTH-02 |
 | `GET /v1/me`, `PATCH /v1/me` | Read and edit the profile | AUTH-03, AUTH-04 |
 | `GET /v1/me/readiness-summary` | Open Gaps across the user's trips, for the Desktop tray | DESK-04 |
 
@@ -295,3 +295,4 @@ they depend on each other). Everything they must agree on lives in
 | 1.1 | 2026-11-19 | Shorter: the first error codes by area and the Change Rules section are removed, because the status-code table and the resource tables carry the same rules; the methods table is one row of the conventions; the repository diagram stays in architecture.md only. Sections renumbered. Corrected: `If-Match` applies only to records that have a version, and the requests that need none are listed. |
 | 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
 | 1.3 | 2026-11-19 | Follows the Trip time zone rules in prd.md: creating a trip sends the device's time zone, trip dates are read in the trip's time zone, and the Day window and planned times are local at the place. |
+| 1.4 | 2026-11-20 | `POST /v1/auth/sessions/end-others` added for "sign out other devices", following the EPIC-01 spec. |

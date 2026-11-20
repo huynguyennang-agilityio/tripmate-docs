@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.1\
+**Version:** 1.2\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -205,7 +205,6 @@ AI evaluation and the AI release gate run nightly and before a release
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| Who adds Trello's GitHub Power-Up to the board, so a pull request attaches to its card? | The product owner | Phase 0 |
 | Where do each repository's coding conventions live? | In that repository's `CLAUDE.md`, next to the code | Phase 0 |
 
 ## 6. Version History
@@ -214,3 +213,4 @@ AI evaluation and the AI release gate run nightly and before a release
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: the Trello board and the Definition of Ready, the steps from card to merge with naming rules, the Definition of Done, defect severities, decisions and open questions. |
 | 1.1 | 2026-11-20 | Approved by the product owner. Section 1 names the team (the product owner and Claude Code), links the TripMate Trello board, and uses its columns: Discussion, Backlog, ToDo, In-Progress, Review, Done. The open question about the board is narrowed to the GitHub Power-Up. |
+| 1.2 | 2026-11-20 | The open question about Trello's GitHub Power-Up is closed: the product owner added it to the board. |

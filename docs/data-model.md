@@ -3,7 +3,7 @@
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.4\
+**Version:** 1.5\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -81,7 +81,9 @@ erDiagram
         uuid id PK
         uuid user_id FK
         text refresh_token_hash
+        text replaced_token_hash
         text device_name
+        timestamptz last_used_at
         timestamptz expires_at
         timestamptz revoked_at
     }
@@ -460,3 +462,4 @@ closes. Once closed it never changes (FR-03).
 | 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
 | 1.3 | 2026-11-19 | `credentials` also holds an Apple identity, following AUTH-05 in prd.md. |
 | 1.4 | 2026-11-19 | Time convention follows the Trip time zone rules in prd.md: `trips.time_zone` comes from the creating Member's device and is used for dates; the Day window and planned times are local at the place. |
+| 1.5 | 2026-11-20 | `sessions` gains `replaced_token_hash`, to recognize a reused refresh token, and `last_used_at`, for the devices list, following the EPIC-01 spec. |
