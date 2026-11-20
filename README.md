@@ -29,6 +29,7 @@ separate repositories.
 | Know who may do what and how data is protected | [docs/security.md](docs/security.md) |
 | Know how TripMate is tested and how the assistant is evaluated | [docs/test-strategy.md](docs/test-strategy.md) |
 | See the cases the assistant is evaluated on | [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) |
+| Know how an epic behaves, how it is built, and which cards build it | [docs/specs/](docs/specs/), one `spec.md` per epic |
 | Take a task from Trello card to merged, and know when it is Done | [docs/development-flow.md](docs/development-flow.md) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
@@ -49,7 +50,7 @@ flowchart TB
     end
     subgraph S2["2: PRD / Spec"]
         direction LR
-        options["docs/solution-options.md"] ~~~ prd["prd.md"] ~~~ specs["docs/specs/EPIC/spec.md"]:::planned
+        options["docs/solution-options.md"] ~~~ prd["prd.md"] ~~~ specs["docs/specs/EPIC/spec.md"]
     end
     subgraph S3["3: UI/UX & Architecture"]
         direction LR
@@ -98,6 +99,7 @@ that has a page version also links to it in its own header.
 | [TripMate Test Strategy](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9) | docs/test-strategy.md as a document page |
 | [TripMate AI Golden Dataset](https://claude.ai/artifact/Lib799999zYpM9xTnkLzNh) | docs/ai-golden-dataset.md as a document page |
 | [TripMate Development Flow](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM) | docs/development-flow.md as a document page |
+| [TripMate EPIC-01 Spec](https://claude.ai/artifact/CDUhq8v5rqC2f3neCN53Rs) | docs/specs/epic-01/spec.md as a document page |
 | [TripMate ADR-0005 Authentication](https://claude.ai/artifact/AnngZQmwf1Ax8GWodXwcvz) | docs/adr/0005-authentication-built-into-the-backend.md as a document page |
 | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md as a document page |
 | [TripMate ADR-0007 Static Web Build](https://claude.ai/artifact/F2Xm35mpu9KMUtjechuCdm) | docs/adr/0007-web-client-is-a-static-build.md as a document page |
@@ -128,6 +130,7 @@ docs/
   test-strategy.md     Stage 4
   ai-golden-dataset.md Stage 4
   development-flow.md  Stage 5
+  specs/epic-01/       EPIC-01 spec
   adr/                 Decision records
 ```
 
