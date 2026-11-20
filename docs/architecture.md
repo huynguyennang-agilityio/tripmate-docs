@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.7\
+**Version:** 1.8\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -125,10 +125,10 @@ flowchart TB
 | Mobile client | Flutter | Screens optimised for use while travelling | Hold domain rules |
 | Desktop client | Tauri 2, Rust; macOS, Windows, Linux | Runs the Web build; DESK-02 to DESK-07 | Run money, voting, or Gap logic |
 | API process | FastAPI on Uvicorn | Authentication, authorization, every read and write, WebSocket connections | Call the LLM, or call any provider inside a database transaction. Place search is its only provider call (section 6.2) |
-| Worker process | Same codebase, job runner | AI requests, Nudge evaluation, travel-time lookups, publishing committed events | Accept client connections |
+| Worker process | Same codebase, Taskiq worker | AI requests, Nudge evaluation, travel-time lookups, publishing committed events | Accept client connections |
 | Scheduler process | Same codebase, periodic trigger | Finds due work in PostgreSQL every minute and enqueues it | Hold state of its own |
-| PostgreSQL | Managed PostgreSQL 16+ | The only source of truth | -- |
-| Redis | Managed Redis | Job queue, WebSocket fan-out, rate limits, short-lived caches | Hold anything that cannot be rebuilt from PostgreSQL |
+| PostgreSQL | Render Postgres, PostgreSQL 16+ | The only source of truth | -- |
+| Redis | Render Key Value, Redis compatible | Job queue, WebSocket fan-out, rate limits, short-lived caches | Hold anything that cannot be rebuilt from PostgreSQL |
 | Object storage | Cloudflare R2, private bucket, used through the S3 API | Files | Serve files without a presigned URL |
 
 **The Web client is a static build.** Desktop wraps the static output
@@ -450,22 +450,22 @@ build. Desktop ships for macOS, Windows, and Linux.
 
 ### 9.1 Hosting
 
-The backend runs on a managed platform-as-a-service in the Singapore
-region, the closest region to the first users in Vietnam. It runs the
+The backend runs on Render, a managed platform-as-a-service, in the
+Singapore region, the closest region to the first users in Vietnam. It runs the
 containers of section 3: at least two API instances behind the
 platform's HTTPS load balancer, one worker, and one scheduler.
 
-The platform is chosen in Phase 0 against these needs:
+Render was chosen against these needs:
 
-| Need | Why |
-|------|-----|
-| Singapore region | Latency for users in Vietnam |
-| Managed PostgreSQL with point-in-time recovery | Financial records must never be lost |
-| Managed Redis | Queue and WebSocket fan-out |
-| Long-lived WebSocket connections | Realtime (D4) |
-| Separate worker and scheduler processes from one image | Section 3 |
-| Preview environment per pull request | Review in the AI-native SDLC |
-| Container images | Moving to AWS later needs no code change |
+| Need | Why | On Render |
+|------|-----|-----------|
+| Singapore region | Latency for users in Vietnam | Singapore region; a service's region is set when it is created |
+| Managed PostgreSQL with point-in-time recovery | Financial records must never be lost | Render Postgres, 7 days of point-in-time recovery on the Pro workspace plan |
+| Managed Redis | Queue and WebSocket fan-out | Render Key Value |
+| Long-lived WebSocket connections | Realtime (D4) | Web services keep WebSocket connections |
+| Separate worker and scheduler processes from one image | Section 3 | Two background workers from the API image |
+| Preview environment per pull request | Review in the AI-native SDLC | Preview environments from a `render.yaml` blueprint, on the Pro workspace plan |
+| Container images | Moving to AWS later needs no code change | Deploys a Docker image |
 
 ### 9.2 Environments
 
@@ -501,7 +501,9 @@ The platform is chosen in Phase 0 against these needs:
 
 ## 10. Background Work
 
-The worker runs jobs from a Redis-backed queue. The scheduler
+The worker runs Taskiq jobs from a queue in Redis (`taskiq-redis`).
+Jobs are `async` functions that use the same services and database
+sessions as the API. The scheduler
 does not keep timers of its own: every minute it asks PostgreSQL what
 is due and enqueues it. Losing Redis therefore loses no work, only a
 minute of delay.
@@ -586,7 +588,8 @@ tripmate/
 | Decision | Alternatives set aside | ADR |
 |----------|------------------------|-----|
 | Authentication built into the backend, with rotating refresh tokens | A hosted identity service (Supabase Auth, Clerk, Auth0) | [ADR-0005](adr/0005-authentication-built-into-the-backend.md) |
-| Managed PaaS in Singapore | AWS from the start; a self-managed server | No: reversible, since the backend ships as a container |
+| Render, a managed PaaS, in Singapore | AWS from the start; a self-managed server; Railway; DigitalOcean App Platform | No: reversible, since the backend ships as a container |
+| Taskiq for background jobs | Celery, which runs jobs as synchronous functions; SAQ | No: a job is a plain `async` function, so another library changes only the worker entry point |
 | Anthropic Claude through LangChain | OpenAI, Google Gemini | No: models are configuration |
 | Google Maps Platform behind a provider interface | Goong, Mapbox | [ADR-0006](adr/0006-google-maps-platform-behind-a-provider-interface.md) |
 | Web client as a static export, no server rendering | Server rendering with a separate Desktop build | [ADR-0007](adr/0007-web-client-is-a-static-build.md) |
@@ -604,8 +607,6 @@ the table.
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| Which PaaS? | Chosen in Phase 0 against section 9.1 | Phase 0 |
-| Which job queue library runs the worker? | Celery on Redis is the candidate; chosen in Phase 0 with the PaaS | Phase 0 |
 | Which weather source for `get_weather`? | None in the MVP; the assistant says weather is not checked | EPIC-04 spec |
 | Which email service for password reset? | Chosen with AUTH-06, after the MVP | AUTH-06 |
 | What happens to a user's data when they delete their account? | Not in the MVP; needs a product rule because Expenses must keep the person | Before public launch |
@@ -622,3 +623,4 @@ the table.
 | 1.5 | 2026-11-19 | The time zone question in section 12.2 is closed: prd.md now says a trip starts and ends in the time zone of the place the group departs from, taken from the creating Member's device. |
 | 1.6 | 2026-11-19 | The three ADR candidates in section 12.1 are written and linked: ADR-0005 (authentication built into the backend), ADR-0006 (Google Maps Platform behind a provider interface), ADR-0007 (the Web client is a static build). |
 | 1.7 | 2026-11-19 | Section 11: every repository is cloned side by side in one `tripmate/` folder, and code repositories read the documents at `../tripmate-docs/` instead of copying them; tasks are tracked on a Trello board. |
+| 1.8 | 2026-11-20 | The product owner chose Render in Singapore as the PaaS and Taskiq as the job queue library; both open questions in section 12.2 are closed. Section 9.1 shows how Render meets each hosting need; sections 3 and 10 name the services and the library. |
