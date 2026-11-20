@@ -26,6 +26,7 @@ by AI agents such as Claude Code.
 | [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) | The cases the AI assistant is evaluated on, and what is expected in each. |
 | [docs/development-flow.md](docs/development-flow.md) | How a task goes from Trello card to merged: the board, the steps, the Definition of Done, defects. |
 | [docs/specs/epic-01/spec.md](docs/specs/epic-01/spec.md) | EPIC-01: how accounts behave, how they are built, and which cards build them. |
+| [docs/specs/epic-11/spec.md](docs/specs/epic-11/spec.md) | EPIC-11, first part: what the platform gives every epic, how it is built, and which cards build it. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
 
 When a document is created, add it here and turn its box in the
@@ -109,6 +110,7 @@ here and linked from the document's header as its page version.
 | docs/ai-golden-dataset.md | [TripMate AI Golden Dataset](https://claude.ai/artifact/Lib799999zYpM9xTnkLzNh) |
 | docs/development-flow.md | [TripMate Development Flow](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM) |
 | docs/specs/epic-01/spec.md | [TripMate EPIC-01 Spec](https://claude.ai/artifact/CDUhq8v5rqC2f3neCN53Rs) |
+| docs/specs/epic-11/spec.md | [TripMate EPIC-11 Spec](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2) |
 | docs/adr/0005-authentication-built-into-the-backend.md | [TripMate ADR-0005 Authentication](https://claude.ai/artifact/AnngZQmwf1Ax8GWodXwcvz) |
 | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) |
 | docs/adr/0007-web-client-is-a-static-build.md | [TripMate ADR-0007 Static Web Build](https://claude.ai/artifact/F2Xm35mpu9KMUtjechuCdm) |

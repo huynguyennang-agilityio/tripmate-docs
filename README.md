@@ -100,6 +100,7 @@ that has a page version also links to it in its own header.
 | [TripMate AI Golden Dataset](https://claude.ai/artifact/Lib799999zYpM9xTnkLzNh) | docs/ai-golden-dataset.md as a document page |
 | [TripMate Development Flow](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM) | docs/development-flow.md as a document page |
 | [TripMate EPIC-01 Spec](https://claude.ai/artifact/CDUhq8v5rqC2f3neCN53Rs) | docs/specs/epic-01/spec.md as a document page |
+| [TripMate EPIC-11 Spec](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2) | docs/specs/epic-11/spec.md as a document page |
 | [TripMate ADR-0005 Authentication](https://claude.ai/artifact/AnngZQmwf1Ax8GWodXwcvz) | docs/adr/0005-authentication-built-into-the-backend.md as a document page |
 | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md as a document page |
 | [TripMate ADR-0007 Static Web Build](https://claude.ai/artifact/F2Xm35mpu9KMUtjechuCdm) | docs/adr/0007-web-client-is-a-static-build.md as a document page |
@@ -131,6 +132,7 @@ docs/
   ai-golden-dataset.md Stage 4
   development-flow.md  Stage 5
   specs/epic-01/       EPIC-01 spec
+  specs/epic-11/       EPIC-11 spec, platform foundation
   adr/                 Decision records
 ```
 
