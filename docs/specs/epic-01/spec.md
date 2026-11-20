@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.1\
+**Version:** 1.2\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-01, Phase 1\
 **Page version:** [TripMate EPIC-01 Spec artifact](https://claude.ai/artifact/CDUhq8v5rqC2f3neCN53Rs)
@@ -304,8 +304,8 @@ Desktop has no screens of its own, so its cards are not split.
 
 | ID | Card | Size | Depends on | Done when | Design |
 |----|------|------|------------|-----------|--------|
-| D1 | `AUTH-02 Refresh token command (Desktop)` | S | W3b; the DESK-01 shell | One Rust command stores, reads, and deletes the refresh token in the operating system's store; `cargo test` passes | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) |
-| D2 | `AUTH-02 Stay signed in after restart (Desktop)` | XS | D1 | The Web build uses the command on Desktop; checked by hand on macOS and Windows: restart keeps the user signed in, Sign out removes the token | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) |
+| D1 | `AUTH-02 Refresh token command (Desktop)` | S | W3b; the DESK-01 shell | One Rust command stores, reads, and deletes the refresh token in the operating system's store: Keychain, Windows Credential Manager, or Secret Service on Linux ([security.md](../../security.md), section 2.1); `cargo test` passes | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) |
+| D2 | `AUTH-02 Stay signed in after restart (Desktop)` | S | D1 | The Web build uses the command on Desktop. Checked by hand on macOS, Windows, and Ubuntu LTS: restart keeps the user signed in, and Sign out removes the token. On Linux with no Secret Service, the app still works and asks the user to sign in at each start. | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) |
 
 ### 6.6 Checkpoints
 
@@ -322,3 +322,4 @@ Desktop has no screens of its own, so its cards are not split.
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: scope (AUTH-01 to AUTH-03; AUTH-04 to AUTH-06 later), behaviour for register, sign-in, sessions and profile, the error codes it adds, acceptance criteria by requirement ID, technical design, decisions and open questions, and 23 cards of size XS to M with checkpoints. |
 | 1.1 | 2026-11-20 | Section 6: the backend and the clients are built at the same time. B0 publishes a draft contract (C0); every Web and Mobile card is split into a mock card against the draft and an integration card against the released contract (C1). 37 cards; checkpoints in their own table. |
+| 1.2 | 2026-11-20 | Cards D1 and D2 cover Linux: the refresh token goes to Secret Service, D2 is checked by hand on Ubuntu LTS as well, and without a Secret Service the user signs in at each start. D2 is now size S. |
