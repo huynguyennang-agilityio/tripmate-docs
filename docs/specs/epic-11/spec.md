@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.0\
+**Version:** 1.1\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -324,14 +324,14 @@ epic being built ([architecture.md](../../architecture.md), section
 | The WebSocket gateway is built with the first epic that sends an event to a screen | In this epic | The outbox already publishes to Redis; the gateway's rules (subscriptions, Former members) need trips |
 | Two environments until the beta: local in Docker, and production | A preview per pull request and a staging environment from Phase 1 | A team of two reviews in CI and locally; production has no real users before the beta. It saves the Render Pro plan and a second server to keep running. Staging is added before the beta. |
 | Mobile has two flavors; mock mode is a build setting | One flavor per environment, and one for mock | A flavor is needed only to install two apps on one phone |
+| Sentry takes errors from the backend, Web, and Mobile; Grafana Cloud takes traces, metrics, and alerts; both on free plans | Sentry alone; Google Cloud Observability with Firebase Crashlytics; a self-hosted stack | Both take OpenTelemetry and need no payment card. Sentry has SDKs for all three clients with release tags, and Grafana alerts on P95, job age, and the outbox. |
+| A fine-grained GitHub token opens the pull request in `tripmate-contracts`, stored as the backend secret `CONTRACTS_TOKEN` | A GitHub App | Five minutes to set up, limited to one repository. The product owner creates it with Contents and Pull requests set to read and write and a one-year expiry, and renews it before it expires. The publishing job runs only on pushes to `main`, never on a pull request, so a changed workflow cannot reach the token. |
+| TripMate gets its own `.com` domain through Cloudflare Registrar, bought by the product owner before the beta; production uses `app.` and `api.` under it | `onrender.com` addresses; a free or first-year-discount domain | The Web refresh cookie is `SameSite=Strict` and needs the Web client and the API on one site ([security.md](../../security.md), section 2.1). Invitation links and app links carry the domain, so it must not change once real users have them. Before the beta, production has no real users and runs on `onrender.com`; locally both are `localhost`. |
 
 ### 5.2 Open questions
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| Which service takes error reports, traces, and metrics? | Sentry for errors on the backend, Web, and Mobile; Grafana Cloud for traces, metrics, and alerts; both on free plans in the MVP | F10 |
-| Which token opens the pull request in `tripmate-contracts`? | A fine-grained GitHub token limited to `tripmate-contracts`, created by the product owner and stored as a backend secret | F12 |
-| The Web refresh cookie is `SameSite=Strict` on the API's domain ([security.md](../../security.md), section 2.1), and two `onrender.com` addresses count as different sites, so the cookie is not sent between them. Which domain do the Web client and the API use? | The product owner registers one domain. Production uses `app.` and `api.` under it. Locally both are `localhost`, so nothing waits for it before production. | WF3 |
 | Is the WebSocket gateway part of EPIC-02 or EPIC-03? | EPIC-02, if its exit criterion "Web and Mobile display consistent trip information" needs live updates; otherwise EPIC-03 | EPIC-02 spec |
 
 ## 6. Tasks
@@ -382,9 +382,9 @@ flowchart LR
 | F7 | `Idempotency keys` | M | F3, F5 | The `idempotency_keys` migration; every case of 2.4 as a test |
 | F8 | `Outbox` | S | F3 | The `outbox_events` migration; adding an event inside a transaction; the integrity test |
 | F9 | `Worker, scheduler, and cleanup` | M | F7, F8 | 2.5: Taskiq on Redis, the outbox publisher, event handlers as jobs, the scheduler's due-work queries, daily cleanup; the background work tests |
-| F10 | `Logs, traces, metrics, and error reporting` | M | F4 | 2.6, with the service of 5.2; the log line test |
+| F10 | `Logs, traces, metrics, and error reporting` | M | F4 | 2.6, sent to Sentry and Grafana Cloud (5.1); the log line test |
 | F11 | `Local stack, image, and production on Render` | M | F9, F10 | 2.8: `compose.yaml` runs the whole stack with seed data; the image is published for every release tag; `render.yaml` for production with migrations as the pre-deploy step; the alerts of 2.6 |
-| F12 | `Contract publishing` | S | F2, CT1 | 2.10: `openapi.json` generated from the app, `x-stub` on stub routes, examples required on stubs, the pull request in `tripmate-contracts` |
+| F12 | `Contract publishing` | S | F2, CT1 | 2.10: `openapi.json` generated from the app, `x-stub` on stub routes, examples required on stubs, the pull request in `tripmate-contracts` with `CONTRACTS_TOKEN`, from a job that runs only on pushes to `main` |
 
 ### 6.2 Contract: `tripmate-contracts`
 
@@ -427,3 +427,4 @@ flowchart LR
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: scope of the first part of EPIC-11, what the platform gives every epic (backend layout, request pipeline, errors, idempotency, outbox and background work, observability, configuration and health check, Render environments, CI, the contract pipeline, Web and Mobile foundations), two environments until the beta (local and production), acceptance criteria, technical design, decisions and open questions, and 20 cards with checkpoints. |
+| 1.1 | 2026-11-20 | The product owner answered three open questions, now decisions in section 5.1: Sentry and Grafana Cloud on free plans; a fine-grained GitHub token for contract pull requests, used only on pushes to `main`; a `.com` domain through Cloudflare Registrar, bought before the beta. |
