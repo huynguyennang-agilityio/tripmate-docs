@@ -3,7 +3,7 @@
 **Document type:** API Design\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.5\
+**Version:** 1.6\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -43,7 +43,7 @@ that the backend generates and publishes to `tripmate-contracts`
 | Transport | JSON over HTTPS; `Content-Type: application/json; charset=utf-8` |
 | Base path | `/v1`; trip-scoped resources under `/v1/trips/{tripId}/...` |
 | Field names | `camelCase` in JSON; resource paths in `kebab-case`, plural nouns |
-| Authentication | `Authorization: Bearer <access token>` on every request except sign-up, sign-in, refresh, and the health check ([security.md](security.md)) |
+| Authentication | `Authorization: Bearer <access token>` on every request except sign-up, sign-in, refresh, and the health check, `GET /v1/health` ([security.md](security.md)) |
 | Device | `X-Device-Id: <uuid>` on every request, created once per install; used for rate limits and session names only |
 | Request ID | The server returns `X-Request-Id` on every response; clients send it when reporting a problem |
 | Idempotency | `Idempotency-Key: <uuid>` required on every `POST` that creates a record; the key is made once per user action and reused on retry ([data-model.md](data-model.md), section 6.3) |
@@ -307,3 +307,4 @@ they depend on each other). Everything they must agree on lives in
 | 1.3 | 2026-11-19 | Follows the Trip time zone rules in prd.md: creating a trip sends the device's time zone, trip dates are read in the trip's time zone, and the Day window and planned times are local at the place. |
 | 1.4 | 2026-11-20 | `POST /v1/auth/sessions/end-others` added for "sign out other devices", following the EPIC-01 spec. |
 | 1.5 | 2026-11-20 | Section 6: a feature starts with a contract stub in the backend, published as a draft tag for the clients' mock cards; the landing order and the CI check include the draft. |
+| 1.6 | 2026-11-20 | Section 2 names the health check path, `GET /v1/health`, following the EPIC-11 spec. |

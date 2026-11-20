@@ -3,7 +3,7 @@
 **Document type:** Test Strategy and AI Evaluation Plan\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.2\
+**Version:** 1.3\
 **Stage:** 4. SOW / Planning\
 **Page version:** [TripMate Test Strategy artifact](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9)
 
@@ -58,7 +58,7 @@ Each level has a letter, used in the matrix in section 5.
 | API and authorization | A | Every endpoint over HTTP, called as each kind of caller, returns the status, error code, and fields it should | pytest with an HTTP client | Every pull request |
 | Contract | C | Backend responses match the published `openapi.json`, events match `events.schema.json`, and each client builds against its pinned contracts version ([api-design.md](api-design.md), section 6) | Schemathesis in `tripmate-backend`; the breaking-change check in `tripmate-contracts` | Every pull request |
 | Client screens | S | A screen shows the right state for the data it is given, in Vietnamese and in English | Vitest with Testing Library (Web); widget and screenshot tests (Mobile) | Every pull request |
-| End-to-end | E | A journey works across the deployed stack, through the real client. In the MVP only the Web journeys are automated (section 6). | Playwright | A smoke set on every pull request preview; the Web journeys nightly and before a release |
+| End-to-end | E | A journey works across the deployed stack, through the real client. In the MVP only the Web journeys are automated (section 6). | Playwright | A smoke set in CI on every pull request; the Web journeys nightly and before a release |
 | AI evaluation | AI | The assistant's outputs meet the thresholds of section 7 on the golden dataset ([ai-golden-dataset.md](ai-golden-dataset.md)) | Evaluation harness in `tripmate-backend` | On changes to prompts, tools, schemas, or models; nightly; before a release |
 | Release checks | M | What a person checks by hand with a checklist: the journeys on Mobile and Desktop, installers on clean machines, store builds, wording, the beta scenario | Manual, with a checklist | At the end of each phase and before each release |
 
@@ -81,10 +81,13 @@ section 9.2. This table says which tests run in each.
 | Environment | Tests that run there | Providers |
 |-------------|----------------------|-----------|
 | Local | U, P, I, A, S | Scripted adapters |
-| CI on GitHub Actions | U, P, I, A, C, S, and the translation check | Scripted adapters; PostgreSQL and Redis as service containers |
-| Preview, one per pull request | The end-to-end smoke set | Scripted adapters; seed data |
-| Staging | The Web journeys, the journeys run by hand on Mobile and Desktop, Desktop update tests, the AI evaluation with live providers, release checks, the beta | Claude and Google Maps with test keys and low quotas |
+| CI on GitHub Actions | U, P, I, A, C, S, the translation check, and the end-to-end smoke set against the local stack in Docker | Scripted adapters; PostgreSQL and Redis as service containers; seed data |
+| Staging, from the beta (Phase 7) | The Web journeys, the journeys run by hand on Mobile and Desktop, Desktop update tests, the AI evaluation with live providers, release checks, the beta | Claude and Google Maps with test keys and low quotas |
 | Production | No test writes data there; monitoring and alerts only | Live |
+
+Until staging exists, the journeys run by hand at the end of a phase use
+the local stack, with Mobile on an emulator or a phone on the same
+network.
 
 **Test data**
 
@@ -108,16 +111,16 @@ section 9.2. This table says which tests run in each.
 ```mermaid
 flowchart LR
     PR["Pull request"] --> CI["CI: lint, types, unit, property,<br/>integration, API and authorization,<br/>contract, screens, translations"]
-    CI --> PV["Preview:<br/>end-to-end smoke set"]
+    CI --> PV["CI:<br/>end-to-end smoke set"]
     PV --> RV["AI review,<br/>then human review"]
     RV --> MG["Merge"]
-    MG --> NT["Nightly on staging:<br/>the Web journeys,<br/>full AI evaluation"]
+    MG --> NT["Nightly in CI:<br/>the Web journeys,<br/>full AI evaluation"]
     NT --> RC["Release candidate:<br/>release checks,<br/>security assessment,<br/>release gates"]
 ```
 
 | When | What must pass | What a failure blocks |
 |------|----------------|-----------------------|
-| Every pull request | Everything in CI, then the smoke set on the preview. A pull request that touches the assistant's prompts, tools, schemas, or model settings also runs the AI smoke set (section 7.4). | The merge |
+| Every pull request | Everything in CI, including the end-to-end smoke set. A pull request that touches the assistant's prompts, tools, schemas, or model settings also runs the AI smoke set (section 7.4). | The merge |
 | Nightly | The automated journeys of section 6, on Web, and the full AI evaluation with scripted tool results | New work in the failing area, until a card is opened and the failure is fixed |
 | End of each phase | The phase's exit criteria in mvp-roadmap.md, every matrix row of the phase's requirements, and the journeys of section 6 that are run by hand | Closing the phase |
 | Before a release | Everything above, the full AI evaluation with live providers, the release checks, the reading of the screens in both languages, and the security assessment | The release |
@@ -308,7 +311,7 @@ tested only in section 7.
 | J3 | Same data everywhere: a change made on one client appears on the other two without a reload | Step 10 | By hand before a release, with Web, Mobile, and Desktop open side by side |
 | J4 | Desktop: join from a `tripmate://` link, a native notification for a Nudge, the tray count, quick-add Expense, the Itinerary read offline, an update that installs | Step 10 | By hand on macOS, Windows, and Ubuntu (X11 and Wayland), at the end of Phase 6 and before a release |
 
-- The smoke set on a pull request preview is J2 plus a short J1: create
+- The smoke set on every pull request is J2 plus a short J1: create
   a trip, propose, vote, add an Expense, read the Balances.
 - A journey run by hand at the end of a phase covers what has been
   built so far.
@@ -491,3 +494,4 @@ proved.
 | 1.0 | 2026-11-20 | First version: principles, test levels and types, environments and test data, what runs when, the requirements-to-test matrix for every P0 requirement, end-to-end journeys (automated on Web only in the MVP), the AI evaluation plan with hard checks, graded metrics and the AI release gate, required suites and release gates, ownership, decisions and open questions. The golden dataset is its own document, ai-golden-dataset.md. |
 | 1.1 | 2026-11-20 | The Definition of Done is linked now that development-flow.md exists. |
 | 1.2 | 2026-11-20 | Approved by the product owner. No content changed. |
+| 1.3 | 2026-11-20 | No preview environments: the end-to-end smoke set runs in CI against the local stack in Docker, and the nightly runs are in CI. Staging exists from the beta (Phase 7); until then the journeys run by hand use the local stack. |

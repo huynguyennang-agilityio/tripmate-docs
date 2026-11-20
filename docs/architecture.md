@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.9\
+**Version:** 1.10\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -460,11 +460,10 @@ Render was chosen against these needs:
 | Need | Why | On Render |
 |------|-----|-----------|
 | Singapore region | Latency for users in Vietnam | Singapore region; a service's region is set when it is created |
-| Managed PostgreSQL with point-in-time recovery | Financial records must never be lost | Render Postgres, 7 days of point-in-time recovery on the Pro workspace plan |
+| Managed PostgreSQL with point-in-time recovery | Financial records must never be lost | Render Postgres, with point-in-time recovery: 3 days on the Hobby workspace plan, 7 days on Pro |
 | Managed Redis | Queue and WebSocket fan-out | Render Key Value |
 | Long-lived WebSocket connections | Realtime (D4) | Web services keep WebSocket connections |
 | Separate worker and scheduler processes from one image | Section 3 | Two background workers from the API image |
-| Preview environment per pull request | Review in the AI-native SDLC | Preview environments from a `render.yaml` blueprint, on the Pro workspace plan |
 | Container images | Moving to AWS later needs no code change | Deploys a Docker image |
 
 ### 9.2 Environments
@@ -472,8 +471,8 @@ Render was chosen against these needs:
 | Environment | Purpose | Data |
 |-------------|---------|------|
 | Local | Development | Docker Compose with PostgreSQL and Redis; test API keys |
-| Preview | One per pull request on the backend and Web | Seed data |
-| Staging | Release candidates, Desktop update tests, beta | Test data only |
+| CI | Every pull request: the tests and the end-to-end smoke set, against the local stack in Docker | Seed data |
+| Staging | Added before the beta (Phase 7): release candidates, Desktop update tests, beta | Test data only |
 | Production | Real groups | Real data |
 
 ### 9.3 Delivery
@@ -628,3 +627,4 @@ the table.
 | 1.7 | 2026-11-19 | Section 11: every repository is cloned side by side in one `tripmate/` folder, and code repositories read the documents at `../tripmate-docs/` instead of copying them; tasks are tracked on a Trello board. |
 | 1.8 | 2026-11-20 | The product owner chose Render in Singapore as the PaaS and Taskiq as the job queue library; both open questions in section 12.2 are closed. Section 9.1 shows how Render meets each hosting need; sections 3 and 10 name the services and the library. |
 | 1.9 | 2026-11-20 | Section 11: the landing order starts with a contract stub and a draft contract, so the backend and the clients' mock cards are built at the same time. |
+| 1.10 | 2026-11-20 | Until the beta there are two environments, local in Docker and production; staging is added before the beta and there are no preview environments. The hosting needs no longer list a preview per pull request; point-in-time recovery is 3 days on Render's Hobby plan and 7 on Pro. |

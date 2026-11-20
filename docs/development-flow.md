@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.3\
+**Version:** 1.4\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -75,7 +75,7 @@ flowchart LR
 | Contract stub | `tripmate-backend` | Every route of the feature exists with its request and response schemas and its error codes, returns `501`, and CI publishes a draft contract | -- |
 | Backend | `tripmate-backend` | The behaviour works and its tests pass | The stub |
 | Mock | `tripmate-web` or `tripmate-mobile` | Every state of the screens works against a mock API generated from the draft contract, with screen or widget tests in both languages | The draft is tagged |
-| Integration | `tripmate-web` or `tripmate-mobile` | The client pins the released contract, works against the preview backend, and its contract and end-to-end tests pass | The backend cards and its own mock card |
+| Integration | `tripmate-web` or `tripmate-mobile` | The client pins the released contract, works against the local stack in Docker, and its contract and end-to-end tests pass | The backend cards and its own mock card |
 
 - A client card's title ends with its client and kind, for example
   `AUTH-01 Register (Web, mock)` and `AUTH-01 Register (Web,
@@ -96,7 +96,7 @@ flowchart LR
     A -->|No| P
     A -->|Yes| B["Branch, code<br/>and tests"]
     B --> PR["Pull request"]
-    PR --> CI["CI and<br/>preview smoke set"]
+    PR --> CI["CI, with the<br/>end-to-end smoke set"]
     CI --> AR["Independent<br/>AI review"]
     AR --> HR["Human review"]
     HR --> D{"Definition<br/>of Done met?"}
@@ -110,7 +110,7 @@ flowchart LR
 | Approve the plan | A person | Yes, or what to change. The card moves to In-Progress. |
 | Build | The AI, within the approved plan | Code and tests on the branch |
 | Open the pull request | The author | A pull request linked to the card. The card moves to Review. |
-| Checks | CI and the preview | Everything listed for every pull request in [test-strategy.md](test-strategy.md), section 4 |
+| Checks | CI | Everything listed for every pull request in [test-strategy.md](test-strategy.md), section 4 |
 | AI review | A separate AI session that did not write the code | Findings on correctness, tests, scope, and security. It changes no code. |
 | Human review | A person | Approval, or changes requested |
 | Merge | The author, after approval | A merge commit. The card moves to Done. |
@@ -152,7 +152,7 @@ reason.
 - [ ] Tests changed with the code, in the same pull request.
 - [ ] Everything that runs on every pull request passed: CI (lint,
   types, unit, property, integration, API and authorization, contract,
-  screens, translations) and the end-to-end smoke set on the preview
+  screens, translations) and the end-to-end smoke set
   ([test-strategy.md](test-strategy.md), section 4).
 - [ ] The independent AI review ran, and each finding is fixed or
   answered in the pull request.
@@ -235,9 +235,8 @@ AI evaluation and the AI release gate run nightly and before a release
 
 ### 5.2 Open questions
 
-| Question | Proposed answer | Needed by |
-|----------|-----------------|-----------|
-| Where do each repository's coding conventions live? | In that repository's `CLAUDE.md`, next to the code | Phase 0 |
+None. Each repository's coding conventions live in its own
+`CLAUDE.md`, written by its skeleton card in the EPIC-11 spec.
 
 ## 6. Version History
 
@@ -247,3 +246,4 @@ AI evaluation and the AI release gate run nightly and before a release
 | 1.1 | 2026-11-20 | Approved by the product owner. Section 1 names the team (the product owner and Claude Code), links the TripMate Trello board, and uses its columns: Discussion, Backlog, ToDo, In-Progress, Review, Done. The open question about the board is narrowed to the GitHub Power-Up. |
 | 1.2 | 2026-11-20 | The open question about Trello's GitHub Power-Up is closed: the product owner added it to the board. |
 | 1.3 | 2026-11-20 | Section 1: a feature with an API and screens is built as a contract stub, backend cards, mock cards against the draft contract, and integration cards against the released contract, so the backend and the clients are built at the same time. Decision added to section 5.1. |
+| 1.4 | 2026-11-20 | There are no preview environments: an integration card works against the local stack in Docker, and the end-to-end smoke set runs in CI. The open question about coding conventions is closed: each repository's `CLAUDE.md`, written in EPIC-11. |

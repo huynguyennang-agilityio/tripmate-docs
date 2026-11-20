@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.2\
+**Version:** 1.3\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-01, Phase 1\
 **Page version:** [TripMate EPIC-01 Spec artifact](https://claude.ai/artifact/CDUhq8v5rqC2f3neCN53Rs)
@@ -142,7 +142,7 @@ All backend work is in the `identity` module
 ([architecture.md](../../architecture.md), section 4). It needs the
 EPIC-11 platform foundation first: the access guard, error codes,
 idempotency keys, structured logging, and CI
-([mvp-roadmap.md](../../../mvp-roadmap.md), section 6.1).
+([EPIC-11 spec](../epic-11/spec.md)).
 
 ### 4.2 Endpoints
 
@@ -269,17 +269,17 @@ flowchart LR
 | ID | Card | Size | Depends on | Done when | Design |
 |----|------|------|------------|-----------|--------|
 | W1a | `AUTH-01 Welcome and Register (Web, mock)` | S | C0 | Register shows each field error of 2.5 in both languages and signs the user in | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W1b | `AUTH-01 Welcome and Register (Web, integration)` | XS | C1, W1a | The account is created on the preview backend; a taken email shows `auth.email_taken` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W1b | `AUTH-01 Welcome and Register (Web, integration)` | XS | C1, W1a | The account is created on the local stack; a taken email shows `auth.email_taken` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 | W2a | `AUTH-01 Sign in (Web, mock)` | S | W1a | Sign in, with the one wrong-credentials message and the rate limit message | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W2b | `AUTH-01 Sign in (Web, integration)` | S | C1, W2a | Sign in works on the preview backend; the start of journey J2 passes | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W2b | `AUTH-01 Sign in (Web, integration)` | S | C1, W2a | Sign in works on the local stack; the start of journey J2 passes | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 | W3a | `AUTH-02 Token refresh and sign out (Web, mock)` | S | W2a | One refresh on `401 auth.token_expired`, then one retry; a failed refresh or Sign out lands on Welcome; no token in `localStorage` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W3b | `AUTH-02 Token refresh and sign out (Web, integration)` | S | C1, W3a | The refresh cookie works with the preview backend; a reused token ends the session | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W3b | `AUTH-02 Token refresh and sign out (Web, integration)` | S | C1, W3a | The refresh cookie works with the local stack; a reused token ends the session | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 | W4a | `AUTH-03 Profile setup (Web, mock)` | S | W2a | Shown once after registering, then My trips, or the Invitation preview when the user came from a link | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W4b | `AUTH-03 Profile setup (Web, integration)` | XS | C1, W4a | The display name is saved on the preview backend | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W4b | `AUTH-03 Profile setup (Web, integration)` | XS | C1, W4a | The display name is saved on the local stack | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 | W5a | `AUTH-03 Profile and display name (Web, mock)` | S | W4a | Profile shows the fields of 2.4; editing the display name follows the rules of 2.1 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 | W5b | `AUTH-03 Profile and display name (Web, integration)` | XS | C1, W5a | The edited name is read back from `GET /v1/me` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 | W6a | `AUTH-02 Devices on Profile (Web, mock)` | S | W3a, W5a | List with the current device marked; end one device; sign out other devices | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W6b | `AUTH-02 Devices on Profile (Web, integration)` | XS | C1, W6a | Ending a device on the preview backend signs that device out | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W6b | `AUTH-02 Devices on Profile (Web, integration)` | XS | C1, W6a | Ending a device on the local stack signs that device out | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 
 ### 6.4 Mobile: `tripmate-mobile`
 
@@ -312,7 +312,7 @@ Desktop has no screens of its own, so its cards are not split.
 | After | The product owner checks |
 |-------|--------------------------|
 | C0 | The draft contract: every request, response, and error code the screens need, before the mock cards start |
-| B3 and W2a | Register and sign in through the API on the preview, and the same screens against the mock |
+| B3 and W2a | Register and sign in through the API on the local stack, and the same screens against the mock |
 | B8 | Every backend row of section 3 has a passing test, before the contract is released |
 | The last card | Every row of section 3 has a passing test on every client it names; sign in, edit the profile, and end a device on Web, Mobile, and Desktop |
 
@@ -323,3 +323,4 @@ Desktop has no screens of its own, so its cards are not split.
 | 1.0 | 2026-11-20 | First version: scope (AUTH-01 to AUTH-03; AUTH-04 to AUTH-06 later), behaviour for register, sign-in, sessions and profile, the error codes it adds, acceptance criteria by requirement ID, technical design, decisions and open questions, and 23 cards of size XS to M with checkpoints. |
 | 1.1 | 2026-11-20 | Section 6: the backend and the clients are built at the same time. B0 publishes a draft contract (C0); every Web and Mobile card is split into a mock card against the draft and an integration card against the released contract (C1). 37 cards; checkpoints in their own table. |
 | 1.2 | 2026-11-20 | Cards D1 and D2 cover Linux: the refresh token goes to Secret Service, D2 is checked by hand on Ubuntu LTS as well, and without a Secret Service the user signs in at each start. D2 is now size S. |
+| 1.3 | 2026-11-20 | Integration cards work against the local stack in Docker instead of a preview backend; section 4.1 links the EPIC-11 spec for the foundation. |

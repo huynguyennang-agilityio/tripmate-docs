@@ -3,7 +3,7 @@
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.5\
+**Version:** 1.6\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -421,8 +421,10 @@ closes. Once closed it never changes (FR-03).
 
 ### 6.3 Idempotency keys
 
-- `idempotency_keys` holds `(user_id, key)`, a hash of the request
-  body, the response status, and the response body.
+- `idempotency_keys` holds the key with its owner, a hash of the
+  request body, the response status, and the response body. The owner
+  is `user_id` when the caller is signed in and `device_id` before
+  sign-in, for registering.
 - The same key with the same body returns the stored response; the
   same key with a different body returns `409
   request.idempotency_mismatch`.
@@ -463,3 +465,4 @@ closes. Once closed it never changes (FR-03).
 | 1.3 | 2026-11-19 | `credentials` also holds an Apple identity, following AUTH-05 in prd.md. |
 | 1.4 | 2026-11-19 | Time convention follows the Trip time zone rules in prd.md: `trips.time_zone` comes from the creating Member's device and is used for dates; the Day window and planned times are local at the place. |
 | 1.5 | 2026-11-20 | `sessions` gains `replaced_token_hash`, to recognize a reused refresh token, and `last_used_at`, for the devices list, following the EPIC-01 spec. |
+| 1.6 | 2026-11-20 | Section 6.3: an idempotency key belongs to the device ID before sign-in, following the EPIC-11 spec. |
