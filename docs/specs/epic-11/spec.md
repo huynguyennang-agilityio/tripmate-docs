@@ -33,7 +33,7 @@ built, and which cards build it*.
 | The request pipeline: request ID, device ID, the access declaration, token check, rate limits, errors, idempotency | The WebSocket gateway (5.2) |
 | The outbox, the Taskiq worker, the scheduler, cleanup jobs | Hardening, load tests, the security assessment, the release plan: EPIC-11, second part, Phase 7 |
 | Logs, traces, metrics, error reporting, and the P95 alert | Navigation shells and shared screens: EPIC-10 |
-| Render: preview per pull request, staging, production | The Desktop window and installers: EPIC-12 (DESK-01, DESK-07) |
+| The local stack in Docker, and production on Render; staging is added before the beta | The Desktop window and installers: EPIC-12 (DESK-01, DESK-07) |
 | CI in all five code repositories, and the contract pipeline with draft and released tags | |
 | Web and Mobile foundations: project, generated client, mock mode, translations | |
 
@@ -183,20 +183,26 @@ it belongs to the device ID.
   server.unavailable`. Render uses it to decide when an instance takes
   traffic.
 
-### 2.8 Environments on Render
+### 2.8 Environments
 
-One `render.yaml` blueprint describes every environment
-([architecture.md](../../architecture.md), section 9).
+Until the beta there are two environments
+([architecture.md](../../architecture.md), section 9.2).
 
-| Environment | Services | Data | Deploys |
-|-------------|----------|------|---------|
-| Preview, one per backend pull request | API, worker, scheduler, a small Postgres and Key Value | Seed data ([test-strategy.md](../../test-strategy.md), section 3) | On every push to the pull request; removed when it closes |
-| Staging | The same, one API instance | Test data | On every merge to `main` |
-| Production | Two API instances, one worker, one scheduler, Postgres with point-in-time recovery, Key Value | Real | A tagged release, by hand |
+| Environment | What runs | Data | How it starts |
+|-------------|-----------|------|---------------|
+| Local | `compose.yaml`: the API, worker, and scheduler from the backend image, PostgreSQL, Redis. Web and Mobile run against it. | Seed data ([test-strategy.md](../../test-strategy.md), section 3) | `docker compose up` |
+| CI | The same `compose.yaml`, for the end-to-end smoke set | Seed data | On every pull request |
+| Production | On Render, from `render.yaml`: two API instances, one worker, one scheduler, Postgres with point-in-time recovery, Key Value, and the Web static site | Real | A tagged release, by hand |
 
-- Migrations run as the pre-deploy step; a failing migration stops the
-  deploy and the previous version keeps serving.
+- The backend image is published to GitHub Container Registry for
+  every release tag; a client's `compose.yaml` runs the image of the
+  release its pinned contract came from.
+- Migrations run in production as Render's pre-deploy step; a failing
+  migration stops the deploy and the previous version keeps serving.
 - A rollback is a redeploy of the previous image.
+- Staging joins `render.yaml` before the beta (Phase 7), for release
+  candidates, Desktop update tests, and the AI evaluation with live
+  providers.
 
 ### 2.9 CI in every code repository
 
@@ -207,6 +213,10 @@ One `render.yaml` blueprint describes every environment
 | `tripmate-web` | ESLint, TypeScript, Vitest, the static build, the generated client and messages against the pinned contracts version |
 | `tripmate-mobile` | `flutter analyze`, `flutter test`, the generated client and ARB files against the pinned contracts version, an Android build |
 | `tripmate-desktop` | `cargo clippy`, `cargo test` |
+
+The end-to-end smoke set runs in CI against the stack of 2.8: in
+`tripmate-backend` with the latest Web release, and in `tripmate-web`
+with the backend image of its pinned release.
 
 When a repository's CI exists, its checks become required on `main`,
 next to the branch protection already set.
@@ -235,12 +245,12 @@ flowchart LR
 
 | | Web | Mobile |
 |---|-----|--------|
-| Project | Next.js App Router, TypeScript strict, static export ([ADR-0007](../../adr/0007-web-client-is-a-static-build.md)) | Flutter, with flavors `mock`, `preview`, `staging`, `production` |
+| Project | Next.js App Router, TypeScript strict, static export ([ADR-0007](../../adr/0007-web-client-is-a-static-build.md)) | Flutter, with two flavors, `dev` and `prod`, so both apps can be installed on one phone |
 | API client | Generated from the pinned contracts version with Orval: typed client, TanStack Query hooks | Generated from the pinned contracts version with OpenAPI Generator, `dart-dio` |
-| Mock mode | MSW handlers generated with the client, on in mock mode and in screen tests | A Dio interceptor that answers from the contract's examples, in the `mock` flavor and in widget tests |
+| Mock mode | MSW handlers generated with the client, on when `NEXT_PUBLIC_API_MODE=mock` and in screen tests | A Dio interceptor that answers from the contract's examples, on when built with `--dart-define=API_MODE=mock` and in widget tests |
 | Headers sent on every request | `X-Device-Id`; `Idempotency-Key` on creates, kept for retries of the same action | The same |
 | Translations | `next-intl` messages generated from `translations/*.json` | ARB files generated from the same source |
-| Preview | A Render static site per pull request, every `/join/*` path served the join page, pointed at the staging API | A `preview` build for a phone, pointed at the staging API |
+| Where it runs | `localhost:3000` against the local stack; in production, a Render static site with every `/join/*` path served the join page | The `dev` flavor against the local stack (`10.0.2.2:8000` from the Android emulator, `localhost:8000` from the iOS simulator); `prod` against production |
 
 A mock card ([docs/development-flow.md](../../development-flow.md),
 section 1) runs in mock mode; its integration card switches the same
@@ -265,7 +275,7 @@ The requirements are the cross-cutting rows of
 | Language tests | A registered error code with no text in either language fails CI | C |
 | Cross-client API contract tests | A breaking change against the last tag or the latest draft fails CI in `tripmate-contracts`; Web and Mobile build against the pinned version | C |
 | Data protection | A log line from a sign-in request holds no email, password, or token | U |
-| Performance | The P95 latency metric and its alert exist on staging and production | M |
+| Performance | The P95 latency metric and its alert exist in production | M |
 
 ## 4. Technical Design
 
@@ -312,7 +322,8 @@ epic being built ([architecture.md](../../architecture.md), section
 | Mock responses come from the contract's examples | Hand-written mock data in each client | One source for both clients; a stub without examples fails CI |
 | An idempotency key before sign-in belongs to the device ID | No key on register; a key with no owner | Register creates a record and api-design.md asks for a key on every create |
 | The WebSocket gateway is built with the first epic that sends an event to a screen | In this epic | The outbox already publishes to Redis; the gateway's rules (subscriptions, Former members) need trips |
-| Previews of Web and Mobile point at the staging API | A backend preview for every client pull request | A client pull request changes no API; integration cards run against a released contract, which staging serves |
+| Two environments until the beta: local in Docker, and production | A preview per pull request and a staging environment from Phase 1 | A team of two reviews in CI and locally; production has no real users before the beta. It saves the Render Pro plan and a second server to keep running. Staging is added before the beta. |
+| Mobile has two flavors; mock mode is a build setting | One flavor per environment, and one for mock | A flavor is needed only to install two apps on one phone |
 
 ### 5.2 Open questions
 
@@ -320,7 +331,7 @@ epic being built ([architecture.md](../../architecture.md), section
 |----------|-----------------|-----------|
 | Which service takes error reports, traces, and metrics? | Sentry for errors on the backend, Web, and Mobile; Grafana Cloud for traces, metrics, and alerts; both on free plans in the MVP | F10 |
 | Which token opens the pull request in `tripmate-contracts`? | A fine-grained GitHub token limited to `tripmate-contracts`, created by the product owner and stored as a backend secret | F12 |
-| The Web refresh cookie is `SameSite=Strict` on the API's domain ([security.md](../../security.md), section 2.1), and two `onrender.com` addresses count as different sites, so the cookie is not sent between them. Which domain do the Web client and the API use? | The product owner registers one domain. Staging and production use `app.` and `api.` under it; Web previews run on that domain too, or check refresh only on staging | WF3 |
+| The Web refresh cookie is `SameSite=Strict` on the API's domain ([security.md](../../security.md), section 2.1), and two `onrender.com` addresses count as different sites, so the cookie is not sent between them. Which domain do the Web client and the API use? | The product owner registers one domain. Production uses `app.` and `api.` under it. Locally both are `localhost`, so nothing waits for it before production. | WF3 |
 | Is the WebSocket gateway part of EPIC-02 or EPIC-03? | EPIC-02, if its exit criterion "Web and Mobile display consistent trip information" needs live updates; otherwise EPIC-03 | EPIC-02 spec |
 
 ## 6. Tasks
@@ -351,7 +362,7 @@ flowchart LR
     CT1 --> CT2
     CT1 --> WF1 --> WF2
     CT2 --> WF2
-    WF1 --> WF3
+    WF2 --> WF3
     F11 --> WF3
     CT1 --> MF1 --> MF2
     CT2 --> MF2
@@ -372,7 +383,7 @@ flowchart LR
 | F8 | `Outbox` | S | F3 | The `outbox_events` migration; adding an event inside a transaction; the integrity test |
 | F9 | `Worker, scheduler, and cleanup` | M | F7, F8 | 2.5: Taskiq on Redis, the outbox publisher, event handlers as jobs, the scheduler's due-work queries, daily cleanup; the background work tests |
 | F10 | `Logs, traces, metrics, and error reporting` | M | F4 | 2.6, with the service of 5.2; the log line test |
-| F11 | `Render blueprint and environments` | M | F9, F10 | 2.8: preview per pull request with seed data, staging, production; migrations as the pre-deploy step; the alerts of 2.6 |
+| F11 | `Local stack, image, and production on Render` | M | F9, F10 | 2.8: `compose.yaml` runs the whole stack with seed data; the image is published for every release tag; `render.yaml` for production with migrations as the pre-deploy step; the alerts of 2.6 |
 | F12 | `Contract publishing` | S | F2, CT1 | 2.10: `openapi.json` generated from the app, `x-stub` on stub routes, examples required on stubs, the pull request in `tripmate-contracts` |
 
 ### 6.2 Contract: `tripmate-contracts`
@@ -388,13 +399,13 @@ flowchart LR
 |----|------|------|------------|-----------|
 | WF1 | `Web skeleton and CI` | M | CT1 | Next.js static export, TypeScript strict, Vitest with Testing Library, `next-intl` messages generated from the pinned contracts version, the checks of 2.9 required on `main`, `CLAUDE.md` |
 | WF2 | `Web API client and mock mode` | M | WF1, CT2 | The generated client and hooks, MSW handlers from the pinned draft, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
-| WF3 | `Web preview on Render` | S | WF1, F11 | A static site per pull request, `/join/*` served the join page, the staging API configured |
+| WF3 | `Web smoke set and production site` | S | WF2, F11 | Playwright runs in CI against the stack of 2.8; the production static site on Render serves the join page for every `/join/*` path |
 
 ### 6.4 Mobile: `tripmate-mobile`
 
 | ID | Card | Size | Depends on | Done when |
 |----|------|------|------------|-----------|
-| MF1 | `Mobile skeleton and CI` | M | CT1 | Flutter project with the four flavors, ARB files generated from the pinned contracts version, the checks of 2.9 required on `main`, `CLAUDE.md` |
+| MF1 | `Mobile skeleton and CI` | M | CT1 | Flutter project with the two flavors and mock mode of 2.11, ARB files generated from the pinned contracts version, the checks of 2.9 required on `main`, `CLAUDE.md` |
 | MF2 | `Mobile API client and mock mode` | M | MF1, CT2 | The generated `dart-dio` client, the mock interceptor answering from the contract's examples, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
 
 ### 6.5 Desktop: `tripmate-desktop`
@@ -408,11 +419,11 @@ flowchart LR
 | After | The product owner checks |
 |-------|--------------------------|
 | F5 | A `signed_in` test route answers with each error of 2.3, and removing its declaration fails CI |
-| F11 | A pull request in `tripmate-backend` gets its own preview link, and the health check answers there |
+| F11 | `docker compose up` runs the whole stack, and the health check answers locally and in production |
 | CT2, WF2, MF2 | A stub route becomes a draft tag, and the test screen on Web and on Mobile shows its example in mock mode. EPIC-01 can start with B0. |
 
 ## 7. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-11-20 | First version: scope of the first part of EPIC-11, what the platform gives every epic (backend layout, request pipeline, errors, idempotency, outbox and background work, observability, configuration and health check, Render environments, CI, the contract pipeline, Web and Mobile foundations), acceptance criteria, technical design, decisions and open questions, and 20 cards with checkpoints. |
+| 1.0 | 2026-11-20 | First version: scope of the first part of EPIC-11, what the platform gives every epic (backend layout, request pipeline, errors, idempotency, outbox and background work, observability, configuration and health check, Render environments, CI, the contract pipeline, Web and Mobile foundations), two environments until the beta (local and production), acceptance criteria, technical design, decisions and open questions, and 20 cards with checkpoints. |
