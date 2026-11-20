@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.8\
+**Version:** 1.9\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -547,10 +547,13 @@ flowchart LR
     WEB -->|"tagged release"| DSK["tripmate-desktop"]
 ```
 
-- A feature that touches the API lands in order: backend first, kept
-  backward compatible; then the contract; then each client in its own
+- A feature that touches the API lands in order: a contract stub in
+  the backend and its draft contract; then the backend, kept backward
+  compatible, and each client's mock cards at the same time; then the
+  released contract; then each client's integration card in its own
   pull request. How the contract is versioned and checked is in
-  [api-design.md](api-design.md), section 6.
+  [api-design.md](api-design.md), section 6, and how the cards are
+  split in [development-flow.md](development-flow.md), section 1.
 - Each repository has its own CI, its own `CLAUDE.md` pointing to the
   glossary and these documents, and its own release tags.
 - Separate repositories keep each client's tooling (Python, Node,
@@ -624,3 +627,4 @@ the table.
 | 1.6 | 2026-11-19 | The three ADR candidates in section 12.1 are written and linked: ADR-0005 (authentication built into the backend), ADR-0006 (Google Maps Platform behind a provider interface), ADR-0007 (the Web client is a static build). |
 | 1.7 | 2026-11-19 | Section 11: every repository is cloned side by side in one `tripmate/` folder, and code repositories read the documents at `../tripmate-docs/` instead of copying them; tasks are tracked on a Trello board. |
 | 1.8 | 2026-11-20 | The product owner chose Render in Singapore as the PaaS and Taskiq as the job queue library; both open questions in section 12.2 are closed. Section 9.1 shows how Render meets each hosting need; sections 3 and 10 name the services and the library. |
+| 1.9 | 2026-11-20 | Section 11: the landing order starts with a contract stub and a draft contract, so the backend and the clients' mock cards are built at the same time. |

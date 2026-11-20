@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.2\
+**Version:** 1.3\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -49,12 +49,43 @@ table moves it.
 - The tests it adds, by requirement ID, matching the rows of the
   matrix in [test-strategy.md](test-strategy.md), section 5.
 - A link to the design, if it changes a screen.
-- The repository it changes. A feature that changes the API has one
-  card per repository, in the order of
-  [architecture.md](architecture.md), section 11.
+- The repository it changes, and its kind from the table below. A
+  feature that changes the API has one card per repository, in the
+  order of [architecture.md](architecture.md), section 11.
 
 A card for the next epic that is not in ToDo is the signal that Stage 4
 work is not finished for that epic.
+
+**Cards for a feature with an API and screens.** The backend and the
+clients are built at the same time, against a draft contract
+([api-design.md](api-design.md), section 6):
+
+```mermaid
+flowchart LR
+    S["Contract stub<br/>(backend)"] --> D["Draft contract<br/>tagged"]
+    S --> B["Backend cards"]
+    D --> M["Mock cards<br/>(Web, Mobile)"]
+    B --> R["Released contract<br/>tagged"]
+    R --> I["Integration cards<br/>(Web, Mobile)"]
+    M --> I
+```
+
+| Card kind | Repository | Done when | Starts after |
+|-----------|------------|-----------|--------------|
+| Contract stub | `tripmate-backend` | Every route of the feature exists with its request and response schemas and its error codes, returns `501`, and CI publishes a draft contract | -- |
+| Backend | `tripmate-backend` | The behaviour works and its tests pass | The stub |
+| Mock | `tripmate-web` or `tripmate-mobile` | Every state of the screens works against a mock API generated from the draft contract, with screen or widget tests in both languages | The draft is tagged |
+| Integration | `tripmate-web` or `tripmate-mobile` | The client pins the released contract, works against the preview backend, and its contract and end-to-end tests pass | The backend cards and its own mock card |
+
+- A client card's title ends with its client and kind, for example
+  `AUTH-01 Register (Web, mock)` and `AUTH-01 Register (Web,
+  integration)`.
+- A mock card never ships on its own: a client release pins only a
+  released contract.
+- When the backend has to change a shape the draft gave, the same pull
+  request publishes a new draft; the integration card absorbs the
+  change.
+- Desktop cards, and cards that change no screen, are not split.
 
 ## 2. From Card to Merge
 
@@ -200,6 +231,7 @@ AI evaluation and the AI release gate run nightly and before a release
 | A Definition of Ready on the board | Cards start as soon as someone takes them | The Stage 4 gate asks that every task of the next epic has scope, dependencies, and a test before building starts |
 | The AI review runs in a separate session | The authoring session reviews its own change | A reviewer that saw the reasoning tends to accept it |
 | Four defect severities | No scale | "No open Critical or High defect" is a quality gate and needs a definition |
+| A client card is split into a mock card and an integration card | One client card after the backend is done | Web and Mobile are built while the backend is, against the same draft; the integration card catches any difference between the draft and the real API |
 
 ### 5.2 Open questions
 
@@ -214,3 +246,4 @@ AI evaluation and the AI release gate run nightly and before a release
 | 1.0 | 2026-11-20 | First version: the Trello board and the Definition of Ready, the steps from card to merge with naming rules, the Definition of Done, defect severities, decisions and open questions. |
 | 1.1 | 2026-11-20 | Approved by the product owner. Section 1 names the team (the product owner and Claude Code), links the TripMate Trello board, and uses its columns: Discussion, Backlog, ToDo, In-Progress, Review, Done. The open question about the board is narrowed to the GitHub Power-Up. |
 | 1.2 | 2026-11-20 | The open question about Trello's GitHub Power-Up is closed: the product owner added it to the board. |
+| 1.3 | 2026-11-20 | Section 1: a feature with an API and screens is built as a contract stub, backend cards, mock cards against the draft contract, and integration cards against the released contract, so the backend and the clients are built at the same time. Decision added to section 5.1. |

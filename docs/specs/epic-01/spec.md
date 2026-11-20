@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.0\
+**Version:** 1.1\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-01, Phase 1\
 **Page version:** [TripMate EPIC-01 Spec artifact](https://claude.ai/artifact/CDUhq8v5rqC2f3neCN53Rs)
@@ -217,27 +217,38 @@ card also meets the Definition of Done
 ([docs/development-flow.md](../../development-flow.md), section 3); the
 files it changes are named in its plan, in step 2 of that flow.
 
+The backend and the clients are built at the same time: B0 publishes a
+draft contract, Web and Mobile build every screen against a mock API
+generated from it (cards ending in `a`), and each screen is switched
+to the real API once the contract is released (cards ending in `b`).
+The card kinds are defined in
+[docs/development-flow.md](../../development-flow.md), section 1.
+
 ```mermaid
 flowchart LR
-    F["EPIC-11<br/>foundation"] --> B1 --> B2 --> B3 --> B4 --> B6
+    F["EPIC-11<br/>foundation"] --> B0 --> C0
+    B0 --> B1 --> B2 --> B3 --> B4 --> B6
     B3 --> B5
     B2 --> B7
     B5 --> B8
     B6 --> B8
     B7 --> B8
     B8 --> C1
-    C1 --> W1 --> W2 --> W3 --> W6
-    W2 --> W4 --> W5
-    C1 --> M1 --> M2 --> M3 --> M6
-    M2 --> M4 --> M5
-    W3 --> D1 --> D2
+    C0 --> WA["W1a to W6a<br/>Web, mock"]
+    C0 --> MA["M1a to M6a<br/>Mobile, mock"]
+    C1 --> WB["W1b to W6b<br/>Web, integration"]
+    C1 --> MB["M1b to M6b<br/>Mobile, integration"]
+    WA --> WB
+    MA --> MB
+    WB --> D1 --> D2
 ```
 
 ### 6.1 Backend: `tripmate-backend`, module `identity`
 
 | ID | Card | Size | Depends on | Done when |
 |----|------|------|------------|-----------|
-| B1 | `AUTH-01 Account tables and input rules` | S | EPIC-11 foundation | Migration for `users`, `credentials`, `sessions` with the fields of 4.3; Argon2id hashing; the email, password, and display name rules of 2.1 as unit tests |
+| B0 | `AUTH-01 Accounts contract stub` | S | EPIC-11 foundation | Every endpoint of 4.2 exists with its request and response schemas and the error codes of 2.5, and returns `501`; CI publishes the draft contract |
+| B1 | `AUTH-01 Account tables and input rules` | S | B0 | Migration for `users`, `credentials`, `sessions` with the fields of 4.3; Argon2id hashing; the email, password, and display name rules of 2.1 as unit tests |
 | B2 | `AUTH-01 Register` | M | B1 | `POST /v1/auth/register` with `Idempotency-Key` returns `201` and tokens; `409 auth.email_taken`, also for an email in other case; sign-up rate limit |
 | B3 | `AUTH-01 Sign in` | S | B2 | `POST /v1/auth/login` makes a session; wrong email and wrong password both give `401 auth.invalid_credentials`; rate limits by email and by IP address |
 | B4 | `AUTH-02 Refresh with token rotation` | M | B3 | `POST /v1/auth/refresh` replaces the refresh token and sets `last_used_at`; a replaced token ends the session; an ended session gives `401 auth.session_ended` |
@@ -246,54 +257,68 @@ flowchart LR
 | B7 | `AUTH-03 Read and edit the profile` | S | B2 | `GET` and `PATCH /v1/me` with the display name rules; no way to read another user; the new name shows in a trip |
 | B8 | `FR-01 Protected endpoints test` | S | B5, B6, B7 | A test generated from the contract: every endpoint except register, sign-in, refresh, and the health check refuses a missing, expired, or forged token |
 
-**Checkpoint after B3.** A user can register and sign in through the
-API, and the AUTH-01 API tests pass. The product owner tries it on the
-preview before B4 starts.
-
-**Checkpoint after B8.** Every backend row of section 3 has a passing
-test. The product owner reviews before the contract is published.
-
 ### 6.2 Contract: `tripmate-contracts`
 
 | ID | Card | Size | Depends on | Done when |
 |----|------|------|------------|-----------|
-| C1 | `AUTH-01 Publish the accounts contract` | S | B8 | The new `openapi.json` is tagged; the contract check passes; every error code of 2.5 has text in both languages |
+| C0 | `AUTH-01 Accounts contract draft` | XS | B0 | The draft `openapi.json` is tagged, for example `contracts-v1.1.0-draft.1`; every error code of 2.5 has text in both languages |
+| C1 | `AUTH-01 Accounts contract release` | XS | B8 | The released `openapi.json` is tagged; the contract check against the last draft passes |
 
 ### 6.3 Web: `tripmate-web`
 
 | ID | Card | Size | Depends on | Done when | Design |
 |----|------|------|------------|-----------|--------|
-| W1 | `AUTH-01 Welcome and Register (Web)` | S | C1 | Register shows each field error of 2.5 in both languages and signs the user in | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W2 | `AUTH-01 Sign in (Web)` | S | W1 | Sign in, with the one wrong-credentials message and the rate limit message; the start of journey J2 passes | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W3 | `AUTH-02 Token refresh and sign out (Web)` | S | W2 | One refresh on `401 auth.token_expired`, then one retry; a failed refresh or Sign out lands on Welcome; no token in `localStorage` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W4 | `AUTH-03 Profile setup (Web)` | S | W2 | Shown once after registering, then My trips, or the Invitation preview when the user came from a link | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W5 | `AUTH-03 Profile and display name (Web)` | S | W4 | Profile shows the fields of 2.4; editing the display name follows the rules of 2.1 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
-| W6 | `AUTH-02 Devices on Profile (Web)` | S | W3, W5 | List with the current device marked; end one device; sign out other devices | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W1a | `AUTH-01 Welcome and Register (Web, mock)` | S | C0 | Register shows each field error of 2.5 in both languages and signs the user in | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W1b | `AUTH-01 Welcome and Register (Web, integration)` | XS | C1, W1a | The account is created on the preview backend; a taken email shows `auth.email_taken` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W2a | `AUTH-01 Sign in (Web, mock)` | S | W1a | Sign in, with the one wrong-credentials message and the rate limit message | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W2b | `AUTH-01 Sign in (Web, integration)` | S | C1, W2a | Sign in works on the preview backend; the start of journey J2 passes | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W3a | `AUTH-02 Token refresh and sign out (Web, mock)` | S | W2a | One refresh on `401 auth.token_expired`, then one retry; a failed refresh or Sign out lands on Welcome; no token in `localStorage` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W3b | `AUTH-02 Token refresh and sign out (Web, integration)` | S | C1, W3a | The refresh cookie works with the preview backend; a reused token ends the session | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W4a | `AUTH-03 Profile setup (Web, mock)` | S | W2a | Shown once after registering, then My trips, or the Invitation preview when the user came from a link | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W4b | `AUTH-03 Profile setup (Web, integration)` | XS | C1, W4a | The display name is saved on the preview backend | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W5a | `AUTH-03 Profile and display name (Web, mock)` | S | W4a | Profile shows the fields of 2.4; editing the display name follows the rules of 2.1 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W5b | `AUTH-03 Profile and display name (Web, integration)` | XS | C1, W5a | The edited name is read back from `GET /v1/me` | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W6a | `AUTH-02 Devices on Profile (Web, mock)` | S | W3a, W5a | List with the current device marked; end one device; sign out other devices | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
+| W6b | `AUTH-02 Devices on Profile (Web, integration)` | XS | C1, W6a | Ending a device on the preview backend signs that device out | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) |
 
 ### 6.4 Mobile: `tripmate-mobile`
 
 | ID | Card | Size | Depends on | Done when | Design |
 |----|------|------|------------|-----------|--------|
-| M1 | `AUTH-01 Welcome and Register (Mobile)` | S | C1 | As W1, with widget tests in both languages | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
-| M2 | `AUTH-01 Sign in (Mobile)` | S | M1 | As W2, with widget tests | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
-| M3 | `AUTH-02 Secure token storage and refresh (Mobile)` | S | M2 | Refresh token only in `flutter_secure_storage`; refresh and sign out as W3; tests for storage and refresh | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
-| M4 | `AUTH-03 Profile setup (Mobile)` | S | M2 | As W4 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
-| M5 | `AUTH-03 Profile and display name (Mobile)` | S | M4 | As W5 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
-| M6 | `AUTH-02 Devices on Profile (Mobile)` | S | M3, M5 | As W6 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M1a | `AUTH-01 Welcome and Register (Mobile, mock)` | S | C0 | As W1a, with widget tests | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M1b | `AUTH-01 Welcome and Register (Mobile, integration)` | XS | C1, M1a | As W1b | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M2a | `AUTH-01 Sign in (Mobile, mock)` | S | M1a | As W2a, with widget tests | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M2b | `AUTH-01 Sign in (Mobile, integration)` | S | C1, M2a | As W2b | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M3a | `AUTH-02 Token refresh and sign out (Mobile, mock)` | S | M2a | Refresh token only in `flutter_secure_storage`; refresh and sign out as W3a; tests for storage and refresh | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M3b | `AUTH-02 Token refresh and sign out (Mobile, integration)` | S | C1, M3a | As W3b | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M4a | `AUTH-03 Profile setup (Mobile, mock)` | S | M2a | As W4a, with widget tests | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M4b | `AUTH-03 Profile setup (Mobile, integration)` | XS | C1, M4a | As W4b | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M5a | `AUTH-03 Profile and display name (Mobile, mock)` | S | M4a | As W5a, with widget tests | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M5b | `AUTH-03 Profile and display name (Mobile, integration)` | XS | C1, M5a | As W5b | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M6a | `AUTH-02 Devices on Profile (Mobile, mock)` | S | M3a, M5a | As W6a, with widget tests | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
+| M6b | `AUTH-02 Devices on Profile (Mobile, integration)` | XS | C1, M6a | As W6b | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) |
 
 ### 6.5 Desktop: `tripmate-desktop`
 
+Desktop has no screens of its own, so its cards are not split.
+
 | ID | Card | Size | Depends on | Done when | Design |
 |----|------|------|------------|-----------|--------|
-| D1 | `AUTH-02 Refresh token command (Desktop)` | S | W3; the DESK-01 shell | One Rust command stores, reads, and deletes the refresh token in the operating system's store; `cargo test` passes | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) |
+| D1 | `AUTH-02 Refresh token command (Desktop)` | S | W3b; the DESK-01 shell | One Rust command stores, reads, and deletes the refresh token in the operating system's store; `cargo test` passes | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) |
 | D2 | `AUTH-02 Stay signed in after restart (Desktop)` | XS | D1 | The Web build uses the command on Desktop; checked by hand on macOS and Windows: restart keeps the user signed in, Sign out removes the token | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) |
 
-**Checkpoint at the end of the epic.** Every row of section 3 has a
-passing test on every client it names, and the product owner signs in,
-edits the profile, and ends a device on Web, Mobile, and Desktop.
+### 6.6 Checkpoints
+
+| After | The product owner checks |
+|-------|--------------------------|
+| C0 | The draft contract: every request, response, and error code the screens need, before the mock cards start |
+| B3 and W2a | Register and sign in through the API on the preview, and the same screens against the mock |
+| B8 | Every backend row of section 3 has a passing test, before the contract is released |
+| The last card | Every row of section 3 has a passing test on every client it names; sign in, edit the profile, and end a device on Web, Mobile, and Desktop |
 
 ## 7. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: scope (AUTH-01 to AUTH-03; AUTH-04 to AUTH-06 later), behaviour for register, sign-in, sessions and profile, the error codes it adds, acceptance criteria by requirement ID, technical design, decisions and open questions, and 23 cards of size XS to M with checkpoints. |
+| 1.1 | 2026-11-20 | Section 6: the backend and the clients are built at the same time. B0 publishes a draft contract (C0); every Web and Mobile card is split into a mock card against the draft and an integration card against the released contract (C1). 37 cards; checkpoints in their own table. |

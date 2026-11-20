@@ -3,7 +3,7 @@
 **Document type:** API Design\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.4\
+**Version:** 1.5\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -268,18 +268,28 @@ they depend on each other). Everything they must agree on lives in
 | `events.schema.json`, the realtime messages and events | Written with the backend change that adds an event |
 | `translations/en.json`, `translations/vi.json` | Anyone; every interface text, error code, and message key |
 
+- A feature starts with a contract stub in the backend: its routes,
+  request and response schemas, and error codes, each route returning
+  `501 Not Implemented` until its backend card is merged. CI publishes
+  the stub as a draft tag, for example `contracts-v1.4.0-draft.1`,
+  which Web and Mobile use for their mock cards
+  ([development-flow.md](development-flow.md), section 1).
 - When a backend change touches the contract, its CI opens a pull
   request in `tripmate-contracts` with the new `openapi.json`. Merging
   it creates a version tag, for example `contracts-v1.4.0`.
 - Web and Mobile pin a contracts version and regenerate their client
   when they move to a newer one. Moving is a normal pull request in
   their own repository.
-- A change to the contract lands in this order: backend (additive and
-  backward compatible), contracts, then the clients. A client never
-  depends on an endpoint that is not yet in production.
+- A change to the contract lands in this order: the backend stub and
+  its draft; then the backend (additive and backward compatible) and
+  the clients' mock cards at the same time; then the released
+  contract; then the clients' integration cards. A client release pins
+  only a released contract and never depends on an endpoint that is
+  not yet in production.
 - CI in `tripmate-contracts` compares each new `openapi.json` with the
   previous tag and fails on a breaking change unless the path version
-  changes.
+  changes. It also compares a release with its latest draft: a drafted
+  shape changes only by publishing a new draft.
 - An endpoint that will be removed is marked `deprecated` in the
   contract and returns a `Sunset` header for at least one release
   before it goes.
@@ -296,3 +306,4 @@ they depend on each other). Everything they must agree on lives in
 | 1.2 | 2026-11-19 | Status: Approved. The product owner approved the document; no content changes. |
 | 1.3 | 2026-11-19 | Follows the Trip time zone rules in prd.md: creating a trip sends the device's time zone, trip dates are read in the trip's time zone, and the Day window and planned times are local at the place. |
 | 1.4 | 2026-11-20 | `POST /v1/auth/sessions/end-others` added for "sign out other devices", following the EPIC-01 spec. |
+| 1.5 | 2026-11-20 | Section 6: a feature starts with a contract stub in the backend, published as a draft tag for the clients' mock cards; the landing order and the CI check include the draft. |
