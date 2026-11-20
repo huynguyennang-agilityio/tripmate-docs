@@ -192,8 +192,9 @@ tracked, estimated, and controlled.
   Requirements-to-Test Matrix, AI Evaluation Plan, Golden Dataset
   (initial version), Release Plan.
 - **Documents:** [mvp-roadmap.md](mvp-roadmap.md);
-  [docs/test-strategy.md](docs/test-strategy.md); tasks as cards on the
-  Trello board.
+  [docs/test-strategy.md](docs/test-strategy.md);
+  [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md); tasks as cards
+  on the Trello board.
 - **Ready to move on when:** every epic is ordered with its
   dependencies; every task for the next epic has scope, dependencies,
   and a test; the Definition of Done and AI release gates are written.
@@ -363,7 +364,8 @@ exist today, and their versions, is shown in the Build Tracker.
 | [docs/security.md](docs/security.md) | How are accounts, trips, and money records kept safe? Authentication, capabilities, data protection, threats and controls | 3 |
 | [docs/adr](docs/adr/) | Why this decision over the alternatives? | 3 |
 | [mvp-roadmap.md](mvp-roadmap.md) | In what order and by when? Phases, milestones, risks, release gates | 4 |
-| [docs/test-strategy.md](docs/test-strategy.md) | How is TripMate tested? Test levels, requirements-to-test mapping, AI evaluation plan and golden dataset | 4 |
+| [docs/test-strategy.md](docs/test-strategy.md) | How is TripMate tested? Test levels, requirements-to-test mapping, AI evaluation plan | 4 |
+| [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) | Which cases is the assistant evaluated on, and what is expected in each? | 4 |
 | `docs/development-flow.md` | How does a task go from Trello card to merged? Definition of Done | 5 |
 | `docs/release-plan.md` | How do we harden, ship, roll back, and measure? | 6 |
 
@@ -438,4 +440,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.6 | 2026-11-18 | docs/ux-review.md now exists and is linked from the Stage 3 documents and the document map. |
 | 2.7 | 2026-11-19 | docs/architecture.md now exists and is linked from the Stage 3 documents, the feedback loops, and the document map. Three companion documents added for stage 3: docs/data-model.md (Database ERD), docs/api-design.md (API Contracts), and docs/security.md (Security Architecture). |
 | 2.8 | 2026-11-19 | Tasks are tracked as cards on a Trello board instead of issues (Stages 4, 5 and 7, the SDLC loop, the document map). Section 7: repositories are cloned side by side so code reads the documents at `../tripmate-docs/`, and the requirement ID ties a Trello card to its branch, tests and pull request. |
-| 2.9 | 2026-11-19 | docs/test-strategy.md now exists and is linked from the Stage 4 documents and the document map. |
+| 2.9 | 2026-11-20 | docs/test-strategy.md and docs/ai-golden-dataset.md now exist and are linked from the Stage 4 documents and the document map. The golden dataset has its own document, so the test strategy holds only what changes rarely. |
