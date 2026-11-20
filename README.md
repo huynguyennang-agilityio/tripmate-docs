@@ -92,6 +92,7 @@ that has a page version also links to it in its own header.
 | [TripMate Data Model](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H) | docs/data-model.md as a document page |
 | [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) | docs/api-design.md as a document page |
 | [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) | docs/security.md as a document page |
+| [TripMate MVP Roadmap](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd) | mvp-roadmap.md as a document page, with the epic dependency map |
 | [TripMate Test Strategy](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9) | docs/test-strategy.md as a document page |
 | [TripMate ADR-0005 Authentication](https://claude.ai/artifact/AnngZQmwf1Ax8GWodXwcvz) | docs/adr/0005-authentication-built-into-the-backend.md as a document page |
 | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md as a document page |

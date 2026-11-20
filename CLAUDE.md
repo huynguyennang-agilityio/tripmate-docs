@@ -101,6 +101,7 @@ here and linked from the document's header as its page version.
 | docs/data-model.md | [TripMate Data Model](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H) |
 | docs/api-design.md | [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) |
 | docs/security.md | [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) |
+| mvp-roadmap.md | [TripMate MVP Roadmap](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd) |
 | docs/test-strategy.md | [TripMate Test Strategy](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9) |
 | docs/adr/0005-authentication-built-into-the-backend.md | [TripMate ADR-0005 Authentication](https://claude.ai/artifact/AnngZQmwf1Ax8GWodXwcvz) |
 | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) |

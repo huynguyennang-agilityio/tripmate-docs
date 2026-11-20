@@ -3,8 +3,9 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.11\
-**Planning horizon:** 13 weeks (initial estimate)
+**Version:** 1.12\
+**Planning horizon:** 13 weeks (initial estimate)\
+**Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
 
 Terms follow [GLOSSARY.md](GLOSSARY.md); scope follows [prd.md](prd.md).
 
@@ -157,6 +158,9 @@ are set yet.
 -   Owner membership powers: remove Members, transfer ownership.
 -   Leaving with a Balance and rejoining as the same Member.
 -   Audit log for trip changes.
+-   Platform foundation (EPIC-11, first part): access guard, error
+    codes, idempotency keys, outbox, structured logging, and CI. Built
+    before the first endpoint, because every endpoint uses it.
 -   Initial Web and Mobile navigation and shared API integration.
 -   Desktop: Tauri shell showing the Web client (DESK-01) and
     `tripmate://` Invitation deep links (DESK-02).
@@ -186,6 +190,11 @@ are set yet.
 
 **Features**
 
+-   Itinerary core (EPIC-05, first part), built before voting because
+    a Decision changes the Itinerary: days from the trip dates, items
+    entered by hand, manual creation and editing.
+-   Editing rules by trip state (Proposal required only while
+    Confirmed).
 -   Trip discussion messages.
 -   Basic realtime updates.
 -   Place Proposals.
@@ -204,6 +213,7 @@ are set yet.
 **Deliverables**
 
 -   Discussion UI on Web and Mobile.
+-   Itinerary core domain model and APIs.
 -   Proposal and voting APIs.
 -   Realtime message/update flow.
 -   Gap rules and Nudge scheduler.
@@ -213,6 +223,11 @@ are set yet.
 
 -   Multiple members can discuss a trip.
 -   Members can propose and vote on places.
+-   A Decision changes the Itinerary, and other open Proposals about the
+    same item become Outdated.
+-   Users can edit the Itinerary without AI.
+-   While the trip is Confirmed, the Itinerary changes only through a
+    Decision.
 -   The UI distinguishes open Proposals, Votes, and Decisions.
 -   Voting thresholds stay correct when Members join or leave.
 -   No Member, including the Owner, can decide alone.
@@ -222,6 +237,8 @@ are set yet.
 ### Phase 3 -- Trip Planning and AI (Weeks 6--7)
 
 **Objective:** The group can create and refine a useful itinerary.
+The Itinerary core and voting already exist from Phase 2; this phase
+adds places, travel time, Feasibility, and the assistant.
 
 **Features**
 
@@ -230,9 +247,6 @@ are set yet.
 -   AI Itinerary drafting as Proposals.
 -   Trip-context-aware prompts.
 -   Structured AI output validation.
--   Manual Itinerary creation and editing.
--   Editing rules by trip state (Proposal required only while
-    Confirmed).
 -   Marking Itinerary items Visited or Skipped, with a progress view.
 -   Estimated cost per Itinerary item.
 -   Day window and travel-time estimates from the map provider.
@@ -257,16 +271,13 @@ estimate (AI-05), and its accommodation and restaurant suggestions
 
 -   AI assistant interface.
 -   Places integration.
--   Itinerary domain model and APIs.
--   Proposal and approval workflow.
+-   Places, travel-time, and Feasibility APIs.
+-   AI drafts published through the Phase 2 Proposal workflow.
 -   Golden test cases for representative planning requests.
 
 **Exit criteria**
 
 -   AI can return a schema-valid Itinerary Proposal.
--   Users can edit the Itinerary without AI.
--   While the trip is Confirmed, the Itinerary changes only through a
-    Decision.
 -   Members can mark items Visited or Skipped during the trip.
 -   A Member can press Capture ideas and publish an Idea draft as a
     Proposal.
@@ -287,6 +298,8 @@ booking details together.
 -   Flight, hotel, transport, activity, restaurant, and other
     categories.
 -   Booking reference, provider, dates, amount, currency, and notes.
+-   Booking amounts count as Estimated costs. Adding a booking as an
+    Expense comes in Phase 5, with Expenses.
 -   Responsible member and payer.
 -   Check-in/check-out dates for accommodation and departure/arrival for
     transport.
@@ -321,6 +334,8 @@ owes whom.
 **Features**
 
 -   Add, edit, and review expenses.
+-   Add a booking as an Expense, prefilled and linked to it, so it
+    stops counting as an Estimated cost (FR-06, FR-08).
 -   Payer selection.
 -   Participant selection.
 -   Equal split.
@@ -345,6 +360,8 @@ owes whom.
 **Exit criteria**
 
 -   Expense splits sum exactly to each expense total.
+-   An Expense added from a booking is counted once in the Budget
+    check.
 -   Sum of member balances is zero under the defined rounding policy.
 -   The Settlement plan covers all outstanding Balances, including
     Former members.
@@ -382,6 +399,7 @@ owes whom.
 ### Phase 7 -- Beta and MVP Release (Week 13)
 
 **Objective:** Validate the end-to-end experience with real groups.
+This phase finishes EPIC-11: hardening, monitoring, and release.
 
 **Activities**
 
@@ -440,19 +458,105 @@ Where each phase gets its requirements and epics:
 
 | Phase | PRD requirements | Epics |
 |-------|------------------|-------|
-| 1 -- Core Foundation | FR-01, FR-02 | EPIC-01, EPIC-02 |
-| 2 -- Collaboration | FR-03; FR-10 (checklist, Foundation Gaps, Nudge engine) | EPIC-03, EPIC-13 |
+| 1 -- Core Foundation | FR-01, FR-02 | EPIC-11 (platform foundation), EPIC-01, EPIC-02 |
+| 2 -- Collaboration | FR-05 (Itinerary core); FR-03; FR-10 (checklist, Foundation Gaps, Nudge engine) | EPIC-05 (Itinerary core), EPIC-03, EPIC-13 |
 | 3 -- Trip Planning and AI | FR-04, FR-05; FR-10 (Itinerary Gaps) | EPIC-04, EPIC-05, EPIC-13 |
 | 4 -- Booking and Task Coordination | FR-06, FR-07; FR-10 (Preparation Gaps) | EPIC-06, EPIC-07, EPIC-13 |
-| 5 -- Expense Management | FR-08 | EPIC-08, EPIC-09 |
+| 5 -- Expense Management | FR-08; FR-06 (add a booking as an Expense) | EPIC-08, EPIC-09 |
 | 6 -- Desktop Release | DESK-01 to DESK-07, built across Phases 1 to 5 | EPIC-12 |
-| 7 -- Beta and MVP Release | PRD section 9 | EPIC-11 |
+| 7 -- Beta and MVP Release | PRD section 9 | EPIC-11 (hardening and release) |
 | Every phase | PRD section 6 | EPIC-10 |
 
 FR-10 (Readiness checklist and Nudges) is delivered across three
-phases under EPIC-13, so its rules have one spec. FR-09 (Trip Summary
+phases under EPIC-13, so its rules have one spec. EPIC-05 and EPIC-11
+are also delivered in two parts each, for the reasons in section 6.1. FR-09 (Trip Summary
 and Memories, P1 and P2) is planned for after the MVP and has no epic
 yet.
+
+### 6.1 Epic Dependencies
+
+An arrow means "must work before". An epic delivered in parts appears
+once per part, inside the phase that builds that part. EPIC-10
+(Cross-Platform Experience) and EPIC-12 (Desktop App) are left out of
+the diagram: EPIC-10 runs in every phase, and each Desktop feature
+follows the backend work it uses (table below).
+
+```mermaid
+flowchart LR
+    subgraph P1["Phase 1"]
+        E11a["EPIC-11<br/>platform foundation"] --> E01["EPIC-01<br/>Auth"] --> E02["EPIC-02<br/>Trips, Membership"]
+    end
+    subgraph P2["Phase 2"]
+        E05a["EPIC-05<br/>Itinerary core"] --> E03["EPIC-03<br/>Collaboration, Voting"] --> E13a["EPIC-13<br/>Foundation Gaps, Nudges"]
+    end
+    subgraph P3["Phase 3"]
+        E05b["EPIC-05<br/>places, travel time, Feasibility"] --> E04["EPIC-04<br/>AI assistant"]
+        E05b --> E13b["EPIC-13<br/>Itinerary Gaps"]
+    end
+    subgraph P4["Phase 4"]
+        E06["EPIC-06<br/>Bookings"] --> E13c["EPIC-13<br/>Preparation Gaps"]
+        E07["EPIC-07<br/>Tasks"] --> E13c
+    end
+    subgraph P5["Phase 5"]
+        E08["EPIC-08<br/>Expenses"] --> E09["EPIC-09<br/>Settlement"]
+    end
+    subgraph P7["Phase 7"]
+        E11b["EPIC-11<br/>hardening, release"]
+    end
+    E02 --> E05a
+    E02 --> E03
+    E05a --> E05b
+    E03 --> E05b
+    E03 --> E04
+    E13a --> E13b
+    E13b --> E13c
+    E02 --> E06
+    E02 --> E07
+    E06 --> E08
+    E02 --> E08
+    E09 --> E11b
+    E08 -. "counted in the Budget warning" .-> E05b
+```
+
+| Epic (part) | Needs | Why | Phase |
+|-------------|-------|-----|-------|
+| EPIC-11, platform foundation | -- | Every endpoint uses the access guard, error codes, idempotency keys, and the outbox | 1 |
+| EPIC-01 Auth | EPIC-11 foundation | Sign-in returns error codes and is logged like every other endpoint | 1 |
+| EPIC-02 Trips, Membership | EPIC-01 | A trip is created by a signed-in user, who becomes its Owner | 1 |
+| EPIC-05, Itinerary core | EPIC-02 | Itinerary days come from the trip dates; the editing rules follow the trip state | 2 |
+| EPIC-03 Collaboration, Voting | EPIC-02, EPIC-05 core | The vote threshold counts current Members; a Decision changes the Itinerary and makes other Proposals on the same item Outdated | 2 |
+| EPIC-13, Foundation Gaps and Nudges | EPIC-02, EPIC-03 | Gaps 1 to 3 read the trip's dates, destination, and Budget; Nudges are posted in the discussion | 2 |
+| EPIC-05, places, travel time, Feasibility | EPIC-05 core, EPIC-03 | Travel time is between Itinerary items; Feasibility warnings show on Proposals before Members vote | 3 |
+| EPIC-04 AI assistant | EPIC-03, EPIC-05 | AI output becomes a Proposal; its tools read places and the Itinerary; idea capture reads the discussion | 3 |
+| EPIC-13, Itinerary Gaps | EPIC-05, EPIC-13 Foundation | Gaps 4 to 7 read days, travel time, and Feasibility warnings, and use the checklist and Nudge engine | 3 |
+| EPIC-06 Bookings | EPIC-02 | The responsible Member and the payer are Members | 4 |
+| EPIC-07 Tasks | EPIC-02 | Assignees are Members | 4 |
+| EPIC-13, Preparation Gaps | EPIC-06, EPIC-07, EPIC-13 Itinerary | Gaps 8 to 10 read Booked bookings, tasks, and the city of each Itinerary item | 4 |
+| EPIC-08 Expenses | EPIC-02, EPIC-06 | Participants are Members; a booking can be added as an Expense | 5 |
+| EPIC-09 Settlement | EPIC-08 | The Settlement plan is computed from Balances | 5 |
+| EPIC-11, hardening and release | Every other epic | Security review, load tests, and monitoring check the finished system | 7 |
+
+**Soft dependency.** The Budget Feasibility warning (Phase 3) adds
+Expenses already recorded. Before Phase 5 there are none, so the
+warning counts Estimated costs only; nothing has to be built twice.
+
+**Desktop features**
+
+| Desktop feature | Needs | Phase |
+|-----------------|-------|-------|
+| DESK-01 Web client in a window, DESK-02 Invitation links | EPIC-02 | 1 |
+| DESK-03 Nudge notifications | EPIC-13 Foundation | 2 |
+| DESK-04 Tray count of open Gaps | EPIC-13 Foundation | 3 |
+| DESK-06 Offline Itinerary | EPIC-05 | 3 |
+| DESK-05 Quick-add Expense | EPIC-08 | 5 |
+| DESK-07 Signed auto-update | All of the above | 6 |
+
+**Critical path.** EPIC-11 foundation, EPIC-01, EPIC-02, EPIC-05 core,
+EPIC-03, EPIC-05 places and Feasibility, EPIC-04. A delay on any of
+these moves every later phase; EPIC-06 and EPIC-07 need only EPIC-02
+and can start early when someone is free.
+
+### 6.2 Epic Breakdown
 
 Each Epic should be decomposed into user stories with:
 
@@ -563,6 +667,7 @@ targets.
 | Expense correctness | Deterministic domain service and invariant-based tests. |
 | Booking provider complexity | Manual booking records in MVP; integrations later. |
 | Scope growth | Enforce MVP non-goals and review change requests. |
+| Phase 2 overload | The Itinerary core moved into Phase 2 so voting can change the Itinerary; build it first and keep it to days, items, and manual editing; re-estimate after Phase 0. |
 | Phase 3 overload | Idea capture and Saved places are P0; defer the P1 items of Phase 3 first, in the order given there; re-estimate after Phase 0. |
 | Small-team capacity | Prioritize complete vertical slices and defer P1/P2 work when needed. |
 
@@ -615,3 +720,4 @@ feedback.
 | 1.9 | 2026-11-17 | Aligned with the decisions in PRD v1.9: idea capture and Saved places are P0 in Phase 3, with the P1 items to defer first; in-app notifications are P1 and Desktop notifies for Nudges; undo of Confirm and automatic Ongoing in Phase 1; Former member read access in Phase 5. New EPIC-13 for Readiness and Nudges; FR-09 after the MVP. Stages and phases explained. The MVP list and the development workflow now link to prd.md and product-workflow.md instead of repeating them. Cross-references no longer name a version. |
 | 1.10 | 2026-11-19 | Desktop also ships for Linux, following prd.md: the platforms, the Phase 6 features and exit criteria, and Phase 7 cross-platform testing name Linux. The schedule is not changed. |
 | 1.11 | 2026-11-19 | Epics and tasks live on the Trello board instead of an issue tracker, following product-workflow.md. The schedule is not changed. |
+| 1.12 | 2026-11-19 | New section 6.1, Epic Dependencies: a dependency diagram by phase, what each epic needs and why, the Desktop features, and the critical path. Three ordering fixes, the 13 weeks unchanged: the Itinerary core (EPIC-05) moves into Phase 2, before voting, because a Decision changes the Itinerary; adding a booking as an Expense is built in Phase 5 with Expenses; EPIC-11 is split, with its platform foundation in Phase 1 and hardening and release in Phase 7. New risk: Phase 2 overload. The roadmap now has a page version, linked from the header. |
