@@ -27,6 +27,8 @@ separate repositories.
 | Look up a table, a constraint, or what is stored where | [docs/data-model.md](docs/data-model.md) |
 | Look up an endpoint convention, an error code, or a realtime event | [docs/api-design.md](docs/api-design.md) |
 | Know who may do what and how data is protected | [docs/security.md](docs/security.md) |
+| Know how TripMate is tested and how the assistant is evaluated | [docs/test-strategy.md](docs/test-strategy.md) |
+| See the cases the assistant is evaluated on | [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
 New to the project? Read the vision, then sections 2 to 4 of the PRD,
@@ -54,7 +56,7 @@ flowchart TB
     end
     subgraph S4["4: SOW / Planning"]
         direction LR
-        roadmap["mvp-roadmap.md"] ~~~ test["docs/test-strategy.md"]:::planned
+        roadmap["mvp-roadmap.md"] ~~~ test["docs/test-strategy.md"] ~~~ gold["docs/ai-golden-dataset.md"]
     end
     subgraph S5["5: AI-native SDLC"]
         direction LR
@@ -92,6 +94,8 @@ that has a page version also links to it in its own header.
 | [TripMate API Design](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf) | docs/api-design.md as a document page |
 | [TripMate Security Architecture](https://claude.ai/artifact/7NLzrGuao8L27ey8CiTnvA) | docs/security.md as a document page |
 | [TripMate MVP Roadmap](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd) | mvp-roadmap.md as a document page, with the epic dependency map |
+| [TripMate Test Strategy](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9) | docs/test-strategy.md as a document page |
+| [TripMate AI Golden Dataset](https://claude.ai/artifact/Lib799999zYpM9xTnkLzNh) | docs/ai-golden-dataset.md as a document page |
 | [TripMate ADR-0005 Authentication](https://claude.ai/artifact/AnngZQmwf1Ax8GWodXwcvz) | docs/adr/0005-authentication-built-into-the-backend.md as a document page |
 | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md as a document page |
 | [TripMate ADR-0007 Static Web Build](https://claude.ai/artifact/F2Xm35mpu9KMUtjechuCdm) | docs/adr/0007-web-client-is-a-static-build.md as a document page |
@@ -118,6 +122,8 @@ docs/
   data-model.md        Stage 3
   api-design.md        Stage 3
   security.md          Stage 3
+  test-strategy.md     Stage 4
+  ai-golden-dataset.md Stage 4
   adr/                 Decision records
 ```
 
