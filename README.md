@@ -104,6 +104,7 @@ that has a page version also links to it in its own header.
 | [Web prototype](https://claude.ai/artifact/4prwGmgBsXBv5Jvnc3aEUo) | Clickable Web client |
 | [Mobile prototype](https://claude.ai/artifact/MS8Hfa77SzLyhwFwnfFAen) | Clickable Mobile client |
 | [Desktop prototype](https://claude.ai/artifact/UHEF5bSEzMDa4k2z62cRRJ) | Clickable Desktop client |
+| [TripMate Trello board](https://trello.com/b/zsxAnzsz/tripmate) | Tasks as cards, one per requirement ID |
 
 ## Repository layout
 

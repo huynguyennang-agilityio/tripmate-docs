@@ -2,8 +2,8 @@
 
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.0\
+**Status:** Approved\
+**Version:** 1.1\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -19,18 +19,25 @@ Definition of Done, and how defects are handled.
 
 ## 1. The Trello Board
 
-Every task is one card. A card moves left to right, and only the
-condition in the table moves it.
+**Who.** The team is the product owner and Claude Code. Claude Code
+plans, builds, and reviews; the product owner approves every plan,
+reviews every pull request, and owns every epic. "A person" in this
+document is the product owner.
+
+**The board.** Tasks are cards on the [TripMate board](https://trello.com/b/zsxAnzsz/tripmate). Every task
+is one card. A card moves left to right, and only the condition in the
+table moves it.
 
 | Column | A card moves here when |
 |--------|------------------------|
+| Discussion | It is a question or an idea that is not a task yet. It leaves this column as a task in Backlog, as a change to a document, or archived. |
 | Backlog | It is written: a requirement ID and a title |
-| Ready | It meets the Definition of Ready below |
-| In progress | Someone has taken it and the plan is approved |
-| In review | Its pull request is open and CI is green |
+| ToDo | It meets the Definition of Ready below |
+| In-Progress | Its plan is approved |
+| Review | Its pull request is open and CI is green |
 | Done | It meets the Definition of Done (section 3) |
 
-**Definition of Ready.** A card may move to Ready only when it has:
+**Definition of Ready.** A card may move to ToDo only when it has:
 
 - The requirement ID at the start of its title, for example
   `INV-01 Create an Invitation`.
@@ -46,14 +53,14 @@ condition in the table moves it.
   card per repository, in the order of
   [architecture.md](architecture.md), section 11.
 
-A card for the next epic that is not Ready is the signal that Stage 4
+A card for the next epic that is not in ToDo is the signal that Stage 4
 work is not finished for that epic.
 
 ## 2. From Card to Merge
 
 ```mermaid
 flowchart LR
-    R["Ready card"] --> P["AI reads card, spec, code;<br/>proposes a plan"]
+    R["Card in ToDo"] --> P["AI reads card, spec, code;<br/>proposes a plan"]
     P --> A{"Person<br/>approves plan?"}
     A -->|No| P
     A -->|Yes| B["Branch, code<br/>and tests"]
@@ -69,9 +76,9 @@ flowchart LR
 | Step | Who | What comes out |
 |------|-----|----------------|
 | Plan | The AI, from the card, the spec, and the code | The files to change, the tests by requirement ID, whether the contract changes, and the questions the spec does not answer |
-| Approve the plan | A person | Yes, or what to change. The card moves to In progress. |
+| Approve the plan | A person | Yes, or what to change. The card moves to In-Progress. |
 | Build | The AI, within the approved plan | Code and tests on the branch |
-| Open the pull request | The author | A pull request linked to the card. The card moves to In review. |
+| Open the pull request | The author | A pull request linked to the card. The card moves to Review. |
 | Checks | CI and the preview | Everything listed for every pull request in [test-strategy.md](test-strategy.md), section 4 |
 | AI review | A separate AI session that did not write the code | Findings on correctness, tests, scope, and security. It changes no code. |
 | Human review | A person | Approval, or changes requested |
@@ -198,7 +205,7 @@ AI evaluation and the AI release gate run nightly and before a release
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| Who sets up the Trello board, its columns, and the GitHub Power-Up? | The product owner, with the columns in section 1 | Phase 0 |
+| Who adds Trello's GitHub Power-Up to the board, so a pull request attaches to its card? | The product owner | Phase 0 |
 | Where do each repository's coding conventions live? | In that repository's `CLAUDE.md`, next to the code | Phase 0 |
 
 ## 6. Version History
@@ -206,3 +213,4 @@ AI evaluation and the AI release gate run nightly and before a release
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: the Trello board and the Definition of Ready, the steps from card to merge with naming rules, the Definition of Done, defect severities, decisions and open questions. |
+| 1.1 | 2026-11-20 | Approved by the product owner. Section 1 names the team (the product owner and Claude Code), links the TripMate Trello board, and uses its columns: Discussion, Backlog, ToDo, In-Progress, Review, Done. The open question about the board is narrowed to the GitHub Power-Up. |

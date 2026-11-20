@@ -3,7 +3,7 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.14\
+**Version:** 1.15\
 **Planning horizon:** 13 weeks (initial estimate)\
 **Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
 
@@ -93,19 +93,21 @@ and the milestones are section 5.
 
 **Responsibilities**
 
+The team is two: the product owner and Claude Code. The product owner
+owns every epic.
+
 | Role | Responsible for |
 |------|-----------------|
 | Product owner | Approving documents, stage gates, plans, and scope changes (section 12); accepting each milestone and the release; recruiting the beta groups |
-| Developer, working with AI coding tools | Specs, code, and tests for each card, following [docs/development-flow.md](docs/development-flow.md) |
-| AI reviewer, in a separate session | The independent review of every pull request |
+| Claude Code | Specs, code, and tests for each card, following [docs/development-flow.md](docs/development-flow.md); the independent review of every pull request, in a separate session |
 
 Who does which test work is in
 [docs/test-strategy.md](docs/test-strategy.md), section 9.
 
 **Assumptions**
 
-- One small team or one developer, with AI coding tools, for 13 weeks
-  (section 1).
+- The product owner and Claude Code, for 13 weeks. The 13 weeks are
+  re-estimated after Phase 0 (section 12).
 - TripMate records money and bookings; it does not process payments
   or buy anything ([prd.md](prd.md), section 4.2), so no payment or
   supplier integration is in the plan.
@@ -137,7 +139,6 @@ Who does which test work is in
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| Who is on the team, and who owns which epic? | Set with the per-epic estimates | Phase 0 |
 | When does Week 1 start? | Set when Stage 4 closes | Phase 0 |
 | What is the monthly limit for hosting, Claude, and Google Maps costs? | Set after the PaaS is chosen | Phase 0 |
 
@@ -771,3 +772,4 @@ feedback.
 | 1.12 | 2026-11-19 | New section 6.1, Epic Dependencies: a dependency diagram by phase, what each epic needs and why, the Desktop features, and the critical path. Three ordering fixes, the 13 weeks unchanged: the Itinerary core (EPIC-05) moves into Phase 2, before voting, because a Decision changes the Itinerary; adding a booking as an Expense is built in Phase 5 with Expenses; EPIC-11 is split, with its platform foundation in Phase 1 and hardening and release in Phase 7. New risk: Phase 2 overload. The roadmap now has a page version, linked from the header. |
 | 1.13 | 2026-11-20 | Section 8 now links to docs/test-strategy.md for the tests and the AI evaluation instead of repeating them, and adds the AI release gate to the release gates. AI Proposal acceptance is measured in the beta, not used as a gate. The Definition of Done links to docs/development-flow.md. The schedule is not changed. |
 | 1.14 | 2026-11-20 | New Project scope in section 3, replacing a formal SOW: deliverables with where each lives and when it is accepted, responsibilities, assumptions, constraints, acceptance of a phase and of the MVP, and three open questions. The schedule is not changed. |
+| 1.15 | 2026-11-20 | Project scope: the team is the product owner and Claude Code, and the product owner owns every epic; the open question about the team is closed. The schedule is not changed. |
