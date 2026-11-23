@@ -3,7 +3,7 @@
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.15\
+**Version:** 1.16\
 **Planning horizon:** 13 weeks (initial estimate)\
 **Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
 
@@ -643,9 +643,10 @@ Each Epic should be decomposed into user stories with:
 
 How a task goes from Trello card to merged is described once, in
 [product-workflow.md](product-workflow.md), Stage 5 (AI-native SDLC):
-the AI plans, a person approves the plan, the AI implements, tests and
-an independent AI review run, a person reviews, and nothing merges
-until every quality gate passes. The board, the steps, and the
+the AI plans each epic, the product owner approves the plan, the AI
+writes the tests and then the code, automated checks and an
+independent AI review run, the product owner reviews High-risk
+changes, and nothing merges until every quality gate passes. The board, the steps, and the
 Definition of Done for one task are in
 [docs/development-flow.md](docs/development-flow.md).
 
@@ -773,3 +774,4 @@ feedback.
 | 1.13 | 2026-11-20 | Section 8 now links to docs/test-strategy.md for the tests and the AI evaluation instead of repeating them, and adds the AI release gate to the release gates. AI Proposal acceptance is measured in the beta, not used as a gate. The Definition of Done links to docs/development-flow.md. The schedule is not changed. |
 | 1.14 | 2026-11-20 | New Project scope in section 3, replacing a formal SOW: deliverables with where each lives and when it is accepted, responsibilities, assumptions, constraints, acceptance of a phase and of the MVP, and three open questions. The schedule is not changed. |
 | 1.15 | 2026-11-20 | Project scope: the team is the product owner and Claude Code, and the product owner owns every epic; the open question about the team is closed. The schedule is not changed. |
+| 1.16 | 2026-11-23 | Section 7: the one-sentence summary of the development workflow follows the new flow (the product owner approves each epic's plan and reviews High-risk changes). |

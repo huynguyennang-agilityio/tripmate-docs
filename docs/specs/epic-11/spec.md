@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 1.1\
+**Version:** 1.2\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -20,7 +20,7 @@ not repeat what other documents own; it links to them:
 | Tokens, the access guard, capabilities, rate limits | [security.md](../../security.md), sections 2 and 3 |
 | `outbox_events`, `idempotency_keys`, migrations | [data-model.md](../../data-model.md), sections 6 and 8 |
 | Test levels and what runs when | [test-strategy.md](../../test-strategy.md), sections 2 to 4 |
-| Card kinds and the Definition of Done | [docs/development-flow.md](../../development-flow.md), sections 1 and 3 |
+| Card kinds, risk levels, the three agents, and the Definition of Done | [docs/development-flow.md](../../development-flow.md), sections 1 to 3 |
 
 This spec answers *what the platform gives every epic, how it is
 built, and which cards build it*.
@@ -34,7 +34,7 @@ built, and which cards build it*.
 | The outbox, the Taskiq worker, the scheduler, cleanup jobs | Hardening, load tests, the security assessment, the release plan: EPIC-11, second part, Phase 7 |
 | Logs, traces, metrics, error reporting, and the P95 alert | Navigation shells and shared screens: EPIC-10 |
 | The local stack in Docker, and production on Render; staging is added before the beta | The Desktop window and installers: EPIC-12 (DESK-01, DESK-07) |
-| CI in all five code repositories, and the contract pipeline with draft and released tags | |
+| CI in all five code repositories, the flow checks, and the contract pipeline with draft and released tags | |
 | Web and Mobile foundations: project, generated client, mock mode, translations | |
 
 ## 2. What the Platform Gives Every Epic
@@ -63,6 +63,7 @@ tripmate-backend/
 │       └── events.py      Handlers for other modules' events
 ├── migrations/            Alembic
 ├── tests/                 unit, property, integration, api, contract
+├── .claude/agents/        The test, code, and review agent roles
 ├── Dockerfile             One image for the three processes
 ├── render.yaml            Render blueprint
 ├── compose.yaml           Local PostgreSQL and Redis
@@ -218,6 +219,8 @@ The end-to-end smoke set runs in CI against the stack of 2.8: in
 `tripmate-backend` with the latest Web release, and in `tripmate-web`
 with the backend image of its pinned release.
 
+Every code repository also runs the flow checks of 2.12.
+
 When a repository's CI exists, its checks become required on `main`,
 next to the branch protection already set.
 
@@ -256,6 +259,25 @@ A mock card ([docs/development-flow.md](../../development-flow.md),
 section 1) runs in mock mode; its integration card switches the same
 screens to the real API by configuration only.
 
+### 2.12 The flow checks
+
+The rules of [docs/development-flow.md](../../development-flow.md),
+section 2.3, are held by five checks. This epic builds them.
+
+| Check | How it works |
+|-------|--------------|
+| Failing first | Finds the commits with the trailer `Agent: test`, checks out the last one, and runs the tests those commits added. Each must fail or error. |
+| Test lock | Compares the tests added by the test commits with the head of the branch. A test that a commit without the trailer changed, skipped, or deleted fails the check. |
+| Requirement-to-test report | Collects every test name, reads the requirement ID in it, and compares with `tests/requirement-ids.txt`, the P0 IDs in scope. The first card of each epic adds that epic's IDs. The report is kept with the CI run. |
+| Mutation | Runs mutation testing on the rule files the pull request changes. A surviving mutant fails the check unless the pull request lists it with a reason. Backend only. |
+| Risk gate | Matches the changed files against the repository's path list for the High items of development-flow.md, section 2.1. A match, or a path no rule names, needs the label `human-approved`. |
+
+- The checks are scripts with their own tests, kept in
+  `tripmate-backend` and offered as one reusable workflow. The other
+  code repositories call it with their own path list and test command.
+- The path list, the workflows, each `CLAUDE.md`, and the agent roles
+  are on the path list themselves.
+
 ## 3. Acceptance Criteria
 
 Each criterion has at least one test named with its requirement
@@ -276,6 +298,9 @@ The requirements are the cross-cutting rows of
 | Cross-client API contract tests | A breaking change against the last tag or the latest draft fails CI in `tripmate-contracts`; Web and Mobile build against the pinned version | C |
 | Data protection | A log line from a sign-in request holds no email, password, or token | U |
 | Performance | The P95 latency metric and its alert exist in production | M |
+| Development flow | A test that passes before its code exists, and a locked test that a later commit weakens, each fail CI | U |
+| Development flow | A P0 requirement in scope with no test fails CI | U |
+| Development flow | A pull request that reaches a High path cannot merge without the product owner's label | U |
 
 ## 4. Technical Design
 
@@ -289,7 +314,7 @@ The requirements are the cross-cutting rows of
 | Background jobs | Taskiq with `taskiq-redis` ([architecture.md](../../architecture.md), section 12.1) |
 | Logs and traces | `structlog`; OpenTelemetry SDK |
 | Quality | Ruff, mypy in strict mode, import-linter |
-| Tests | pytest, Hypothesis, Schemathesis, an HTTP test client |
+| Tests | pytest, Hypothesis, Schemathesis, an HTTP test client; `mutmut` for mutation testing |
 | Supply chain | pip-audit, a secret scan, Dependabot |
 
 ### 4.2 Data
@@ -302,7 +327,7 @@ migration that creates `trips`.
 `idempotency_keys` holds `device_id` next to `user_id`, which is empty
 before sign-in (2.4); data-model.md says so in the same change.
 
-### 4.3 Each repository's `CLAUDE.md`
+### 4.3 Each repository's `CLAUDE.md` and agent roles
 
 The skeleton card of each repository writes its `CLAUDE.md`: setup,
 commands, coding conventions, and a pointer to `../tripmate-docs/` for
@@ -310,6 +335,11 @@ the glossary, prd.md, the architecture documents, and the spec of the
 epic being built ([architecture.md](../../architecture.md), section
 11). This closes the open question of
 [docs/development-flow.md](../../development-flow.md), section 5.2.
+
+The same card writes the three agent roles in `.claude/agents/`: the
+test agent, the code agent, and the review agent, each with what it
+reads, what it may change, and what it never does
+([docs/development-flow.md](../../development-flow.md), section 2.3).
 
 ## 5. Decisions and Open Questions
 
@@ -328,10 +358,15 @@ epic being built ([architecture.md](../../architecture.md), section
 | A fine-grained GitHub token opens the pull request in `tripmate-contracts`, stored as the backend secret `CONTRACTS_TOKEN` | A GitHub App | Five minutes to set up, limited to one repository. The product owner creates it with Contents and Pull requests set to read and write and a one-year expiry, and renews it before it expires. The publishing job runs only on pushes to `main`, never on a pull request, so a changed workflow cannot reach the token. |
 | TripMate gets its own `.com` domain through Cloudflare Registrar, bought by the product owner before the beta; production uses `app.` and `api.` under it | `onrender.com` addresses; a free or first-year-discount domain | The Web refresh cookie is `SameSite=Strict` and needs the Web client and the API on one site ([security.md](../../security.md), section 2.1). Invitation links and app links carry the domain, so it must not change once real users have them. Before the beta, production has no real users and runs on `onrender.com`; locally both are `localhost`. |
 
+| The flow checks are scripts with their own tests, shared as one reusable workflow from `tripmate-backend` | A copy in each repository; a marketplace action | One place to change a gate, and the gate is tested like any other code |
+| A test commit is marked by a trailer in its message | A separate branch or pull request for tests | One pull request per card stays the rule; the trailer is enough for CI to tell the two kinds of commit apart |
+| The requirement IDs in scope are a file in each code repository | CI reads prd.md from `tripmate-docs` | A code repository's CI needs nothing outside it, and the scope grows epic by epic |
+
 ### 5.2 Open questions
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
+| What does a rate-limited route answer when Redis does not answer? | `503 server.unavailable`: a limit that cannot be counted is not skipped | F6 |
 | Is the WebSocket gateway part of EPIC-02 or EPIC-03? | EPIC-02, if its exit criterion "Web and Mobile display consistent trip information" needs live updates; otherwise EPIC-03 | EPIC-02 spec |
 
 ## 6. Tasks
@@ -343,9 +378,21 @@ with the ID of the row in its title, for example
 cards change no feature screen, so none is split into a mock and an
 integration card.
 
+The Risk column is the level of
+[docs/development-flow.md](../../development-flow.md), section 2.1.
+The product owner reviews the pull request of a High card; a Low card
+merges on its own when its checks pass. Most cards of this epic are
+High, because they build what that list protects: CI, the checks,
+hosting, the access guard, and migrations. F1, F2, and F14 come first,
+so the checks exist before the other cards start. Each card's test
+cases are in section 7.
+
 ```mermaid
 flowchart LR
-    F1 --> F2
+    F1 --> F2 --> F14
+    F2 --> F13
+    F14 --> CT1
+    F14 --> DF1
     F1 --> F3
     F1 --> F4 --> F5 --> F6
     F3 --> F7
@@ -366,65 +413,342 @@ flowchart LR
     F11 --> WF3
     CT1 --> MF1 --> MF2
     CT2 --> MF2
-    DF1
 ```
 
 ### 6.1 Backend: `tripmate-backend`, module `platform`
 
-| ID | Card | Size | Depends on | Done when |
-|----|------|------|------------|-----------|
-| F1 | `Backend skeleton and health check` | M | -- | The layout of 2.1; the three processes start from one image; settings checked at start-up; `compose.yaml`; `GET /v1/health`; `CLAUDE.md` (4.3) |
-| F2 | `Backend CI` | S | F1 | Every backend check of 2.9 that has code to run; the checks are required on `main` |
-| F3 | `Database session and migrations` | S | F1 | One transaction per request; Alembic set up with its first empty migration; integration tests get a clean database; test builders have their base |
-| F4 | `Error format and error codes` | S | F1, CT1 | 2.3: one exception type, `request.invalid` with fields, `500 server.error`, request ID; registered codes checked for text in both languages |
-| F5 | `Access declaration and token check` | M | F4 | 2.2: every route declares its access; the declaration test; device ID required; EdDSA token check with test keys; the session hook for `identity` |
-| F6 | `Rate limits` | S | F5 | The general ceiling and per-route limits in Redis; `429 rate.limited` with `Retry-After` |
-| F7 | `Idempotency keys` | M | F3, F5 | The `idempotency_keys` migration; every case of 2.4 as a test |
-| F8 | `Outbox` | S | F3 | The `outbox_events` migration; adding an event inside a transaction; the integrity test |
-| F9 | `Worker, scheduler, and cleanup` | M | F7, F8 | 2.5: Taskiq on Redis, the outbox publisher, event handlers as jobs, the scheduler's due-work queries, daily cleanup; the background work tests |
-| F10 | `Logs, traces, metrics, and error reporting` | M | F4 | 2.6, sent to Sentry and Grafana Cloud (5.1); the log line test |
-| F11 | `Local stack, image, and production on Render` | M | F9, F10 | 2.8: `compose.yaml` runs the whole stack with seed data; the image is published for every release tag; `render.yaml` for production with migrations as the pre-deploy step; the alerts of 2.6 |
-| F12 | `Contract publishing` | S | F2, CT1 | 2.10: `openapi.json` generated from the app, `x-stub` on stub routes, examples required on stubs, the pull request in `tripmate-contracts` with `CONTRACTS_TOKEN`, from a job that runs only on pushes to `main` |
+| ID | Card | Size | Risk | Depends on | Done when |
+|----|------|------|------|------------|-----------|
+| F1 | `Backend skeleton and health check` | M | High | -- | The layout of 2.1; the three processes start from one image; settings checked at start-up; `compose.yaml`; `GET /v1/health`; `CLAUDE.md` and the agent roles (4.3) |
+| F2 | `Backend CI` | S | High | F1 | Every backend check of 2.9 that has code to run; the checks are required on `main` |
+| F3 | `Database session and migrations` | S | High | F1 | One transaction per request; Alembic set up with its first empty migration; integration tests get a clean database; test builders have their base |
+| F4 | `Error format and error codes` | S | High | F1, CT1 | 2.3: one exception type, `request.invalid` with fields, `500 server.error`, request ID; registered codes checked for text in both languages |
+| F5 | `Access declaration and token check` | M | High | F4 | 2.2: every route declares its access; the declaration test; device ID required; EdDSA token check with test keys; the session hook for `identity` |
+| F6 | `Rate limits` | S | Low | F5 | The general ceiling and per-route limits in Redis; `429 rate.limited` with `Retry-After` |
+| F7 | `Idempotency keys` | M | High | F3, F5 | The `idempotency_keys` migration; every case of 2.4 as a test |
+| F8 | `Outbox` | S | High | F3 | The `outbox_events` migration; adding an event inside a transaction; the integrity test |
+| F9 | `Worker, scheduler, and cleanup` | M | High | F7, F8 | 2.5: Taskiq on Redis, the outbox publisher, event handlers as jobs, the scheduler's due-work queries, daily cleanup; the background work tests |
+| F10 | `Logs, traces, metrics, and error reporting` | M | High | F4 | 2.6, sent to Sentry and Grafana Cloud (5.1); the log line test |
+| F11 | `Local stack, image, and production on Render` | M | High | F9, F10 | 2.8: `compose.yaml` runs the whole stack with seed data; the image is published for every release tag; `render.yaml` for production with migrations as the pre-deploy step; the alerts of 2.6 |
+| F12 | `Contract publishing` | S | High | F2, CT1 | 2.10: `openapi.json` generated from the app, `x-stub` on stub routes, examples required on stubs, the pull request in `tripmate-contracts` with `CONTRACTS_TOKEN`, from a job that runs only on pushes to `main` |
+| F13 | `Requirement-to-test report` | S | High | F2 | 2.12: the report from test names and `tests/requirement-ids.txt`, kept with each CI run; a P0 ID in scope with no test fails CI |
+| F14 | `Flow checks and agent roles` | M | High | F2 | 2.12: failing first, test lock, mutation, and the risk gate as scripts with their own tests, in one reusable workflow, required on `main`; the label `human-approved` exists |
 
 ### 6.2 Contract: `tripmate-contracts`
 
-| ID | Card | Size | Depends on | Done when |
-|----|------|------|------------|-----------|
-| CT1 | `Contracts repository and translation check` | S | -- | `openapi.json`, `events.schema.json`, `translations/en.json` and `vi.json` in place; the translation check of 2.9; `CLAUDE.md` |
-| CT2 | `Draft and release tags` | S | CT1, F12 | 2.10: a draft tag when any operation is a stub, a release tag otherwise; the breaking-change check against the last tag and the latest draft |
+| ID | Card | Size | Risk | Depends on | Done when |
+|----|------|------|------|------------|-----------|
+| CT1 | `Contracts repository and translation check` | S | High | F14 | `openapi.json`, `events.schema.json`, `translations/en.json` and `vi.json` in place; the translation check of 2.9; the flow checks of 2.12; `CLAUDE.md` and the agent roles (4.3) |
+| CT2 | `Draft and release tags` | S | High | CT1, F12 | 2.10: a draft tag when any operation is a stub, a release tag otherwise; the breaking-change check against the last tag and the latest draft |
 
 ### 6.3 Web: `tripmate-web`
 
-| ID | Card | Size | Depends on | Done when |
-|----|------|------|------------|-----------|
-| WF1 | `Web skeleton and CI` | M | CT1 | Next.js static export, TypeScript strict, Vitest with Testing Library, `next-intl` messages generated from the pinned contracts version, the checks of 2.9 required on `main`, `CLAUDE.md` |
-| WF2 | `Web API client and mock mode` | M | WF1, CT2 | The generated client and hooks, MSW handlers from the pinned draft, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
-| WF3 | `Web smoke set and production site` | S | WF2, F11 | Playwright runs in CI against the stack of 2.8; the production static site on Render serves the join page for every `/join/*` path |
+| ID | Card | Size | Risk | Depends on | Done when |
+|----|------|------|------|------------|-----------|
+| WF1 | `Web skeleton and CI` | M | High | CT1 | Next.js static export, TypeScript strict, Vitest with Testing Library, `next-intl` messages generated from the pinned contracts version, the checks of 2.9 and 2.12 required on `main`, `CLAUDE.md` and the agent roles (4.3) |
+| WF2 | `Web API client and mock mode` | M | High | WF1, CT2 | The generated client and hooks, MSW handlers from the pinned draft, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
+| WF3 | `Web smoke set and production site` | S | High | WF2, F11 | Playwright runs in CI against the stack of 2.8; the production static site on Render serves the join page for every `/join/*` path |
 
 ### 6.4 Mobile: `tripmate-mobile`
 
-| ID | Card | Size | Depends on | Done when |
-|----|------|------|------------|-----------|
-| MF1 | `Mobile skeleton and CI` | M | CT1 | Flutter project with the two flavors and mock mode of 2.11, ARB files generated from the pinned contracts version, the checks of 2.9 required on `main`, `CLAUDE.md` |
-| MF2 | `Mobile API client and mock mode` | M | MF1, CT2 | The generated `dart-dio` client, the mock interceptor answering from the contract's examples, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
+| ID | Card | Size | Risk | Depends on | Done when |
+|----|------|------|------|------------|-----------|
+| MF1 | `Mobile skeleton and CI` | M | High | CT1 | Flutter project with the two flavors and mock mode of 2.11, ARB files generated from the pinned contracts version, the checks of 2.9 and 2.12 required on `main`, `CLAUDE.md` and the agent roles (4.3) |
+| MF2 | `Mobile API client and mock mode` | M | High | MF1, CT2 | The generated `dart-dio` client, the mock interceptor answering from the contract's examples, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
 
 ### 6.5 Desktop: `tripmate-desktop`
 
-| ID | Card | Size | Depends on | Done when |
-|----|------|------|------------|-----------|
-| DF1 | `Desktop repository and CI` | S | -- | A Tauri 2 project that builds; the checks of 2.9 required on `main`; `CLAUDE.md`. The window that loads the Web build is DESK-01, in EPIC-12. |
+| ID | Card | Size | Risk | Depends on | Done when |
+|----|------|------|------|------------|-----------|
+| DF1 | `Desktop repository and CI` | S | High | F14 | A Tauri 2 project that builds; the checks of 2.9 and 2.12 required on `main`; `CLAUDE.md` and the agent roles (4.3). The window that loads the Web build is DESK-01, in EPIC-12. |
 
 ### 6.6 Checkpoints
 
 | After | The product owner checks |
 |-------|--------------------------|
+| F14 | On throwaway pull requests: a test that passes before its code, a locked test weakened by a later commit, and a migration with no label each fail CI. From here a Low card merges on its own. |
 | F5 | A `signed_in` test route answers with each error of 2.3, and removing its declaration fails CI |
 | F11 | `docker compose up` runs the whole stack, and the health check answers locally and in production |
 | CT2, WF2, MF2 | A stub route becomes a draft tag, and the test screen on Web and on Mobile shows its example in mock mode. EPIC-01 can start with B0. |
 
-## 7. Version History
+## 7. Test Cases
+
+Each card has its test cases here: the main cases, the error cases,
+and the edge cases, each with its expected result. The product owner
+approves them with this spec. The test agent turns each case into one
+test before the code is written
+([docs/development-flow.md](../../development-flow.md), section 2);
+it adds no expected result of its own.
+
+| Column | Meaning |
+|--------|---------|
+| Case | The card's ID and a number. The pull request maps each case to its test. |
+| Kind | Main: the behaviour works. Error: a wrong input or a failure is refused. Edge: a limit, a repeat, or an unusual order. |
+| Level | The letter of [test-strategy.md](../../test-strategy.md), section 2 |
+
+A case of level M has no automated test: it is shown once by hand and
+recorded in the card's pull request.
+
+### 7.1 Backend
+
+**F1 Backend skeleton and health check**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F1-1 | Main | PostgreSQL and Redis answer | `GET /v1/health` returns `200` with the release version | A |
+| F1-2 | Error | PostgreSQL does not answer | `503 server.unavailable` | I |
+| F1-3 | Error | Redis does not answer | `503 server.unavailable` | I |
+| F1-4 | Error | A required setting is missing at start-up | The process stops and names the setting, never a value | U |
+| F1-5 | Edge | A setting has a value of the wrong type | The process stops and names the setting | U |
+| F1-6 | Main | The one image is started as API, as worker, and as scheduler | Each process starts and stays up | I |
+
+**F2 Backend CI**
+
+Shown once on a throwaway pull request for each case.
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F2-1 | Main | A pull request with no problem | Every check passes, and each is required on `main` | M |
+| F2-2 | Error | A lint error, a type error, or a failing test | The matching check fails | M |
+| F2-3 | Error | A module imports another module's `repository.py` | import-linter fails | M |
+| F2-4 | Error | A string shaped like a secret is committed | The secret scan fails | M |
+| F2-5 | Error | A dependency with a known vulnerability | pip-audit fails | M |
+
+**F3 Database session and migrations**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F3-1 | Main | A handler writes a row and returns | The row is stored | I |
+| F3-2 | Error | A handler writes a row, then raises | No row is stored | I |
+| F3-3 | Edge | Two tests run one after the other | The second sees none of the first one's rows | I |
+| F3-4 | Main | An empty database | Migrating up to the head, then down to the base, both succeed | I |
+| F3-5 | Edge | A model differs from the migrations | The migration check fails | I |
+
+**F4 Error format and error codes**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F4-1 | Main | A module raises its error with a status, a code, and `params` | The response has that status and the format of api-design.md, section 4.1, with `X-Request-Id` equal to `requestId` | A |
+| F4-2 | Error | A body that breaks its schema in two fields | `400 request.invalid` with two entries in `fields` | A |
+| F4-3 | Error | A body that is not JSON | `400 request.invalid` | A |
+| F4-4 | Error | A handler raises something unexpected | `500 server.error` with the request ID; the body holds no message and no stack | A |
+| F4-5 | Edge | Two requests | Two different request IDs | A |
+| F4-6 | Error | A registered code has no Vietnamese text in the pinned contracts version | The error code text check fails and names the code | C |
+| F4-7 | Edge | A registered code has text in both languages | The check passes | C |
+
+**F5 Access declaration and token check**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F5-1 | Error | A route with no access declaration | The declaration test fails and names the route | A |
+| F5-2 | Main | A `signed_in` route, a valid token, an active session | `200`, and the handler knows the user ID and session ID | A |
+| F5-3 | Main | A `public` route with no token | `200` | A |
+| F5-4 | Error | A `signed_in` route with no `Authorization` header | `401 auth.not_signed_in` | A |
+| F5-5 | Error | A token past its expiry | `401 auth.token_expired` | A |
+| F5-6 | Error | A token signed with another key, or with the algorithm `none` | `401 auth.not_signed_in` | A |
+| F5-7 | Edge | A valid token whose session the hook reports as ended | `401 auth.token_expired` | A |
+| F5-8 | Edge | A token that expires one second from now, and one that expired one second ago | `200`, then `401 auth.token_expired` | A |
+| F5-9 | Error | No `X-Device-Id`, or one that is not a UUID | `400 request.invalid` | A |
+| F5-10 | Edge | The health check with no `X-Device-Id` | `200` | A |
+
+**F6 Rate limits**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F6-1 | Main | Requests up to the limit | Each one passes | A |
+| F6-2 | Error | One request over the limit | `429 rate.limited`, with `Retry-After` set to the seconds left in the window | A |
+| F6-3 | Edge | The window has passed | The next request passes | A |
+| F6-4 | Edge | Two callers with different keys | Each is counted on its own | A |
+| F6-5 | Main | A route with its own limit and key | Its limit applies as well as the general ceiling | A |
+| F6-6 | Edge | Redis does not answer | As the open question of 5.2 decides | I |
+
+**F7 Idempotency keys**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F7-1 | Main | A create `POST` with a new key | The request runs once; its status and body are stored | I, A |
+| F7-2 | Main | The same key and the same body again | The stored response; no second record | I, A |
+| F7-3 | Error | The same key with a different body | `409 request.idempotency_mismatch` | A |
+| F7-4 | Edge | The same key while the first request still runs | `409 request.idempotency_in_progress` | I |
+| F7-5 | Edge | The first request fails with `5xx` | Nothing is stored; the retry runs | I |
+| F7-6 | Edge | The first request is refused with `4xx` | The refusal is stored and returned for the same key and body | I |
+| F7-7 | Error | A create `POST` with no key | `400 request.idempotency_key_required` | A |
+| F7-8 | Error | A key that is not a UUID | `400 request.invalid` | A |
+| F7-9 | Edge | Two users send the same key | Each request runs; neither sees the other's response | I |
+| F7-10 | Edge | Before sign-in, two device IDs send the same key | Each request runs | I |
+
+**F8 Outbox**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F8-1 | Main | A transaction adds one event and commits | One outbox row with the trip's next `trip_seq` and no `published_at` | I |
+| F8-2 | Error | A transaction adds an event, then fails | No outbox row and no record | I |
+| F8-3 | Edge | One transaction adds two events | Two rows with consecutive `trip_seq`, in the order added | I |
+| F8-4 | Edge | Two transactions of the same trip commit at the same time | Their `trip_seq` values differ and leave no gap | I |
+| F8-5 | Edge | Events of two trips | Each trip has its own numbering | I |
+
+**F9 Worker, scheduler, and cleanup**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F9-1 | Main | A committed event | It is published to its trip's channel, and `published_at` is set | I |
+| F9-2 | Edge | Three events waiting | They are published in `id` order | I |
+| F9-3 | Edge | The publisher runs again after publishing | Nothing is published twice | I |
+| F9-4 | Error | Redis does not answer while publishing | `published_at` stays empty; the next sweep publishes the event | I |
+| F9-5 | Main | An event with two registered handlers | One job per handler | I |
+| F9-6 | Edge | A handler's job runs twice for one event | The second run changes nothing | I |
+| F9-7 | Main | A due-work query returns one item that is due | The scheduler enqueues it at its next tick | I |
+| F9-8 | Edge | The scheduler restarts while work is due | The work is enqueued after the restart | I |
+| F9-9 | Main | Idempotency keys of 25 hours and of 23 hours | Cleanup deletes the first and keeps the second | I |
+| F9-10 | Edge | A published outbox row of 8 days, and an unpublished one of 8 days | Cleanup deletes the first and keeps the second | I |
+
+**F10 Logs, traces, metrics, and error reporting**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F10-1 | Main | Any request | One JSON log line with the request ID, and the user ID when signed in | U |
+| F10-2 | Error | A sign-in request with an email, a password, and a token | The log line holds none of the three | U |
+| F10-3 | Main | A handler raises something unexpected | Error reporting receives it with the release tag and the request ID | I |
+| F10-4 | Main | A request that reads the database | One trace with a span for the request and one for the query | I |
+| F10-5 | Edge | Error reporting or the trace collector does not answer | The request still succeeds | I |
+| F10-6 | Main | The metrics endpoint or exporter | It carries request rate, errors, latency, queue depth, job age, and outbox rows waiting | I |
+
+**F11 Local stack, image, and production on Render**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F11-1 | Main | `docker compose up` on a clean machine, in CI | The health check returns `200` and the seed data is present | E |
+| F11-2 | Main | A release tag | The image for that tag is in GitHub Container Registry | M |
+| F11-3 | Main | Production after a deploy | The health check returns `200` with the release version; the alerts of 2.6 exist | M |
+| F11-4 | Error | A deploy whose migration fails | The deploy stops; the previous version keeps serving | M |
+| F11-5 | Edge | A rollback | Redeploying the previous image restores the previous version | M |
+
+**F12 Contract publishing**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F12-1 | Main | The app with no change | Generating `openapi.json` twice gives the same file | C |
+| F12-2 | Main | A stub route | The contract marks it `x-stub: true`, and calling it returns `501` | A, C |
+| F12-3 | Error | A stub response schema with no example | The check fails and names the operation | C |
+| F12-4 | Main | A merge to `main` that changes the contract | A pull request opens in `tripmate-contracts` with the new file | M |
+| F12-5 | Edge | A merge to `main` that does not change the contract | No pull request | M |
+| F12-6 | Edge | A pull request from a branch that edits the publishing workflow | The publishing job does not run, so the token is never read | M |
+
+**F13 Requirement-to-test report**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F13-1 | Main | Tests named with requirement IDs | The report lists each ID in scope with its tests | U |
+| F13-2 | Error | A P0 requirement ID in scope with no test | The check fails and names the ID | U |
+| F13-3 | Edge | A requirement ID of an epic that is not in scope yet | It is not asked for | U |
+| F13-4 | Error | A test named with an ID that is not in the list | The check fails and names the test | U |
+| F13-5 | Edge | The only test of an ID is skipped | The ID counts as having no test | U |
+
+**F14 Flow checks and agent roles**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| F14-1 | Main | Every new test of the test commit fails at that commit | Failing first passes | U |
+| F14-2 | Error | One new test of the test commit passes at that commit | Failing first fails and names the test | U |
+| F14-3 | Error | A later commit with no `Agent: test` trailer edits, skips, or deletes a test of the test commit | Test lock fails and names the test | U |
+| F14-4 | Edge | A later commit with the trailer changes that test | Test lock passes | U |
+| F14-5 | Edge | A pull request with no test commit that changes only documents | Failing first and test lock pass | U |
+| F14-6 | Main | A diff inside one module, on no listed path | The risk gate passes with no label | U |
+| F14-7 | Error | A diff that touches a migration, with no label | The risk gate fails and names the path | U |
+| F14-8 | Main | The same diff with the label `human-approved` | The risk gate passes | U |
+| F14-9 | Edge | A diff that changes the path list, a workflow, a `CLAUDE.md`, or an agent role | The risk gate treats it as High | U |
+| F14-10 | Edge | A diff on a path that no rule names | The risk gate treats it as High | U |
+| F14-11 | Error | A changed rule file with a surviving mutant that the pull request does not list | The mutation check fails and shows the mutant | U |
+| F14-12 | Main | The three role files in `.claude/agents/` | Each names what it reads, what it may change, and what it never does, as in development-flow.md, section 2.3 | M |
+
+### 7.2 Contract
+
+**CT1 Contracts repository and translation check**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| CT1-1 | Main | Every key is in `en.json` and in `vi.json`, with valid ICU | The translation check passes | C |
+| CT1-2 | Error | A key is in one language only | The check fails and names the key | C |
+| CT1-3 | Error | A message with broken ICU syntax | The check fails and names the key | C |
+| CT1-4 | Edge | A message whose two languages use different placeholders | The check fails and names the key | C |
+
+**CT2 Draft and release tags**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| CT2-1 | Main | A merged contract with one operation marked `x-stub` | A draft tag, `contracts-vX.Y.Z-draft.1` | C |
+| CT2-2 | Edge | A second merge while a stub remains | `draft.2` of the same version | C |
+| CT2-3 | Main | A merged contract with no stub | A release tag, `contracts-vX.Y.Z` | C |
+| CT2-4 | Error | A change that removes a field, against the last release tag | The breaking-change check fails | C |
+| CT2-5 | Error | A change that breaks the latest draft | The check fails | C |
+| CT2-6 | Edge | A change that only adds an optional field | The check passes | C |
+
+### 7.3 Web
+
+**WF1 Web skeleton and CI**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| WF1-1 | Main | The project with no problem | Lint, types, tests, and the static build pass, and each is required on `main` | M |
+| WF1-2 | Main | A screen test of one message key | The key shows its text in Vietnamese and in English | S |
+| WF1-3 | Error | The generated messages do not match the pinned contracts version | The check fails | C |
+| WF1-4 | Edge | A key the pinned contracts version does not have | The build fails; no key is shown as raw text | S |
+
+**WF2 Web API client and mock mode**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| WF2-1 | Main | Mock mode on | The test screen shows the example of `GET /v1/health` from the pinned contract | S |
+| WF2-2 | Main | Mock mode off, the local stack up | The test screen shows the real answer | M |
+| WF2-3 | Main | Any request | It carries `X-Device-Id`, the same value after a reload | U |
+| WF2-4 | Main | A create request that is retried | Both attempts carry the same `Idempotency-Key` | U |
+| WF2-5 | Edge | The same action done a second time by the user | A new key | U |
+| WF2-6 | Error | The generated client does not match the pinned contracts version | The check fails | C |
+| WF2-7 | Edge | A production build with no mock setting | Mock mode is off, and the mock handlers are not in the bundle | U |
+
+**WF3 Web smoke set and production site**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| WF3-1 | Main | The stack of 2.8 in CI | The smoke set opens the test screen and passes | E |
+| WF3-2 | Error | The backend of the stack is down | The smoke set fails; it does not pass on an empty page | E |
+| WF3-3 | Main | The production site, at `/join/ABC123` | The join page is served | M |
+
+### 7.4 Mobile
+
+**MF1 Mobile skeleton and CI**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| MF1-1 | Main | The project with no problem | Analysis, tests, and the Android build pass, and each is required on `main` | M |
+| MF1-2 | Main | The `dev` and `prod` flavors on one phone | Both install side by side | M |
+| MF1-3 | Main | A widget test of one message key | The key shows its text in Vietnamese and in English | S |
+| MF1-4 | Error | The generated ARB files do not match the pinned contracts version | The check fails | C |
+
+**MF2 Mobile API client and mock mode**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| MF2-1 | Main | Built with `API_MODE=mock` | The test screen shows the example of `GET /v1/health` from the pinned contract | S |
+| MF2-2 | Main | The `dev` flavor against the local stack | The test screen shows the real answer | M |
+| MF2-3 | Main | Any request | It carries `X-Device-Id`, the same value after the app restarts | U |
+| MF2-4 | Main | A create request that is retried | Both attempts carry the same `Idempotency-Key` | U |
+| MF2-5 | Edge | An operation whose contract has no example, in mock mode | The interceptor fails with the operation's name; it returns no made-up data | U |
+| MF2-6 | Error | The generated client does not match the pinned contracts version | The check fails | C |
+
+### 7.5 Desktop
+
+**DF1 Desktop repository and CI**
+
+| Case | Kind | Given | Expected | Level |
+|------|------|-------|----------|-------|
+| DF1-1 | Main | The Tauri 2 project with no problem | It builds; `cargo clippy` and `cargo test` pass, and each is required on `main` | M |
+| DF1-2 | Error | A clippy warning | The check fails | M |
+
+## 8. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-11-20 | First version: scope of the first part of EPIC-11, what the platform gives every epic (backend layout, request pipeline, errors, idempotency, outbox and background work, observability, configuration and health check, Render environments, CI, the contract pipeline, Web and Mobile foundations), two environments until the beta (local and production), acceptance criteria, technical design, decisions and open questions, and 20 cards with checkpoints. |
 | 1.1 | 2026-11-20 | The product owner answered three open questions, now decisions in section 5.1: Sentry and Grafana Cloud on free plans; a fine-grained GitHub token for contract pull requests, used only on pushes to `main`; a `.com` domain through Cloudflare Registrar, bought before the beta. |
+| 1.2 | 2026-11-23 | Follows the new development flow. Every card has a risk level (section 6); all but F6 are High. Section 7 is new: the test cases of every card, with error and edge cases and their expected results. Section 2.12 and two new cards build the flow checks: F13, the requirement-to-test report, and F14, failing first, test lock, mutation, and the risk gate, with the agent roles. F14 now comes before CT1 and DF1. Each skeleton card also writes the agent roles. One open question added: rate limits when Redis does not answer. 22 cards. |
