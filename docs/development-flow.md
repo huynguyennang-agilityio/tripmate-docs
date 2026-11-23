@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.7\
+**Version:** 1.8\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -25,6 +25,25 @@ plans each epic, writes the tests and the code, and reviews them. The
 product owner approves each epic's plan, answers what a spec does not
 decide, and reviews the pull requests of High-risk cards (section
 2.1).
+
+**Machines.** The work runs on three machines, one per group of
+repositories, so no two machines change the same repository.
+
+| Machine | Repositories | Why here |
+|---------|--------------|----------|
+| Mac 1 | `tripmate-backend`, `tripmate-contracts`, `tripmate-docs` | The backend comes first for every feature; the documents, the Trello cards, and the Build Tracker are changed from one place |
+| Mac 2 | `tripmate-mobile` | An iOS build needs macOS |
+| Windows | `tripmate-web`, `tripmate-desktop` | Desktop wraps the Web build, and Windows is checked on the real system |
+
+- Every machine has the same folder layout
+  ([architecture.md](architecture.md), section 11) and pulls
+  `tripmate-docs` before it starts a card.
+- One card runs in one Claude Code session. Cards of one repository
+  that run at the same time each use their own git worktree.
+- The rules every session follows are in the `CLAUDE.md` of
+  `tripmate-docs`; each code repository's `CLAUDE.md` points to them.
+- Desktop builds for macOS and Linux come from CI; they are checked by
+  hand on a Mac and on an Ubuntu virtual machine.
 
 **The board.** Tasks are cards on the [TripMate board](https://trello.com/b/zsxAnzsz/tripmate). Every task
 is one card. A card moves left to right, and only the condition in the
@@ -299,7 +318,8 @@ reason.
 - [ ] An API change went backend first and backward compatible, then
   `tripmate-contracts`, then each client
   ([architecture.md](architecture.md), section 11).
-- [ ] Every new message key is in both `en.json` and `vi.json`.
+- [ ] Every new message key is in both languages, in the file of its
+  area.
 - [ ] A changed screen follows the design system and its screen test
   shows it in Vietnamese and in English.
 
@@ -377,3 +397,4 @@ None. Each repository's coding conventions live in its own
 | 1.5 | 2026-11-23 | Section 2 rewritten. The product owner approves each epic's plan and reviews only High-risk cards; every other card merges on its own when its checks pass. Three risk levels, set in the epic spec and worked out again by CI from the changed files. Three agents in separate sessions: a test agent writes the tests first from the card's test cases, a code agent writes the code, a review agent reads the diff before the pull request. Five CI checks hold the rules: failing first, test lock, the requirement-to-test report, mutation, and the risk gate. A table says which record is written at which step. The Definition of Ready, the board columns, and the Definition of Done follow. Status back to Proposed. |
 | 1.6 | 2026-11-23 | Approved by the product owner. No content changed. |
 | 1.7 | 2026-11-23 | Section 3: the full AI evaluation runs when the assistant changes and before a release, as test-strategy.md now says, not nightly. |
+| 1.8 | 2026-11-23 | Section 1: the work runs on three machines, one per group of repositories (Mac 1: backend, contracts, documents; Mac 2: Mobile; Windows: Web and Desktop), with one session per card and a git worktree for cards of one repository that run at the same time. The Definition of Done follows the translation files split by area. |

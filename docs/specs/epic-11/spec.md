@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.4\
+**Version:** 1.5\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -75,7 +75,14 @@ tripmate-backend/
   otherwise.
 - A module registers with `platform` at start-up (its routes, jobs,
   event handlers, due-work queries, error codes), so `platform` never
-  imports it.
+  imports it. `platform` finds the modules by scanning `app/`, so
+  adding a module changes no shared file.
+- The layout is made for cards that run at the same time. The
+  skeleton creates one file for each part of `platform` (access,
+  errors, rate limits, idempotency, outbox, jobs, logging), holding
+  only its interface, so each later card fills its own file. Every
+  dependency of 4.1 is in the lock file from the skeleton on, and each
+  card's tests are in their own files, named with the card.
 
 ### 2.2 The request pipeline
 
@@ -218,7 +225,7 @@ Until the beta there are two environments
 
 | Repository | Every pull request runs |
 |------------|-------------------------|
-| `tripmate-backend` | Ruff, mypy, unit and property tests, integration and API tests against PostgreSQL and Redis service containers, import-linter, the access declaration test, the error code text check, Schemathesis against the contract, pip-audit, secret scan, image build |
+| `tripmate-backend` | Ruff, mypy, unit and property tests, integration and API tests against PostgreSQL and Redis service containers, import-linter, one migration head, the access declaration test, the error code text check, Schemathesis against the contract, pip-audit, secret scan, image build |
 | `tripmate-contracts` | The breaking-change check against the last tag and the latest draft, the translation check (every key in both languages, valid ICU) |
 | `tripmate-web` | ESLint, TypeScript, Vitest, the static build, the generated client and messages against the pinned contracts version |
 | `tripmate-mobile` | `flutter analyze`, `flutter test`, the generated client and ARB files against the pinned contracts version, an Android build |
@@ -261,7 +268,7 @@ flowchart LR
 | API client | Generated from the pinned contracts version with Orval: typed client, TanStack Query hooks | Generated from the pinned contracts version with OpenAPI Generator, `dart-dio` |
 | Mock mode | MSW handlers generated with the client, on when `NEXT_PUBLIC_API_MODE=mock` and in screen tests | A Dio interceptor that answers from the contract's examples, on when built with `--dart-define=API_MODE=mock` and in widget tests |
 | Headers sent on every request | `X-Device-Id`; `Idempotency-Key` on creates, kept for retries of the same action | The same |
-| Translations | `next-intl` messages generated from `translations/*.json` | ARB files generated from the same source |
+| Translations | `next-intl` messages generated from the files under `translations/` | ARB files generated from the same source |
 | Where it runs | `localhost:3000` against the local stack; in production, a Render static site with every `/join/*` path served the join page | The `dev` flavor against the local stack (`10.0.2.2:8000` from the Android emulator, `localhost:8000` from the iOS simulator); `prod` against production |
 
 A mock card ([docs/development-flow.md](../../development-flow.md),
@@ -350,6 +357,11 @@ test agent, the code agent, and the review agent, each with what it
 reads, what it may change, and what it never does
 ([docs/development-flow.md](../../development-flow.md), section 2.3).
 
+Each `CLAUDE.md` also points to the shared rules in the `CLAUDE.md` of
+`tripmate-docs`, and each repository has a `.gitattributes` that fixes
+line endings, because the work runs on macOS and on Windows
+([docs/development-flow.md](../../development-flow.md), section 1).
+
 ## 5. Decisions and Open Questions
 
 ### 5.1 Decisions made in this spec
@@ -372,6 +384,9 @@ reads, what it may change, and what it never does
 | The requirement IDs in scope are a file in each code repository | CI reads prd.md from `tripmate-docs` | A code repository's CI needs nothing outside it, and the scope grows epic by epic |
 | A rate-limited route returns `503 server.unavailable` when Redis does not answer | Let the request through without counting | A limit that cannot be counted is not skipped: sign-in and sign-up limits are a security control |
 | Until the beta, production is one instance for the three processes, with free Postgres and Key Value plans | The full setup from the first deploy | One or two people use it before the beta, and the monthly cost limit is 10 USD. The cost: no point-in-time recovery, and a short stop at each deploy. The full setup returns before the beta. |
+| The skeleton makes one file per part of `platform`, finds modules by scanning, and installs every dependency at once | Each card creates what it needs | Cards that run at the same time must not change the same file. The lock file and the app's start-up file are where two cards would otherwise meet. |
+| Translations are one file per area in each language, `translations/en/<area>.json` | One `en.json` and one `vi.json` | Web, Mobile, and the backend add keys at the same time, from three machines; one file per area keeps their changes apart |
+| The Web and Mobile skeleton cards need no contract; generated messages and the flow checks move to WF2 and MF2 | WF1 and MF1 wait for CT1 | The three machines start on the first day instead of two waiting for the backend's first three cards |
 
 ### 5.2 Open questions
 
@@ -394,8 +409,9 @@ The product owner reviews the pull request of a High card; a Low card
 merges on its own when its checks pass. Most cards of this epic are
 High, because they build what that list protects: CI, the checks,
 hosting, the access guard, and migrations. F1, F2, and F14 come first,
-so the checks exist before the other cards start. Each card's test
-cases are in section 7.
+so the checks exist before the other cards start. WF1 and MF1 need no
+contract and start on the first day. Each card's test cases are in
+section 7, and which cards run at the same time is in 6.7.
 
 ```mermaid
 flowchart LR
@@ -417,11 +433,11 @@ flowchart LR
     CT1 --> F12
     F2 --> F12 --> CT2
     CT1 --> CT2
-    CT1 --> WF1 --> WF2
+    WF1 --> WF2
     CT2 --> WF2
     WF2 --> WF3
     F11 --> WF3
-    CT1 --> MF1 --> MF2
+    MF1 --> MF2
     CT2 --> MF2
 ```
 
@@ -429,7 +445,7 @@ flowchart LR
 
 | ID | Card | Size | Risk | Depends on | Done when |
 |----|------|------|------|------------|-----------|
-| F1 | `Backend skeleton and health check` | M | High | -- | The layout of 2.1; the three processes start from one image; settings checked at start-up; `compose.yaml`; `GET /v1/health`; `CLAUDE.md` and the agent roles (4.3) |
+| F1 | `Backend skeleton and health check` | M | High | -- | The layout of 2.1, with one file per part of `platform`, modules found by scanning, and every dependency of 4.1 in the lock file; the three processes start from one image; settings checked at start-up; `compose.yaml`; `GET /v1/health`; `CLAUDE.md`, `.gitattributes`, and the agent roles (4.3) |
 | F2 | `Backend CI` | S | High | F1 | Every backend check of 2.9 that has code to run; the checks are required on `main` |
 | F3 | `Database session and migrations` | S | High | F1 | One transaction per request; Alembic set up with its first empty migration; integration tests get a clean database; test builders have their base |
 | F4 | `Error format and error codes` | S | High | F1, CT1 | 2.3: one exception type, `request.invalid` with fields, `500 server.error`, request ID; registered codes checked for text in both languages |
@@ -448,23 +464,23 @@ flowchart LR
 
 | ID | Card | Size | Risk | Depends on | Done when |
 |----|------|------|------|------------|-----------|
-| CT1 | `Contracts repository and translation check` | S | High | F14 | `openapi.json`, `events.schema.json`, `translations/en.json` and `vi.json` in place; the translation check of 2.9; the flow checks of 2.12; `CLAUDE.md` and the agent roles (4.3) |
+| CT1 | `Contracts repository and translation check` | S | High | F14 | `openapi.json`, `events.schema.json`, `translations/en/` and `translations/vi/` in place, one file per area; the translation check of 2.9; the flow checks of 2.12; `CLAUDE.md` and the agent roles (4.3) |
 | CT2 | `Draft and release tags` | S | High | CT1, F12 | 2.10: a draft tag when any operation is a stub, a release tag otherwise; the breaking-change check against the last tag and the latest draft |
 
 ### 6.3 Web: `tripmate-web`
 
 | ID | Card | Size | Risk | Depends on | Done when |
 |----|------|------|------|------------|-----------|
-| WF1 | `Web skeleton and CI` | M | High | CT1 | Next.js static export, TypeScript strict, Vitest with Testing Library, `next-intl` messages generated from the pinned contracts version, the checks of 2.9 and 2.12 required on `main`, `CLAUDE.md` and the agent roles (4.3) |
-| WF2 | `Web API client and mock mode` | M | High | WF1, CT2 | The generated client and hooks, MSW handlers from the pinned draft, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
+| WF1 | `Web skeleton and CI` | S | High | -- | Next.js static export, TypeScript strict, ESLint, Vitest with Testing Library; the checks of 2.9 that need no contract, required on `main`; `CLAUDE.md`, `.gitattributes`, and the agent roles (4.3) |
+| WF2 | `Web API client and mock mode` | M | High | WF1, CT2 | `next-intl` messages generated from the pinned contracts version; the generated client and hooks, MSW handlers from the pinned draft, the headers of 2.11; one test screen reads `GET /v1/health` in both modes; the remaining checks of 2.9 and the flow checks of 2.12 required on `main` |
 | WF3 | `Web smoke set and production site` | S | High | WF2, F11 | Playwright runs in CI against the stack of 2.8; the production static site on Render serves the join page for every `/join/*` path |
 
 ### 6.4 Mobile: `tripmate-mobile`
 
 | ID | Card | Size | Risk | Depends on | Done when |
 |----|------|------|------|------------|-----------|
-| MF1 | `Mobile skeleton and CI` | M | High | CT1 | Flutter project with the two flavors and mock mode of 2.11, ARB files generated from the pinned contracts version, the checks of 2.9 and 2.12 required on `main`, `CLAUDE.md` and the agent roles (4.3) |
-| MF2 | `Mobile API client and mock mode` | M | High | MF1, CT2 | The generated `dart-dio` client, the mock interceptor answering from the contract's examples, the headers of 2.11; one test screen reads `GET /v1/health` in both modes |
+| MF1 | `Mobile skeleton and CI` | S | High | -- | Flutter project with the two flavors and the mock mode setting of 2.11; `flutter analyze`, `flutter test`, and the Android build required on `main`; `CLAUDE.md`, `.gitattributes`, and the agent roles (4.3) |
+| MF2 | `Mobile API client and mock mode` | M | High | MF1, CT2 | ARB files generated from the pinned contracts version; the generated `dart-dio` client, the mock interceptor answering from the contract's examples, the headers of 2.11; one test screen reads `GET /v1/health` in both modes; the remaining checks of 2.9 and the flow checks of 2.12 required on `main` |
 
 ### 6.5 Desktop: `tripmate-desktop`
 
@@ -480,6 +496,27 @@ flowchart LR
 | F5 | A `signed_in` test route answers with each error of 2.3, and removing its declaration fails CI |
 | F11 | `docker compose up` runs the whole stack, and the health check answers locally and in production |
 | CT2, WF2, MF2 | A stub route becomes a draft tag, and the test screen on Web and on Mobile shows its example in mock mode. EPIC-01 can start with B0. |
+
+### 6.7 Machines and parallel work
+
+The work runs on three machines, one per group of repositories
+([docs/development-flow.md](../../development-flow.md), section 1), so
+no two machines change the same repository.
+
+| Wave | Mac 1: backend and contracts | Mac 2: Mobile | Windows: Web and Desktop |
+|------|------------------------------|---------------|--------------------------|
+| 1 | F1, then F2, then F14 | MF1 | WF1 |
+| 2 | CT1, F3, F13 | -- | DF1 |
+| 3 | F4, F8, F12, then CT2 | MF2 | WF2 |
+| 4 | F5, F10, then F6 and F7 | -- | -- |
+| 5 | F9, then F11 | -- | WF3 |
+
+- Cards in one cell of Mac 1 after wave 1 can run at the same time,
+  each in its own git worktree and its own session.
+- Two cards with a migration, F7 and F8, merge one after the other;
+  the second one rebases so there is one migration head.
+- The product owner reviews the backend's pull requests first: the
+  other two machines wait on the contract.
 
 ## 7. Test Cases
 
@@ -511,6 +548,8 @@ recorded in the card's pull request.
 | F1-4 | Error | A required setting is missing at start-up | The process stops and names the setting, never a value | U |
 | F1-5 | Edge | A setting has a value of the wrong type | The process stops and names the setting | U |
 | F1-6 | Main | The one image is started as API, as worker, and as scheduler | Each process starts and stays up | I |
+| F1-7 | Main | A new module folder with an `api.py` is added | Its route is served, and no file outside the folder changed | I |
+| F1-8 | Edge | A module folder with no `api.py` | The app starts; the folder is skipped | U |
 
 **F2 Backend CI**
 
@@ -523,6 +562,7 @@ Shown once on a throwaway pull request for each case.
 | F2-3 | Error | A module imports another module's `repository.py` | import-linter fails | M |
 | F2-4 | Error | A string shaped like a secret is committed | The secret scan fails | M |
 | F2-5 | Error | A dependency with a known vulnerability | pip-audit fails | M |
+| F2-6 | Error | Two migration heads | The migration check fails | M |
 
 **F3 Database session and migrations**
 
@@ -678,7 +718,7 @@ Shown once on a throwaway pull request for each case.
 
 | Case | Kind | Given | Expected | Level |
 |------|------|-------|----------|-------|
-| CT1-1 | Main | Every key is in `en.json` and in `vi.json`, with valid ICU | The translation check passes | C |
+| CT1-1 | Main | Every key is in both languages, in the file of the same area, with valid ICU | The translation check passes | C |
 | CT1-2 | Error | A key is in one language only | The check fails and names the key | C |
 | CT1-3 | Error | A message with broken ICU syntax | The check fails and names the key | C |
 | CT1-4 | Edge | A message whose two languages use different placeholders | The check fails and names the key | C |
@@ -701,9 +741,8 @@ Shown once on a throwaway pull request for each case.
 | Case | Kind | Given | Expected | Level |
 |------|------|-------|----------|-------|
 | WF1-1 | Main | The project with no problem | Lint, types, tests, and the static build pass, and each is required on `main` | M |
-| WF1-2 | Main | A screen test of one message key | The key shows its text in Vietnamese and in English | S |
-| WF1-3 | Error | The generated messages do not match the pinned contracts version | The check fails | C |
-| WF1-4 | Edge | A key the pinned contracts version does not have | The build fails; no key is shown as raw text | S |
+| WF1-2 | Error | A lint error, a type error, or a failing test | The matching check fails | M |
+| WF1-3 | Edge | The repository checked out on Windows and on macOS | No file shows as changed | M |
 
 **WF2 Web API client and mock mode**
 
@@ -716,6 +755,9 @@ Shown once on a throwaway pull request for each case.
 | WF2-5 | Edge | The same action done a second time by the user | A new key | U |
 | WF2-6 | Error | The generated client does not match the pinned contracts version | The check fails | C |
 | WF2-7 | Edge | A production build with no mock setting | Mock mode is off, and the mock handlers are not in the bundle | U |
+| WF2-8 | Main | A screen test of one message key | The key shows its text in Vietnamese and in English | S |
+| WF2-9 | Error | The generated messages do not match the pinned contracts version | The check fails | C |
+| WF2-10 | Edge | A key the pinned contracts version does not have | The build fails; no key is shown as raw text | S |
 
 **WF3 Web smoke set and production site**
 
@@ -733,8 +775,7 @@ Shown once on a throwaway pull request for each case.
 |------|------|-------|----------|-------|
 | MF1-1 | Main | The project with no problem | Analysis, tests, and the Android build pass, and each is required on `main` | M |
 | MF1-2 | Main | The `dev` and `prod` flavors on one phone | Both install side by side | M |
-| MF1-3 | Main | A widget test of one message key | The key shows its text in Vietnamese and in English | S |
-| MF1-4 | Error | The generated ARB files do not match the pinned contracts version | The check fails | C |
+| MF1-3 | Error | An analysis warning or a failing test | The matching check fails | M |
 
 **MF2 Mobile API client and mock mode**
 
@@ -746,6 +787,8 @@ Shown once on a throwaway pull request for each case.
 | MF2-4 | Main | A create request that is retried | Both attempts carry the same `Idempotency-Key` | U |
 | MF2-5 | Edge | An operation whose contract has no example, in mock mode | The interceptor fails with the operation's name; it returns no made-up data | U |
 | MF2-6 | Error | The generated client does not match the pinned contracts version | The check fails | C |
+| MF2-7 | Main | A widget test of one message key | The key shows its text in Vietnamese and in English | S |
+| MF2-8 | Error | The generated ARB files do not match the pinned contracts version | The check fails | C |
 
 ### 7.5 Desktop
 
@@ -765,3 +808,4 @@ Shown once on a throwaway pull request for each case.
 | 1.2 | 2026-11-23 | Follows the new development flow. Every card has a risk level (section 6); all but F6 are High. Section 7 is new: the test cases of every card, with error and edge cases and their expected results. Section 2.12 and two new cards build the flow checks: F13, the requirement-to-test report, and F14, failing first, test lock, mutation, and the risk gate, with the agent roles. F14 now comes before CT1 and DF1. Each skeleton card also writes the agent roles. One open question added: rate limits when Redis does not answer. 22 cards. |
 | 1.3 | 2026-11-23 | Approved by the product owner, with the proposed answer on rate limits: a rate-limited route returns `503 server.unavailable` when Redis does not answer (2.2, 2.3, decision in 5.1, case F6-6). The WebSocket gateway question stays open for the EPIC-02 spec. |
 | 1.4 | 2026-11-23 | The product owner set the monthly cost limit to 10 USD until the beta. Section 2.8: until the beta, production is one instance that runs the API, the worker, and the scheduler, with free Postgres and Key Value plans; the full setup returns before the beta. Card F11 follows, checks the free Postgres plan first, and gains case F11-6. Decision added to 5.1. |
+| 1.5 | 2026-11-23 | The work runs on three machines, and cards run at the same time. New 6.7: which machine builds what, in which wave. The skeleton (F1) makes one file per part of `platform`, finds modules by scanning, and installs every dependency (2.1; cases F1-7, F1-8). WF1 and MF1 need no contract and start on the first day; generated messages and the flow checks move to WF2 and MF2, with their cases. Translations are one file per area in each language. CI checks for one migration head (case F2-6). Every repository has a `.gitattributes`. Three decisions added to 5.1. |
