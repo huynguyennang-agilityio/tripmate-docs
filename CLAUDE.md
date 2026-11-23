@@ -115,6 +115,31 @@ here and linked from the document's header as its page version.
 | docs/adr/0006-google-maps-platform-behind-a-provider-interface.md | [TripMate ADR-0006 Google Maps](https://claude.ai/artifact/2p2MuMoScA9HtFTf6jDgnJ) |
 | docs/adr/0007-web-client-is-a-static-build.md | [TripMate ADR-0007 Static Web Build](https://claude.ai/artifact/F2Xm35mpu9KMUtjechuCdm) |
 
+## Working on several machines
+
+The work runs on three machines
+([docs/development-flow.md](docs/development-flow.md), section 1).
+Claude Code keeps no memory between machines, so the rules every
+session needs are here. Each code repository's `CLAUDE.md` points to
+this section.
+
+- This repository is changed from Mac 1 only. The other machines pull
+  it before they start a card and never edit it; a session that finds
+  a gap in a document stops and reports it.
+- Talk with the product owner in Vietnamese. Write every document,
+  commit, pull request, and Trello card in English.
+- Put a decision to the product owner as a short list of options, each
+  with a concrete example, and say which one you propose.
+- Status is shared through two places, never through a document:
+  the cards on the [TripMate board](https://trello.com/b/zsxAnzsz/tripmate)
+  and the [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU).
+- A session moves only its own card on the board, by the rules of
+  [docs/development-flow.md](docs/development-flow.md), section 1.
+- Never write a token, a key, or a password in chat, in a file, or in
+  a card. The product owner signs in on each machine and stores
+  secrets in GitHub and Render.
+- Every code repository is public: commit no secret and no `.env`.
+
 ## Git workflow
 
 `main` is protected: direct pushes and force pushes are blocked, and
@@ -123,7 +148,8 @@ every change goes through a pull request.
 1. Create a branch from `main`: `docs/<topic>-v<version>`, e.g.
    `docs/prd-v1.6`.
 2. Commit with a message that says what changed and the new version.
-3. Push the branch and open a pull request into `main`.
+3. Push only when the product owner says so. Then push the branch and
+   open a pull request into `main`.
 4. Document pull requests need no reviewer: the author merges as soon
    as the pull request is open. Use a merge commit and delete the
    branch.

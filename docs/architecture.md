@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.11\
+**Version:** 1.12\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -376,9 +376,9 @@ Routes API for travel time between consecutive Itinerary items.
 
 ## 7. Languages
 
-- One shared translation source, `translations/en.json` and
-  `translations/vi.json` in `tripmate-contracts`, in ICU message
-  format.
+- One shared translation source in `tripmate-contracts`, in ICU
+  message format: `translations/en/` and `translations/vi/`, with one
+  file per area in each, so changes made at the same time stay apart.
 - A build step in each client generates the `next-intl` messages for
   Web and Desktop and the ARB files for Mobile
   (`flutter_localizations`) from the pinned contracts version, so every
@@ -637,3 +637,4 @@ the table.
 | 1.9 | 2026-11-20 | Section 11: the landing order starts with a contract stub and a draft contract, so the backend and the clients' mock cards are built at the same time. |
 | 1.10 | 2026-11-20 | Until the beta there are two environments, local in Docker and production; staging is added before the beta and there are no preview environments. The hosting needs no longer list a preview per pull request; point-in-time recovery is 3 days on Render's Hobby plan and 7 on Pro. |
 | 1.11 | 2026-11-23 | Sections 9.1 and 9.2: until the beta, production is one instance for the API, the worker, and the scheduler with free database plans, to stay within the monthly cost limit of 10 USD; the full setup is in place before the beta. |
+| 1.12 | 2026-11-23 | Section 7: the translation source is one file per area in each language. |
