@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.6\
+**Version:** 1.7\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -319,8 +319,9 @@ reason.
 
 Mobile and Desktop are checked by hand at the end of each phase, not on
 every card ([test-strategy.md](test-strategy.md), section 6). The full
-AI evaluation and the AI release gate run nightly and before a release
-([test-strategy.md](test-strategy.md), section 7.5), not on every card.
+AI evaluation and the AI release gate run when the assistant changes
+and before a release ([test-strategy.md](test-strategy.md), sections
+7.4 and 7.5), not on every card.
 
 ## 4. Defects
 
@@ -375,3 +376,4 @@ None. Each repository's coding conventions live in its own
 | 1.4 | 2026-11-20 | There are no preview environments: an integration card works against the local stack in Docker, and the end-to-end smoke set runs in CI. The open question about coding conventions is closed: each repository's `CLAUDE.md`, written in EPIC-11. |
 | 1.5 | 2026-11-23 | Section 2 rewritten. The product owner approves each epic's plan and reviews only High-risk cards; every other card merges on its own when its checks pass. Three risk levels, set in the epic spec and worked out again by CI from the changed files. Three agents in separate sessions: a test agent writes the tests first from the card's test cases, a code agent writes the code, a review agent reads the diff before the pull request. Five CI checks hold the rules: failing first, test lock, the requirement-to-test report, mutation, and the risk gate. A table says which record is written at which step. The Definition of Ready, the board columns, and the Definition of Done follow. Status back to Proposed. |
 | 1.6 | 2026-11-23 | Approved by the product owner. No content changed. |
+| 1.7 | 2026-11-23 | Section 3: the full AI evaluation runs when the assistant changes and before a release, as test-strategy.md now says, not nightly. |

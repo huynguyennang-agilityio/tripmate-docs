@@ -3,7 +3,7 @@
 **Document type:** Test Strategy and AI Evaluation Plan\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.4\
+**Version:** 1.5\
 **Stage:** 4. SOW / Planning\
 **Page version:** [TripMate Test Strategy artifact](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9)
 
@@ -63,7 +63,7 @@ Each level has a letter, used in the matrix in section 5.
 | Contract | C | Backend responses match the published `openapi.json`, events match `events.schema.json`, and each client builds against its pinned contracts version ([api-design.md](api-design.md), section 6) | Schemathesis in `tripmate-backend`; the breaking-change check in `tripmate-contracts` | Every pull request |
 | Client screens | S | A screen shows the right state for the data it is given, in Vietnamese and in English | Vitest with Testing Library (Web); widget and screenshot tests (Mobile) | Every pull request |
 | End-to-end | E | A journey works across the deployed stack, through the real client. In the MVP only the Web journeys are automated (section 6). | Playwright | A smoke set in CI on every pull request; the Web journeys nightly and before a release |
-| AI evaluation | AI | The assistant's outputs meet the thresholds of section 7 on the golden dataset ([ai-golden-dataset.md](ai-golden-dataset.md)) | Evaluation harness in `tripmate-backend` | On changes to prompts, tools, schemas, or models; nightly; before a release |
+| AI evaluation | AI | The assistant's outputs meet the thresholds of section 7 on the golden dataset ([ai-golden-dataset.md](ai-golden-dataset.md)) | Evaluation harness in `tripmate-backend` | On changes to prompts, tools, schemas, or models; before a release; nightly from the beta |
 | Release checks | M | What a person checks by hand with a checklist: the journeys on Mobile and Desktop, installers on clean machines, store builds, wording, the beta scenario | Manual, with a checklist | At the end of each phase and before each release |
 
 The test types the product workflow asks for map onto these levels.
@@ -118,14 +118,14 @@ flowchart LR
     CI --> PV["CI:<br/>end-to-end smoke set"]
     PV --> RV["Product owner's review,<br/>High-risk cards only"]
     RV --> MG["Merge"]
-    MG --> NT["Nightly in CI:<br/>the Web journeys,<br/>full AI evaluation"]
+    MG --> NT["Nightly in CI:<br/>the Web journeys"]
     NT --> RC["Release candidate:<br/>release checks,<br/>security assessment,<br/>release gates"]
 ```
 
 | When | What must pass | What a failure blocks |
 |------|----------------|-----------------------|
 | Every pull request | Everything in CI, including the end-to-end smoke set and the flow checks ([development-flow.md](development-flow.md), section 2.3). A pull request that changes a domain rule file also runs mutation testing on it. A pull request that touches the assistant's prompts, tools, schemas, or model settings also runs the AI smoke set (section 7.4). | The merge |
-| Nightly | The automated journeys of section 6, on Web, and the full AI evaluation with scripted tool results | New work in the failing area, until a card is opened and the failure is fixed |
+| Nightly | The automated journeys of section 6, on Web. From the beta (Phase 7), also the full AI evaluation with scripted tool results; until then it runs as section 7.4 says. | New work in the failing area, until a card is opened and the failure is fixed |
 | End of each phase | The phase's exit criteria in mvp-roadmap.md, every matrix row of the phase's requirements, and the journeys of section 6 that are run by hand | Closing the phase |
 | Before a release | Everything above, the full AI evaluation with live providers, the release checks, the reading of the screens in both languages, and the security assessment | The release |
 
@@ -393,7 +393,7 @@ groups in the beta (PRD section 9). It is not a gate before release.
 - **A person has the last word.** Before a release a person reads every
   failed case and one in five passed cases, and their verdict replaces
   the judge's.
-- **Tool results are scripted** in the smoke and nightly runs: place
+- **Tool results are scripted** in the smoke set and the full evaluation: place
   lists and travel times written by the team in the provider's shape.
   The runs are repeatable, spend no Maps quota, and store no provider
   content.
@@ -401,7 +401,7 @@ groups in the beta (PRD section 9). It is not a gate before release.
 | Run | Cases | Tool results | When |
 |-----|-------|--------------|------|
 | AI smoke set | The ten cases marked ● in [ai-golden-dataset.md](ai-golden-dataset.md), one run each | Scripted | Every pull request that touches the assistant's prompts, tools, schemas, or model settings |
-| Full evaluation | Every case, three runs each | Scripted | Nightly |
+| Full evaluation | Every case, three runs each | Scripted | After a merge that changes the assistant's prompts, tools, schemas, or model settings, and before a release. Nightly from the beta (Phase 7). |
 | Release evaluation | Every case, three runs each | Live Claude and Google Maps on staging | Before a release, and before a model is changed in production |
 
 ### 7.5 The AI release gate
@@ -480,15 +480,16 @@ proved.
 | Each golden case runs three times | One run | The same input does not always give the same output |
 | The backend's own Gap and Feasibility rules score the drafts | A separate scorer | One definition of "fits the Day window", in the product and in the evaluation |
 | Mutation testing on the rule files a pull request changes | No mutation testing; a full run on every pull request | A passing test proves little if it would pass with the rule broken. The rules are few pure files in the backend, so the run stays short. |
+| TripMate supports the last two major versions of iOS, Chrome, Safari, Edge, and Firefox, and Android 10 and later | The last two major versions of Android as well; only the devices of the first users | Android phones are updated slowly, so two versions would leave out phones the first groups use. The hand-run journeys on Mobile cover the oldest and the newest supported Android. |
+| A Claude model other than, and stronger than, the one the assistant runs judges the rubric items; the EPIC-04 spec names both | A model from another provider; the same model in a separate session | A different model does not share every blind spot of the one it judges, and one provider means one key and one bill. A person still reads failed cases before a release (section 7.4). |
+| Until the beta, the full AI evaluation runs when the assistant changes and before a release, not nightly | Nightly from the start | The monthly cost limit is 10 USD ([mvp-roadmap.md](../mvp-roadmap.md), section 3), and a nightly run of every case three times is the largest cost before there are users |
 | Access and audit coverage are generated from the list of endpoints | One hand-written test per endpoint | A new endpoint is covered, or fails the build, without anyone remembering |
 
 ### 10.2 Open questions
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| Which iOS and Android versions, and which browsers, does TripMate support? The PRD says "supported versions" without naming them. | The last two major versions of iOS, Android, Chrome, Safari, Edge, and Firefox | Phase 0 |
 | In which language does the assistant write its own free text? | The language of the Member's request (case PL-07) | EPIC-04 spec |
-| Which model judges the rubric items? | A different model from the one under test, chosen with the assistant's models | Phase 0 |
 | What is the cost limit of one assistant request, in tokens? | Set after the first full evaluation, per feature | EPIC-04 spec |
 | When the harness has its fixtures, does ai-golden-dataset.md stay the readable description of each case, or is its table generated from the fixtures? | Generate it, so each case is written once | EPIC-04 spec |
 | Where are evaluation runs kept so two runs can be compared? | One result file per run, stored with the build, and a summary in the release notes | EPIC-04 spec |
@@ -502,3 +503,4 @@ proved.
 | 1.2 | 2026-11-20 | Approved by the product owner. No content changed. |
 | 1.3 | 2026-11-20 | No preview environments: the end-to-end smoke set runs in CI against the local stack in Docker, and the nightly runs are in CI. Staging exists from the beta (Phase 7); until then the journeys run by hand use the local stack. |
 | 1.4 | 2026-11-23 | Follows the new development flow: a card's tests are written before the code from the test cases in its epic spec (section 1, section 9); every pull request runs the flow checks, and mutation testing when a rule file changes (section 4, decision in 10.1); the product owner reviews High-risk cards only (section 4 diagram). |
+| 1.5 | 2026-11-23 | The product owner answered two Phase 0 questions, now decisions in 10.1: supported versions (the last two major versions of iOS and the browsers; Android 10 and later), and the model that judges rubric items (a stronger Claude model than the assistant's, named in the EPIC-04 spec). Until the beta the full AI evaluation runs when the assistant changes and before a release, not nightly (sections 2, 4, 7.4), to stay within the monthly cost limit. |

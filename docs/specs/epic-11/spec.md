@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.3\
+**Version:** 1.4\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -193,7 +193,8 @@ Until the beta there are two environments
 |-------------|-----------|------|---------------|
 | Local | `compose.yaml`: the API, worker, and scheduler from the backend image, PostgreSQL, Redis. Web and Mobile run against it. | Seed data ([test-strategy.md](../../test-strategy.md), section 3) | `docker compose up` |
 | CI | The same `compose.yaml`, for the end-to-end smoke set | Seed data | On every pull request |
-| Production | On Render, from `render.yaml`: two API instances, one worker, one scheduler, Postgres with point-in-time recovery, Key Value, and the Web static site | Real | A tagged release, by hand |
+| Production, until the beta | On Render, from `render.yaml`: one instance that runs the API, the worker, and the scheduler together, Postgres and Key Value on their free plans, and the Web static site | The product owner and one or two first users | A tagged release, by hand |
+| Production, from the beta | Two API instances, one worker, one scheduler, Postgres with point-in-time recovery, Key Value, and the Web static site | Real | A tagged release, by hand |
 
 - The backend image is published to GitHub Container Registry for
   every release tag; a client's `compose.yaml` runs the image of the
@@ -201,6 +202,14 @@ Until the beta there are two environments
 - Migrations run in production as Render's pre-deploy step; a failing
   migration stops the deploy and the previous version keeps serving.
 - A rollback is a redeploy of the previous image.
+- Until the beta, production has no point-in-time recovery and stops
+  for a few seconds at each deploy. The three processes still start
+  from the one image with their own commands, so moving them to
+  separate instances before the beta changes `render.yaml` only.
+- The monthly cost limit is 10 USD until the beta
+  ([mvp-roadmap.md](../../../mvp-roadmap.md), section 3). F11 first
+  checks that Render's free Postgres plan can hold the data that long;
+  if it cannot, the card stops and asks the product owner.
 - Staging joins `render.yaml` before the beta (Phase 7), for release
   candidates, Desktop update tests, and the AI evaluation with live
   providers.
@@ -362,6 +371,7 @@ reads, what it may change, and what it never does
 | A test commit is marked by a trailer in its message | A separate branch or pull request for tests | One pull request per card stays the rule; the trailer is enough for CI to tell the two kinds of commit apart |
 | The requirement IDs in scope are a file in each code repository | CI reads prd.md from `tripmate-docs` | A code repository's CI needs nothing outside it, and the scope grows epic by epic |
 | A rate-limited route returns `503 server.unavailable` when Redis does not answer | Let the request through without counting | A limit that cannot be counted is not skipped: sign-in and sign-up limits are a security control |
+| Until the beta, production is one instance for the three processes, with free Postgres and Key Value plans | The full setup from the first deploy | One or two people use it before the beta, and the monthly cost limit is 10 USD. The cost: no point-in-time recovery, and a short stop at each deploy. The full setup returns before the beta. |
 
 ### 5.2 Open questions
 
@@ -429,7 +439,7 @@ flowchart LR
 | F8 | `Outbox` | S | High | F3 | The `outbox_events` migration; adding an event inside a transaction; the integrity test |
 | F9 | `Worker, scheduler, and cleanup` | M | High | F7, F8 | 2.5: Taskiq on Redis, the outbox publisher, event handlers as jobs, the scheduler's due-work queries, daily cleanup; the background work tests |
 | F10 | `Logs, traces, metrics, and error reporting` | M | High | F4 | 2.6, sent to Sentry and Grafana Cloud (5.1); the log line test |
-| F11 | `Local stack, image, and production on Render` | M | High | F9, F10 | 2.8: `compose.yaml` runs the whole stack with seed data; the image is published for every release tag; `render.yaml` for production with migrations as the pre-deploy step; the alerts of 2.6 |
+| F11 | `Local stack, image, and production on Render` | M | High | F9, F10 | 2.8: `compose.yaml` runs the whole stack with seed data; the image is published for every release tag; `render.yaml` for production until the beta (one instance, free database plans) with migrations as the pre-deploy step; the alerts of 2.6 |
 | F12 | `Contract publishing` | S | High | F2, CT1 | 2.10: `openapi.json` generated from the app, `x-stub` on stub routes, examples required on stubs, the pull request in `tripmate-contracts` with `CONTRACTS_TOKEN`, from a job that runs only on pushes to `main` |
 | F13 | `Requirement-to-test report` | S | High | F2 | 2.12: the report from test names and `tests/requirement-ids.txt`, kept with each CI run; a P0 ID in scope with no test fails CI |
 | F14 | `Flow checks and agent roles` | M | High | F2 | 2.12: failing first, test lock, mutation, and the risk gate as scripts with their own tests, in one reusable workflow, required on `main`; the label `human-approved` exists |
@@ -622,6 +632,7 @@ Shown once on a throwaway pull request for each case.
 | F11-3 | Main | Production after a deploy | The health check returns `200` with the release version; the alerts of 2.6 exist | M |
 | F11-4 | Error | A deploy whose migration fails | The deploy stops; the previous version keeps serving | M |
 | F11-5 | Edge | A rollback | Redeploying the previous image restores the previous version | M |
+| F11-6 | Main | The one production instance | The API answers, a job enqueued by a request runs, and the scheduler ticks | M |
 
 **F12 Contract publishing**
 
@@ -753,3 +764,4 @@ Shown once on a throwaway pull request for each case.
 | 1.1 | 2026-11-20 | The product owner answered three open questions, now decisions in section 5.1: Sentry and Grafana Cloud on free plans; a fine-grained GitHub token for contract pull requests, used only on pushes to `main`; a `.com` domain through Cloudflare Registrar, bought before the beta. |
 | 1.2 | 2026-11-23 | Follows the new development flow. Every card has a risk level (section 6); all but F6 are High. Section 7 is new: the test cases of every card, with error and edge cases and their expected results. Section 2.12 and two new cards build the flow checks: F13, the requirement-to-test report, and F14, failing first, test lock, mutation, and the risk gate, with the agent roles. F14 now comes before CT1 and DF1. Each skeleton card also writes the agent roles. One open question added: rate limits when Redis does not answer. 22 cards. |
 | 1.3 | 2026-11-23 | Approved by the product owner, with the proposed answer on rate limits: a rate-limited route returns `503 server.unavailable` when Redis does not answer (2.2, 2.3, decision in 5.1, case F6-6). The WebSocket gateway question stays open for the EPIC-02 spec. |
+| 1.4 | 2026-11-23 | The product owner set the monthly cost limit to 10 USD until the beta. Section 2.8: until the beta, production is one instance that runs the API, the worker, and the scheduler, with free Postgres and Key Value plans; the full setup returns before the beta. Card F11 follows, checks the free Postgres plan first, and gains case F11-6. Decision added to 5.1. |
