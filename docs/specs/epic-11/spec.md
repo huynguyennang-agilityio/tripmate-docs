@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.5\
+**Version:** 1.6\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -275,6 +275,19 @@ A mock card ([docs/development-flow.md](../../development-flow.md),
 section 1) runs in mock mode; its integration card switches the same
 screens to the real API by configuration only.
 
+**Mobile project conventions.** MF1 sets them up and writes them in
+the `CLAUDE.md` of `tripmate-mobile`; every later Mobile card follows
+them.
+
+| Topic | Rule |
+|-------|------|
+| Flutter version | Pinned to 3.38.5 (Dart 3.10.4), the same in CI and on every machine |
+| State | `flutter_bloc`: a Cubit for a simple screen, a Bloc for a flow with many events; tested with `bloc_test` |
+| Folder layout | By feature: `lib/app/` (flavors, `API_MODE`, router, theme), `lib/core/` (API, translations, storage), `lib/features/<feature>/{data,logic,ui}/`; `test/` mirrors `lib/` |
+| Routing | `go_router`, which also opens the `/join/*` Universal Links and App Links |
+| Flavors | On Android and iOS. `prod`: application ID `com.tripmate.app`, name "TripMate". `dev`: `com.tripmate.app.dev`, name "TripMate Dev". |
+| Lint | `flutter_lints`; CI runs `flutter analyze --fatal-infos --fatal-warnings` |
+
 ### 2.12 The flow checks
 
 The rules of [docs/development-flow.md](../../development-flow.md),
@@ -387,6 +400,8 @@ line endings, because the work runs on macOS and on Windows
 | The skeleton makes one file per part of `platform`, finds modules by scanning, and installs every dependency at once | Each card creates what it needs | Cards that run at the same time must not change the same file. The lock file and the app's start-up file are where two cards would otherwise meet. |
 | Translations are one file per area in each language, `translations/en/<area>.json` | One `en.json` and one `vi.json` | Web, Mobile, and the backend add keys at the same time, from three machines; one file per area keeps their changes apart |
 | The Web and Mobile skeleton cards need no contract; generated messages and the flow checks move to WF2 and MF2 | WF1 and MF1 wait for CT1 | The three machines start on the first day instead of two waiting for the backend's first three cards |
+| Mobile uses `flutter_bloc`, `go_router`, a folder per feature, and a pinned Flutter version (2.11) | Riverpod; Navigator with hand-written deep links; folders per layer; the latest stable Flutter in CI | Cubits and Blocs are tested with `bloc_test` from a state and an event, which suits tests written before the code. `go_router` opens the join links. A folder per feature keeps cards that run at the same time apart. A pinned version gives CI and every machine the same result. |
+| MF1 has one automated test, MF1-4, next to its manual cases | Manual cases only | `flutter test` needs a test to run, and the test agent needs a case that fails before the code exists |
 
 ### 5.2 Open questions
 
@@ -479,7 +494,7 @@ flowchart LR
 
 | ID | Card | Size | Risk | Depends on | Done when |
 |----|------|------|------|------------|-----------|
-| MF1 | `Mobile skeleton and CI` | S | High | -- | Flutter project with the two flavors and the mock mode setting of 2.11; `flutter analyze`, `flutter test`, and the Android build required on `main`; `CLAUDE.md`, `.gitattributes`, and the agent roles (4.3) |
+| MF1 | `Mobile skeleton and CI` | S | High | -- | Flutter project with the two flavors on Android and iOS, the mock mode setting, and the project conventions of 2.11; `flutter analyze`, `flutter test`, and the Android build required on `main`; `CLAUDE.md`, `.gitattributes`, and the agent roles (4.3) |
 | MF2 | `Mobile API client and mock mode` | M | High | MF1, CT2 | ARB files generated from the pinned contracts version; the generated `dart-dio` client, the mock interceptor answering from the contract's examples, the headers of 2.11; one test screen reads `GET /v1/health` in both modes; the remaining checks of 2.9 and the flow checks of 2.12 required on `main` |
 
 ### 6.5 Desktop: `tripmate-desktop`
@@ -501,7 +516,7 @@ flowchart LR
 
 The work runs on three machines, one per group of repositories
 ([docs/development-flow.md](../../development-flow.md), section 1), so
-no two machines change the same repository.
+no two machines change the same code repository.
 
 | Wave | Mac 1: backend and contracts | Mac 2: Mobile | Windows: Web and Desktop |
 |------|------------------------------|---------------|--------------------------|
@@ -776,6 +791,7 @@ Shown once on a throwaway pull request for each case.
 | MF1-1 | Main | The project with no problem | Analysis, tests, and the Android build pass, and each is required on `main` | M |
 | MF1-2 | Main | The `dev` and `prod` flavors on one phone | Both install side by side | M |
 | MF1-3 | Error | An analysis warning or a failing test | The matching check fails | M |
+| MF1-4 | Main | The app started with the `dev` flavor; then with `prod` | Its first screen shows "TripMate Dev"; then "TripMate" | U |
 
 **MF2 Mobile API client and mock mode**
 
@@ -809,3 +825,4 @@ Shown once on a throwaway pull request for each case.
 | 1.3 | 2026-11-23 | Approved by the product owner, with the proposed answer on rate limits: a rate-limited route returns `503 server.unavailable` when Redis does not answer (2.2, 2.3, decision in 5.1, case F6-6). The WebSocket gateway question stays open for the EPIC-02 spec. |
 | 1.4 | 2026-11-23 | The product owner set the monthly cost limit to 10 USD until the beta. Section 2.8: until the beta, production is one instance that runs the API, the worker, and the scheduler, with free Postgres and Key Value plans; the full setup returns before the beta. Card F11 follows, checks the free Postgres plan first, and gains case F11-6. Decision added to 5.1. |
 | 1.5 | 2026-11-23 | The work runs on three machines, and cards run at the same time. New 6.7: which machine builds what, in which wave. The skeleton (F1) makes one file per part of `platform`, finds modules by scanning, and installs every dependency (2.1; cases F1-7, F1-8). WF1 and MF1 need no contract and start on the first day; generated messages and the flow checks move to WF2 and MF2, with their cases. Translations are one file per area in each language. CI checks for one migration head (case F2-6). Every repository has a `.gitattributes`. Three decisions added to 5.1. |
+| 1.6 | 2026-11-23 | The product owner set the Mobile project conventions (2.11): Flutter 3.38.5 pinned, `flutter_bloc`, `go_router`, a folder per feature, flavors on Android and iOS with their application IDs, and `flutter_lints` with warnings as errors. MF1 follows them and gains case MF1-4, an automated test of the flavor name. Section 6.7: no two machines change the same code repository; `tripmate-docs` may be changed from any machine. Two decisions added to 5.1. |
