@@ -2,7 +2,7 @@
 
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
-**Status:** Proposed\
+**Status:** Approved\
 **Version:** 1.17\
 **Planning horizon:** 13 weeks (initial estimate)\
 **Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
@@ -779,4 +779,4 @@ feedback.
 | 1.14 | 2026-11-20 | New Project scope in section 3, replacing a formal SOW: deliverables with where each lives and when it is accepted, responsibilities, assumptions, constraints, acceptance of a phase and of the MVP, and three open questions. The schedule is not changed. |
 | 1.15 | 2026-11-20 | Project scope: the team is the product owner and Claude Code, and the product owner owns every epic; the open question about the team is closed. The schedule is not changed. |
 | 1.16 | 2026-11-23 | Section 7: the one-sentence summary of the development workflow follows the new flow (the product owner approves each epic's plan and reviews High-risk changes). |
-| 1.17 | 2026-11-23 | Section 3: the two open questions are answered by the product owner. Week 1 starts on Monday 2026-11-23, and the monthly limit for hosting, Claude, and Google Maps is 10 USD until the beta. |
+| 1.17 | 2026-11-23 | Section 3: the two open questions are answered by the product owner. Week 1 starts on Monday 2026-11-23, and the monthly limit for hosting, Claude, and Google Maps is 10 USD until the beta. With no open question left, the product owner approved the roadmap and closed Stage 4. |
