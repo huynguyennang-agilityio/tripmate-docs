@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.10\
+**Version:** 2.11\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -206,14 +206,17 @@ human oversight, independent verification, and quality gates.
 
 ```mermaid
 flowchart TD
-    A[Trello card / task] --> B[AI analyses and plans]
-    B --> C{Human approves plan?}
-    C -->|No| D[Revise plan] --> B
-    C -->|Yes| E[AI implementation] --> F[Automated tests & verification]
-    F --> G[Independent AI review] --> H[Human review]
-    H --> I{All quality gates pass?}
+    P[AI plans the epic: spec, cards, risk levels, test cases] --> C{Product owner approves plan?}
+    C -->|No| D[Revise plan] --> P
+    C -->|Yes| A[Trello card / task]
+    A --> B[Test agent writes the tests first]
+    B --> E[Code agent implements] --> F[Automated tests & verification]
+    F --> G[Independent AI review]
+    G --> I{All quality gates pass?}
     I -->|No| J[Fix issues] --> E
-    I -->|Yes| K[Merge request approved] --> L[Merge]
+    I -->|Yes| K{High-risk change?}
+    K -->|Yes| H[Product owner review] --> L[Merge]
+    K -->|No| L
 ```
 
 - **Activities:**
@@ -221,25 +224,30 @@ flowchart TD
     epic, feature spec, design, and acceptance criteria; note
     dependencies and test expectations; create the Trello card and the
     branch.
-  - *AI analysis and planning:* the AI reads the requirement, the
-    codebase, and conventions; analyses impact; proposes a plan with the
-    files to change and a test plan. A person approves the plan before
-    implementation.
-  - *Implementation:* within the task's scope; follows architecture,
-    coding standards, and security constraints; tests change with the
-    code.
+  - *AI analysis and planning:* once per epic, the AI reads the
+    requirements, the codebase, and conventions; analyses impact;
+    proposes the epic's plan: the spec, the cards, a risk level for
+    each card, and its test cases with their edge cases. The product
+    owner approves the plan before any card starts.
+  - *Implementation:* one agent writes the card's tests first, from
+    its test cases; a separate agent then writes the code within the
+    task's scope, following architecture, coding standards, and
+    security constraints. Neither sees the other's reasoning.
   - *Verification:* unit, integration, contract, end-to-end, and
     regression tests; static analysis and lint; security checks; UI and
     design QA where relevant; AI evaluation where relevant.
-  - *Review:* an independent AI review, then a human code review, for
-    correctness, tests, readability, security, and scope. Reviewers do
-    not change code during a review-only pass.
+  - *Review:* an independent AI review of the diff for correctness,
+    tests, security, scope, and what the change affects outside the
+    task. The product owner reviews only High-risk changes: a shared
+    contract, the schema, access, money, a major dependency, or the
+    checks themselves. Reviewers do not change code during a
+    review-only pass.
   - *Git workflow:* Trello card → branch → commit → merge request; tests and
     lint run before a merge request is opened or updated.
 - **Quality gates:** acceptance criteria met; related tests pass; no
   open Critical or High defect; security checks pass; AI evaluation
   meets its threshold for AI features; no unapproved out-of-scope
-  change; human approval done.
+  change; the product owner's approval done for a High-risk change.
 - **Deliverables:** Implemented Code, Automated Tests, Test /
   Evaluation Results, AI Review Findings, Human Review Approval, Merge
   Request, Updated Technical Documentation.
@@ -313,7 +321,8 @@ keep improving from real data and feedback.
 5. For each priority epic, finish the spec, detailed design, technical
    design, and task breakdown just in time.
 6. Build the epic through the AI-native SDLC with independent
-   verification and human approval.
+   verification, and human approval of the plan and of High-risk
+   changes.
 7. Harden, release, and launch as readiness allows.
 8. Watch data and feedback, and keep iterating.
 
@@ -353,7 +362,7 @@ exist today, and their versions, is shown in the Build Tracker.
 | [product-vision.md](product-vision.md) | What is the product and why build it? Vision, value, positioning, goals, metrics, principles | 1 |
 | [docs/solution-options.md](docs/solution-options.md) | Which ways of solving each problem were considered, which was chosen, and why features are in or out of the MVP? | 2 |
 | [prd.md](prd.md) | What must it do? MVP scope, requirements, business rules, acceptance criteria | 2 |
-| `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, tasks | 2--4 |
+| `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, tasks with their risk levels, test cases | 2--4 |
 | Prototype canvases | How will people use it? | 3 |
 | [Design system](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) (artifact) | What do screens look like? Colour, type, spacing tokens, usage rules, and components, the same for every client | 3 |
 | [docs/information-architecture.md](docs/information-architecture.md) | Where do things live and how do people move between them? Places, Navigation Map, user journey, high-level flows, the same for every platform | 3 |
@@ -423,7 +432,9 @@ exist today, and their versions, is shown in the Build Tracker.
   review.
 - AI features (idea capture, Itinerary drafts, Gap revisions) get
   evaluation sets with expected outcomes, run on every change.
-- A person approves every plan, every stage gate, and every merge.
+- The product owner approves every epic plan and every stage gate,
+  and reviews every High-risk change before it merges. Every other
+  change merges when its checks and its independent AI review pass.
 
 ## 8. Version History
 
@@ -442,3 +453,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.8 | 2026-11-19 | Tasks are tracked as cards on a Trello board instead of issues (Stages 4, 5 and 7, the SDLC loop, the document map). Section 7: repositories are cloned side by side so code reads the documents at `../tripmate-docs/`, and the requirement ID ties a Trello card to its branch, tests and pull request. |
 | 2.9 | 2026-11-20 | docs/test-strategy.md and docs/ai-golden-dataset.md now exist and are linked from the Stage 4 documents and the document map. The golden dataset has its own document, so the test strategy holds only what changes rarely. |
 | 2.10 | 2026-11-20 | docs/development-flow.md now exists and is linked from the Stage 5 documents and the document map: the Trello board and Definition of Ready, the steps from card to merge, the Definition of Done, and defect severities. |
+| 2.11 | 2026-11-23 | Stage 5 follows docs/development-flow.md: the product owner approves each epic's plan (spec, cards, risk levels, test cases) and reviews only High-risk changes; a test agent writes the tests before a separate code agent writes the code; every other change merges when its checks and its independent AI review pass. Section 7 says the same. |

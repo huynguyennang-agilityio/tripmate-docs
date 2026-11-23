@@ -3,7 +3,7 @@
 **Document type:** Test Strategy and AI Evaluation Plan\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.3\
+**Version:** 1.4\
 **Stage:** 4. SOW / Planning\
 **Page version:** [TripMate Test Strategy artifact](https://claude.ai/artifact/9ES7U3oo9wzvNqkkpafWx9)
 
@@ -43,6 +43,10 @@ must stay within this document. The Definition of Done is owned by
 - **Time is an input.** The clock and the trip's time zone are passed
   in, so trip start, Nudge timing, and Invitation expiry are tested
   without waiting.
+- **Tests come before the code.** A card's tests are written from its
+  test cases in the epic spec, by an agent that does not write the
+  code, and are shown failing first
+  ([development-flow.md](development-flow.md), section 2).
 - **Tests change with the code.** A pull request that changes behaviour
   changes its tests in the same pull request.
 
@@ -112,7 +116,7 @@ network.
 flowchart LR
     PR["Pull request"] --> CI["CI: lint, types, unit, property,<br/>integration, API and authorization,<br/>contract, screens, translations"]
     CI --> PV["CI:<br/>end-to-end smoke set"]
-    PV --> RV["AI review,<br/>then human review"]
+    PV --> RV["Product owner's review,<br/>High-risk cards only"]
     RV --> MG["Merge"]
     MG --> NT["Nightly in CI:<br/>the Web journeys,<br/>full AI evaluation"]
     NT --> RC["Release candidate:<br/>release checks,<br/>security assessment,<br/>release gates"]
@@ -120,7 +124,7 @@ flowchart LR
 
 | When | What must pass | What a failure blocks |
 |------|----------------|-----------------------|
-| Every pull request | Everything in CI, including the end-to-end smoke set. A pull request that touches the assistant's prompts, tools, schemas, or model settings also runs the AI smoke set (section 7.4). | The merge |
+| Every pull request | Everything in CI, including the end-to-end smoke set and the flow checks ([development-flow.md](development-flow.md), section 2.3). A pull request that changes a domain rule file also runs mutation testing on it. A pull request that touches the assistant's prompts, tools, schemas, or model settings also runs the AI smoke set (section 7.4). | The merge |
 | Nightly | The automated journeys of section 6, on Web, and the full AI evaluation with scripted tool results | New work in the failing area, until a card is opened and the failure is fixed |
 | End of each phase | The phase's exit criteria in mvp-roadmap.md, every matrix row of the phase's requirements, and the journeys of section 6 that are run by hand | Closing the phase |
 | Before a release | Everything above, the full AI evaluation with live providers, the release checks, the reading of the screens in both languages, and the security assessment | The release |
@@ -454,8 +458,9 @@ proved.
 
 | Work | Who |
 |------|-----|
-| The tests of a task | The author of the pull request writes them with the code, in the same pull request |
-| Checking that the tests match the spec | The AI review, then the human review, before the merge |
+| The test cases of a task, with their expected results | The author of the epic spec; the product owner approves them with the spec |
+| The tests of a task | The test agent writes them from the test cases, before the code ([development-flow.md](development-flow.md), section 2) |
+| Checking that the tests match the spec | The review agent, before the pull request; the checks that a test fails first and is not weakened later |
 | This matrix | The author of an epic spec adds or changes rows in the same change as the spec |
 | Golden cases, expected results, and thresholds | The author of the assistant's change proposes them; the product owner approves a changed expectation or threshold |
 | Reading failed AI cases before a release | A person, never only the judging model |
@@ -474,6 +479,7 @@ proved.
 | The golden dataset is its own document | One section of this document | The dataset grows with every defect found in the assistant, while the strategy changes rarely. Each has its own version. |
 | Each golden case runs three times | One run | The same input does not always give the same output |
 | The backend's own Gap and Feasibility rules score the drafts | A separate scorer | One definition of "fits the Day window", in the product and in the evaluation |
+| Mutation testing on the rule files a pull request changes | No mutation testing; a full run on every pull request | A passing test proves little if it would pass with the rule broken. The rules are few pure files in the backend, so the run stays short. |
 | Access and audit coverage are generated from the list of endpoints | One hand-written test per endpoint | A new endpoint is covered, or fails the build, without anyone remembering |
 
 ### 10.2 Open questions
@@ -495,3 +501,4 @@ proved.
 | 1.1 | 2026-11-20 | The Definition of Done is linked now that development-flow.md exists. |
 | 1.2 | 2026-11-20 | Approved by the product owner. No content changed. |
 | 1.3 | 2026-11-20 | No preview environments: the end-to-end smoke set runs in CI against the local stack in Docker, and the nightly runs are in CI. Staging exists from the beta (Phase 7); until then the journeys run by hand use the local stack. |
+| 1.4 | 2026-11-23 | Follows the new development flow: a card's tests are written before the code from the test cases in its epic spec (section 1, section 9); every pull request runs the flow checks, and mutation testing when a rule file changes (section 4, decision in 10.1); the product owner reviews High-risk cards only (section 4 diagram). |
