@@ -2,8 +2,8 @@
 
 **Document type:** Epic Spec\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.4\
+**Status:** Approved\
+**Version:** 1.5\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-01, Phase 1\
 **Page version:** [TripMate EPIC-01 Spec artifact](https://claude.ai/artifact/CDUhq8v5rqC2f3neCN53Rs)
@@ -82,7 +82,7 @@ stateDiagram-v2
 
 | Rule | Detail |
 |------|--------|
-| One session per device | Named from the device type and the client, for example "iPhone · TripMate app" or "Chrome on macOS · Web" |
+| One session per device | Named from the device type and the client, for example "iPhone · TripMate app" or "Chrome on macOS · Web". A second sign-in from the same device ID ends that device's earlier session. |
 | Refresh | The refresh token is replaced at every use; the old one stops working at once |
 | Reuse of an old refresh token | Ends that whole session. The device that presented it must sign in again. |
 | Sign out | Ends this device's session and clears its tokens; the user lands on Welcome |
@@ -107,7 +107,9 @@ stateDiagram-v2
 | `400` | `request.invalid` with `fields` | Email malformed; password or display name breaks a rule. Field codes: `auth.password_too_short`, `auth.password_too_common`, `profile.display_name_invalid` |
 | `401` | `auth.invalid_credentials` | Wrong email or password |
 | `401` | `auth.session_ended` | A refresh for a session that was ended or revoked |
+| `404` | `auth.session_not_found` | Ending a session that is not the caller's, or an unknown ID |
 | `409` | `auth.email_taken` | Register with an email that has an account |
+| `422` | `auth.session_is_current` | Ending the current session from the devices list |
 
 `auth.not_signed_in` and `auth.token_expired` already exist
 ([api-design.md](../../api-design.md), section 4.2). Every code has text
@@ -131,7 +133,7 @@ Each criterion has at least one test named with its requirement ID
 | AUTH-02 | A user lists their devices and ends another one; that device's next refresh fails | A |
 | AUTH-02 | Each client keeps the refresh token where [security.md](../../security.md), section 2.1, says, and never in `localStorage` | S, M |
 | AUTH-03 | A user reads and edits only their own profile | A |
-| AUTH-03 | A changed display name shows in every trip of the user | I, S |
+| AUTH-03 | A changed display name shows in every trip of the user. Built and tested with the EPIC-02 spec, when trips exist (5.1). | I, S |
 | FR-01 | Every endpoint except register, sign-in, refresh, and the health check refuses a missing, expired, or forged token (generated from the contract) | A |
 
 ## 4. Technical Design
@@ -152,9 +154,9 @@ section 3.1. This epic builds all of them except
 
 | Endpoint | Token | Idempotency-Key | Notes |
 |----------|-------|-----------------|-------|
-| `POST /v1/auth/register` | None | Required | Returns the same body as sign-in, with `201` |
-| `POST /v1/auth/login` | None | Not taken (5.2) | |
-| `POST /v1/auth/refresh` | Refresh token | Not taken (5.2) | Web sends the cookie; Mobile and Desktop send the token in the body |
+| `POST /v1/auth/register` | None | Required | Returns the same body as sign-in, with `201`. The body names the client kind (5.1). |
+| `POST /v1/auth/login` | None | Not taken (5.1) | The body names the client kind (5.1) |
+| `POST /v1/auth/refresh` | Refresh token | Not taken (5.1) | Web sends the cookie; Mobile and Desktop send the token in the body |
 | `POST /v1/auth/logout` | Access | -- | Web also clears the cookie |
 | `GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/{id}`, `POST /v1/auth/sessions/end-others` | Access | -- | `end-others` is new in this epic; api-design.md lists it in the same change |
 | `GET /v1/me`, `PATCH /v1/me` | Access | -- | No `If-Match`: only the user changes their profile |
@@ -191,20 +193,19 @@ without the email ([security.md](../../security.md), section 4).
 | Register says when an email is taken | The same answer whether or not the account exists | The user needs to know to sign in instead. Sign-up is rate limited to 5 per hour per IP address, which keeps guessing slow. |
 | No email verification in the MVP | Verify the email before the first sign-in | No email service is chosen before AUTH-06 ([architecture.md](../../architecture.md), section 12.2); an unverified email is never used to link a Google or Apple account ([security.md](../../security.md), section 2) |
 | No Audit log entry for account changes | Audit sign-ins | The Audit log is per trip (business rule 13); account events go to the structured log |
+| Sign-in and refresh take no `Idempotency-Key` | A key on every `POST` that creates a record | A repeated sign-in from a device replaces that device's session, and a repeated refresh is refused as a reused token, so neither can leave a duplicate. [api-design.md](../../api-design.md), section 2, names the exception. |
+| Register and sign-in name the client kind in the body: `web`, `mobile`, or `desktop` | The backend guesses from the `User-Agent` or the `Origin` | The backend must know whether to set the refresh cookie or return the token. For `web` the refresh token is set as the cookie and left out of the body. The kind also names the session. The Web build sends `desktop` when it runs in the Desktop shell. |
+| A second sign-in from a device ID that has a session ends the earlier session | One more session for the same device | 2.3 says one session per device, and the devices list shows one row for each |
+| Refresh answers `401 auth.session_ended` for a token that was never issued | A different code for an unknown token | The answer does not say whether a token was once valid |
+| The same refresh token sent twice at the same moment ends the session | A short window in which the old token still works | The reuse rule has no exception to exploit. Each client keeps one refresh in flight (cases W3-3 and M3), so it does not send two. |
+| Ending a device returns `422 auth.session_is_current` for the current session, and `404 auth.session_not_found` for another user's session and for an unknown ID alike | One code for all three | The screen can tell the user why, and the answer never shows that another user's session exists |
+| `PATCH /v1/me` with an email returns `400 request.invalid` | Ignore the field | The schema takes the display name only, and a client that sends more learns it at once |
+| "A changed display name shows in every trip" is built and tested in the EPIC-02 spec | A test in this epic with a made-up trip | Trips do not exist before EPIC-02. Its membership card reads the name from `users` and keeps no copy. |
+| The MVP offers no password reset in the app | Email reset in the MVP; social sign-in in the MVP | AUTH-06 and AUTH-05 are P1. During the beta the product owner resets a password by hand on request. |
 
 ### 5.2 Open questions
 
-| Question | Proposed answer | Needed by |
-|----------|-----------------|-----------|
-| Do sign-in and refresh take an `Idempotency-Key`? [api-design.md](../../api-design.md), section 2, asks for one on every `POST` that creates a record, and a session is a record. | No. A repeated sign-in makes one more session, which the user can end; a repeated refresh is refused as a reused token. api-design.md names the exception in the same change. | AUTH-01 card |
-| How does the backend know to answer with the refresh cookie and not with a token in the body? | Register and sign-in name the client kind in the body: `web`, `mobile`, or `desktop`. For `web` the refresh token is set as the cookie and left out of the body. The kind also names the session. The Web build sends `desktop` when it runs in the Desktop shell. | B0 |
-| A second sign-in from a device ID that already has a session: one more session, or the same one? 2.3 says one session per device. | It ends that device's earlier session, so the devices list has one row per device | B3 |
-| What does refresh answer for a token that was never issued? | `401 auth.session_ended`, the same as an ended session, so the answer does not say whether a token was once valid | B4 |
-| What happens when the same refresh token arrives twice at the same moment, as a retry can cause? | The rule holds: the second is a reuse and ends the session. Each client keeps one refresh in flight (cases W3-3 and M3), so it does not send two. | B4 |
-| Which codes does ending a device return for the current session, and for a session that is not the caller's? | `422 auth.session_is_current`, and `404 auth.session_not_found` for another user's session and for an unknown ID alike. Both are added to 2.5 and to the contract. | B0 |
-| What does `PATCH /v1/me` answer when the body carries the email? | `400 request.invalid`: the schema takes the display name only | B7 |
-| "A changed display name shows in every trip" cannot be tested before trips exist. Where is it built? | In the EPIC-02 spec: the membership card reads the name from `users` and keeps no copy. Case B7-6 moves there. | EPIC-02 spec |
-| prd.md, AUTH-06, says a user who forgets their password "signs in with Google or Apple", but both are P1. What does the MVP offer? | Nothing in the app; the product owner resets the password by hand on request during the beta | Phase 7 |
+None.
 
 ## 6. Tasks
 
@@ -269,7 +270,7 @@ flowchart LR
 | B4 | `AUTH-02 Refresh with token rotation` | M | High | B3 | `POST /v1/auth/refresh` replaces the refresh token and sets `last_used_at`; a replaced token ends the session; an ended session gives `401 auth.session_ended` |
 | B5 | `AUTH-02 Sign out` | XS | High | B3 | `POST /v1/auth/logout` ends the session at once and clears the Web cookie |
 | B6 | `AUTH-02 Devices list and ending devices` | M | High | B4 | `GET /v1/auth/sessions` marks the current one; `DELETE /v1/auth/sessions/{id}` refuses the current one; `POST /v1/auth/sessions/end-others`; an ended device's next refresh fails |
-| B7 | `AUTH-03 Read and edit the profile` | S | Low | B2 | `GET` and `PATCH /v1/me` with the display name rules; no way to read another user; the new name shows in a trip |
+| B7 | `AUTH-03 Read and edit the profile` | S | Low | B2 | `GET` and `PATCH /v1/me` with the display name rules; no way to read another user |
 | B8 | `FR-01 Protected endpoints test` | S | Low | B5, B6, B7 | A test generated from the contract: every endpoint except register, sign-in, refresh, and the health check refuses a missing, expired, or forged token |
 
 ### 6.2 Contract: `tripmate-contracts`
@@ -341,9 +342,6 @@ test before the code is written
 it adds no expected result of its own. The columns are those of the
 [EPIC-11 spec](../epic-11/spec.md), section 7.
 
-A case marked (5.2) rests on the proposed answer to an open question
-of section 5.2 and changes with it.
-
 ### 7.1 Backend
 
 **B0 Accounts contract stub**
@@ -382,7 +380,7 @@ of section 5.2 and changes with it.
 | B2-6 | Error | No `Idempotency-Key` | `400 request.idempotency_key_required` | A |
 | B2-7 | Edge | Six sign-ups from one IP address within an hour | The first five pass; the sixth returns `429 rate.limited` with `Retry-After` | A |
 | B2-8 | Main | Any register response and its log line | Neither holds the password or its hash | A |
-| B2-9 | Edge | The client kind is Web; then Mobile (5.2) | The refresh token is set as the cookie of security.md, section 2.1, and is not in the body; then it is in the body and no cookie is set | A |
+| B2-9 | Edge | The client kind is Web; then Mobile | The refresh token is set as the cookie of security.md, section 2.1, and is not in the body; then it is in the body and no cookie is set | A |
 
 **B3 Sign in**
 
@@ -395,7 +393,7 @@ of section 5.2 and changes with it.
 | B3-5 | Edge | Eleven attempts for one email within 15 minutes, the last with the right password | The eleventh returns `429 rate.limited` with `Retry-After` | A |
 | B3-6 | Edge | Eleven attempts from one IP address, each for a different email | The eleventh returns `429 rate.limited` | A |
 | B3-7 | Edge | The 15 minutes have passed | Sign-in works again | A |
-| B3-8 | Edge | A second sign-in from the same device ID (5.2) | That device's earlier session is ended; the devices list shows one row for the device | A, I |
+| B3-8 | Edge | A second sign-in from the same device ID | That device's earlier session is ended; the devices list shows one row for the device | A, I |
 
 **B4 Refresh with token rotation**
 
@@ -405,8 +403,8 @@ of section 5.2 and changes with it.
 | B4-2 | Error | The replaced refresh token, presented again | `401 auth.session_ended`; the newer refresh token of that session fails as well | A, I |
 | B4-3 | Error | The refresh token of a session that was signed out | `401 auth.session_ended` | A |
 | B4-4 | Edge | A session last refreshed 29 days ago, and one 30 days ago | The first refreshes; the second returns `401 auth.session_ended` | A |
-| B4-5 | Error | A refresh token that was never issued (5.2) | `401 auth.session_ended` | A |
-| B4-6 | Edge | The same refresh token sent twice at the same moment (5.2) | One request gets new tokens; the session is then ended as a reuse | I |
+| B4-5 | Error | A refresh token that was never issued | `401 auth.session_ended` | A |
+| B4-6 | Edge | The same refresh token sent twice at the same moment | One request gets new tokens; the session is then ended as a reuse | I |
 | B4-7 | Main | Web sends the cookie; Mobile sends the token in the body | Both refresh; Web gets the new cookie | A |
 | B4-8 | Edge | A Web refresh from another `Origin` | Refused | A |
 | B4-9 | Main | The `sessions` table after a refresh | It holds hashes only, never a refresh token | I |
@@ -427,8 +425,8 @@ of section 5.2 and changes with it.
 | B6-1 | Main | A user with three active sessions and one ended | The list has the three active ones, each with its name and last use, and marks the current one | A |
 | B6-2 | Edge | Another user's sessions | They are never in the list | A |
 | B6-3 | Main | `DELETE` on another session of the user | `204`; that device's refresh returns `401 auth.session_ended`, and its next request `401 auth.token_expired` | A |
-| B6-4 | Error | `DELETE` on the current session (5.2) | `422 auth.session_is_current`; the session stays | A |
-| B6-5 | Error | `DELETE` on a session of another user, or on an unknown ID (5.2) | `404 auth.session_not_found` for both | A |
+| B6-4 | Error | `DELETE` on the current session | `422 auth.session_is_current`; the session stays | A |
+| B6-5 | Error | `DELETE` on a session of another user, or on an unknown ID | `404 auth.session_not_found` for both | A |
 | B6-6 | Main | `end-others` with three active sessions | The two others are ended; the current one still works | A |
 | B6-7 | Edge | `end-others` with only the current session | `200`; nothing changes | A |
 
@@ -439,9 +437,8 @@ of section 5.2 and changes with it.
 | B7-1 | Main | `GET /v1/me` for a new user | The display name, the email, and zero trips in each group | A |
 | B7-2 | Main | `PATCH /v1/me` with a valid display name | `200`; `GET /v1/me` returns the new name, trimmed | A |
 | B7-3 | Error | A display name of 41 characters, of spaces only, or with a line break | `400 request.invalid` with `profile.display_name_invalid`; the name is unchanged | A |
-| B7-4 | Error | `PATCH /v1/me` with an `email` field (5.2) | `400 request.invalid`; the email is unchanged | A |
+| B7-4 | Error | `PATCH /v1/me` with an `email` field | `400 request.invalid`; the email is unchanged | A |
 | B7-5 | Edge | The contract | No operation takes a user ID to read or edit a profile | C |
-| B7-6 | Main | A user in a trip changes their display name (5.2) | Built with the EPIC-02 spec, when trips exist | I |
 
 **B8 Protected endpoints test**
 
@@ -596,3 +593,4 @@ Checked by hand on macOS, Windows, and Ubuntu LTS.
 | 1.2 | 2026-11-20 | Cards D1 and D2 cover Linux: the refresh token goes to Secret Service, D2 is checked by hand on Ubuntu LTS as well, and without a Secret Service the user signs in at each start. D2 is now size S. |
 | 1.3 | 2026-11-20 | Integration cards work against the local stack in Docker instead of a preview backend; section 4.1 links the EPIC-11 spec for the foundation. |
 | 1.4 | 2026-11-23 | Follows the new development flow. Every card has a risk level (section 6): the cards that change the contract, a table, tokens, or sessions are High, the others Low. Section 7 is new: the test cases of every card, with error and edge cases and their expected results. Writing them found seven points the spec did not decide, now open questions in 5.2: the client kind, a second sign-in from one device, a refresh token never issued, two refreshes at once, the codes for ending a device, the email in a profile edit, and where the display name in trips is tested. B0 adds this epic's IDs to the requirement-to-test report. |
+| 1.5 | 2026-11-23 | Approved by the product owner, with every proposed answer. The nine open questions are now decisions in 5.1: no `Idempotency-Key` on sign-in and refresh, the client kind in the body, one session per device ID, the answers of refresh for an unknown token and for the same token sent twice, the codes for ending a device (added to 2.5), the email in a profile edit, the display name in trips moved to the EPIC-02 spec (case B7-6 removed), and no password reset in the app during the MVP. |

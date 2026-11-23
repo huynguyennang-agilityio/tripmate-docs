@@ -2,8 +2,8 @@
 
 **Document type:** Epic Spec\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.2\
+**Status:** Approved\
+**Version:** 1.3\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -98,7 +98,7 @@ flowchart LR
 | Access declaration | Every route declares `public`, `signed_in`, or a capability of [security.md](../../security.md), section 3.2. A route with no declaration fails a test in CI. |
 | Token check | For any route that is not `public`: the EdDSA access token's signature and expiry are checked, and `identity` is asked through its registered hook whether the session is still active. A failure returns `401 auth.not_signed_in` or `401 auth.token_expired`. |
 | Capability | For a capability route, the guard asks `trips` for the caller's membership (registered by EPIC-02). Until then only `public` and `signed_in` routes exist. |
-| Rate limits | The general ceiling of [security.md](../../security.md), section 2.2, on every route; a route can add its own limit with its key. Counters live in Redis. A limit returns `429 rate.limited` with `Retry-After`. |
+| Rate limits | The general ceiling of [security.md](../../security.md), section 2.2, on every route; a route can add its own limit with its key. Counters live in Redis. A limit returns `429 rate.limited` with `Retry-After`. When Redis does not answer, a rate-limited route returns `503 server.unavailable`. |
 | Idempotency | Every `POST` that creates a record declares it; the platform applies 2.4. |
 | Transaction | The handler runs in one database transaction. The change, its Audit log entries, and its outbox events are written together or not at all. |
 
@@ -122,7 +122,7 @@ Codes this epic adds:
 | `400` | `request.idempotency_key_required` | A create `POST` with no `Idempotency-Key` |
 | `409` | `request.idempotency_in_progress` | The same key arrives while the first request is still running |
 | `500` | `server.error` | Anything unexpected |
-| `503` | `server.unavailable` | The health check finds PostgreSQL or Redis unreachable |
+| `503` | `server.unavailable` | The health check finds PostgreSQL or Redis unreachable; a rate limit cannot be counted |
 
 `request.invalid`, `request.idempotency_mismatch`, `rate.limited`,
 `auth.not_signed_in`, and `auth.token_expired` already exist
@@ -361,12 +361,12 @@ reads, what it may change, and what it never does
 | The flow checks are scripts with their own tests, shared as one reusable workflow from `tripmate-backend` | A copy in each repository; a marketplace action | One place to change a gate, and the gate is tested like any other code |
 | A test commit is marked by a trailer in its message | A separate branch or pull request for tests | One pull request per card stays the rule; the trailer is enough for CI to tell the two kinds of commit apart |
 | The requirement IDs in scope are a file in each code repository | CI reads prd.md from `tripmate-docs` | A code repository's CI needs nothing outside it, and the scope grows epic by epic |
+| A rate-limited route returns `503 server.unavailable` when Redis does not answer | Let the request through without counting | A limit that cannot be counted is not skipped: sign-in and sign-up limits are a security control |
 
 ### 5.2 Open questions
 
 | Question | Proposed answer | Needed by |
 |----------|-----------------|-----------|
-| What does a rate-limited route answer when Redis does not answer? | `503 server.unavailable`: a limit that cannot be counted is not skipped | F6 |
 | Is the WebSocket gateway part of EPIC-02 or EPIC-03? | EPIC-02, if its exit criterion "Web and Mobile display consistent trip information" needs live updates; otherwise EPIC-03 | EPIC-02 spec |
 
 ## 6. Tasks
@@ -560,7 +560,7 @@ Shown once on a throwaway pull request for each case.
 | F6-3 | Edge | The window has passed | The next request passes | A |
 | F6-4 | Edge | Two callers with different keys | Each is counted on its own | A |
 | F6-5 | Main | A route with its own limit and key | Its limit applies as well as the general ceiling | A |
-| F6-6 | Edge | Redis does not answer | As the open question of 5.2 decides | I |
+| F6-6 | Edge | Redis does not answer | `503 server.unavailable`; the request is not let through | I |
 
 **F7 Idempotency keys**
 
@@ -752,3 +752,4 @@ Shown once on a throwaway pull request for each case.
 | 1.0 | 2026-11-20 | First version: scope of the first part of EPIC-11, what the platform gives every epic (backend layout, request pipeline, errors, idempotency, outbox and background work, observability, configuration and health check, Render environments, CI, the contract pipeline, Web and Mobile foundations), two environments until the beta (local and production), acceptance criteria, technical design, decisions and open questions, and 20 cards with checkpoints. |
 | 1.1 | 2026-11-20 | The product owner answered three open questions, now decisions in section 5.1: Sentry and Grafana Cloud on free plans; a fine-grained GitHub token for contract pull requests, used only on pushes to `main`; a `.com` domain through Cloudflare Registrar, bought before the beta. |
 | 1.2 | 2026-11-23 | Follows the new development flow. Every card has a risk level (section 6); all but F6 are High. Section 7 is new: the test cases of every card, with error and edge cases and their expected results. Section 2.12 and two new cards build the flow checks: F13, the requirement-to-test report, and F14, failing first, test lock, mutation, and the risk gate, with the agent roles. F14 now comes before CT1 and DF1. Each skeleton card also writes the agent roles. One open question added: rate limits when Redis does not answer. 22 cards. |
+| 1.3 | 2026-11-23 | Approved by the product owner, with the proposed answer on rate limits: a rate-limited route returns `503 server.unavailable` when Redis does not answer (2.2, 2.3, decision in 5.1, case F6-6). The WebSocket gateway question stays open for the EPIC-02 spec. |
