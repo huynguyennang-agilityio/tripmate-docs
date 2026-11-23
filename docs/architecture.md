@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.10\
+**Version:** 1.11\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -455,6 +455,14 @@ Singapore region, the closest region to the first users in Vietnam. It runs the
 containers of section 3: at least two API instances behind the
 platform's HTTPS load balancer, one worker, and one scheduler.
 
+Until the beta, production is smaller: one instance runs the API, the
+worker, and the scheduler together, and PostgreSQL and Redis use
+Render's free plans, with no point-in-time recovery. One or two people
+use it, and the monthly cost limit is 10 USD
+([mvp-roadmap.md](../mvp-roadmap.md), section 3). The setup of this
+section is in place before the beta
+([EPIC-11 spec](specs/epic-11/spec.md), section 2.8).
+
 Render was chosen against these needs:
 
 | Need | Why | On Render |
@@ -473,7 +481,7 @@ Render was chosen against these needs:
 | Local | Development | Docker Compose with PostgreSQL and Redis; test API keys |
 | CI | Every pull request: the tests and the end-to-end smoke set, against the local stack in Docker | Seed data |
 | Staging | Added before the beta (Phase 7): release candidates, Desktop update tests, beta | Test data only |
-| Production | Real groups | Real data |
+| Production | Until the beta: the product owner and one or two first users, on the smaller setup of 9.1. From the beta: real groups. | Real data |
 
 ### 9.3 Delivery
 
@@ -628,3 +636,4 @@ the table.
 | 1.8 | 2026-11-20 | The product owner chose Render in Singapore as the PaaS and Taskiq as the job queue library; both open questions in section 12.2 are closed. Section 9.1 shows how Render meets each hosting need; sections 3 and 10 name the services and the library. |
 | 1.9 | 2026-11-20 | Section 11: the landing order starts with a contract stub and a draft contract, so the backend and the clients' mock cards are built at the same time. |
 | 1.10 | 2026-11-20 | Until the beta there are two environments, local in Docker and production; staging is added before the beta and there are no preview environments. The hosting needs no longer list a preview per pull request; point-in-time recovery is 3 days on Render's Hobby plan and 7 on Pro. |
+| 1.11 | 2026-11-23 | Sections 9.1 and 9.2: until the beta, production is one instance for the API, the worker, and the scheduler with free database plans, to stay within the monthly cost limit of 10 USD; the full setup is in place before the beta. |

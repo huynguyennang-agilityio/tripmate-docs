@@ -2,8 +2,8 @@
 
 **Document type:** MVP Roadmap\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 1.16\
+**Status:** Approved\
+**Version:** 1.17\
 **Planning horizon:** 13 weeks (initial estimate)\
 **Page version:** [TripMate MVP Roadmap artifact](https://claude.ai/artifact/BRWph5dW3isKwQdLVt9ipd)
 
@@ -135,12 +135,16 @@ Who does which test work is in
 - The MVP is accepted when every release gate in section 8 passes and
   the beta groups complete a trip end to end.
 
+**Dates and cost limit**
+
+| What | Set to |
+|------|--------|
+| Week 1 starts | Monday 2026-11-23. Week 13 ends on Sunday 2027-02-21. |
+| Monthly limit for hosting, Claude, and Google Maps, until the beta | 10 USD. Production runs on one small instance with free database plans ([EPIC-11 spec](docs/specs/epic-11/spec.md), section 2.8), and the full AI evaluation does not run nightly ([docs/test-strategy.md](docs/test-strategy.md), section 7.4). The limit is set again before the beta, with the full production setup. |
+
 **Open questions**
 
-| Question | Proposed answer | Needed by |
-|----------|-----------------|-----------|
-| When does Week 1 start? | Set when Stage 4 closes | Phase 0 |
-| What is the monthly limit for hosting, Claude, and Google Maps costs? | Set after the PaaS is chosen | Phase 0 |
+None.
 
 ## 4. Thirteen-Week Roadmap
 
@@ -775,3 +779,4 @@ feedback.
 | 1.14 | 2026-11-20 | New Project scope in section 3, replacing a formal SOW: deliverables with where each lives and when it is accepted, responsibilities, assumptions, constraints, acceptance of a phase and of the MVP, and three open questions. The schedule is not changed. |
 | 1.15 | 2026-11-20 | Project scope: the team is the product owner and Claude Code, and the product owner owns every epic; the open question about the team is closed. The schedule is not changed. |
 | 1.16 | 2026-11-23 | Section 7: the one-sentence summary of the development workflow follows the new flow (the product owner approves each epic's plan and reviews High-risk changes). |
+| 1.17 | 2026-11-23 | Section 3: the two open questions are answered by the product owner. Week 1 starts on Monday 2026-11-23, and the monthly limit for hosting, Claude, and Google Maps is 10 USD until the beta. With no open question left, the product owner approved the roadmap and closed Stage 4. |
