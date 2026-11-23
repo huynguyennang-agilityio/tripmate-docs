@@ -123,9 +123,14 @@ Claude Code keeps no memory between machines, so the rules every
 session needs are here. Each code repository's `CLAUDE.md` points to
 this section.
 
-- This repository is changed from Mac 1 only. The other machines pull
-  it before they start a card and never edit it; a session that finds
-  a gap in a document stops and reports it.
+- Any machine may change this repository, by the steps of the Git
+  workflow below. Every machine pulls it before it starts a card.
+- A session changes a document only for its own card, or when the
+  product owner asks. A session that finds a gap or a contradiction in
+  a document stops and asks the product owner; the answer goes into
+  the document before the tests or the code.
+- The Trello cards and the Build Tracker are still created and planned
+  from Mac 1; a session moves only its own card.
 - Talk with the product owner in Vietnamese. Write every document,
   commit, pull request, and Trello card in English.
 - Put a decision to the product owner as a short list of options, each
@@ -143,15 +148,31 @@ this section.
 ## Git workflow
 
 `main` is protected: direct pushes and force pushes are blocked, and
-every change goes through a pull request.
+every change goes through a pull request. A branch must be up to date
+with `main` before it merges, and the version check must pass.
 
-1. Create a branch from `main`: `docs/<topic>-v<version>`, e.g.
-   `docs/prd-v1.6`.
+1. Pull `main`, then create a branch from it: `docs/<topic>-v<version>`,
+   e.g. `docs/prd-v1.6`. Note the version of each document you change.
 2. Commit with a message that says what changed and the new version.
 3. Push only when the product owner says so. Then push the branch and
    open a pull request into `main`.
-4. Document pull requests need no reviewer: the author merges as soon
-   as the pull request is open. Use a merge commit and delete the
-   branch.
-5. Pull `main`, tag the merge commit with the version tag, and push the
+4. The version check (`scripts/check_versions.py`, run by CI) compares
+   every changed document with its version on `main`. It fails when:
+   - the new version is not the next one after `main`'s (1.5 to 1.6,
+     or 1.9 to 2.0);
+   - the last row of the Version History table is not the new version;
+   - the version tag of the new version already exists.
+5. When another machine merged a change to the same document first,
+   the check fails. Rebase on `main`, take the next version, add your
+   own Version History row below theirs, and push again. A git conflict
+   in the text itself means two sessions changed the same rule: stop
+   and ask the product owner.
+6. Document pull requests need no reviewer: the author merges as soon
+   as the checks pass. Use a merge commit and delete the branch.
+7. Pull `main`, tag the merge commit with the version tag, and push the
    tag.
+8. Update the artifact copy after the merge. Read the artifact first;
+   when it changed since, merge both changes before publishing.
+
+Run the check before you push:
+`python3 scripts/check_versions.py --base origin/main`.

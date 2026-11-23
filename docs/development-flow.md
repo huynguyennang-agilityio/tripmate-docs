@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.8\
+**Version:** 1.9\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -26,12 +26,14 @@ product owner approves each epic's plan, answers what a spec does not
 decide, and reviews the pull requests of High-risk cards (section
 2.1).
 
-**Machines.** The work runs on three machines, one per group of
-repositories, so no two machines change the same repository.
+**Machines.** The work runs on three machines, one per group of code
+repositories, so no two machines change the same code repository.
+`tripmate-docs` is the exception: any machine may change it, guarded
+by the version check below.
 
 | Machine | Repositories | Why here |
 |---------|--------------|----------|
-| Mac 1 | `tripmate-backend`, `tripmate-contracts`, `tripmate-docs` | The backend comes first for every feature; the documents, the Trello cards, and the Build Tracker are changed from one place |
+| Mac 1 | `tripmate-backend`, `tripmate-contracts` | The backend comes first for every feature; the Trello cards and the Build Tracker are planned from one place |
 | Mac 2 | `tripmate-mobile` | An iOS build needs macOS |
 | Windows | `tripmate-web`, `tripmate-desktop` | Desktop wraps the Web build, and Windows is checked on the real system |
 
@@ -44,6 +46,13 @@ repositories, so no two machines change the same repository.
   `tripmate-docs`; each code repository's `CLAUDE.md` points to them.
 - Desktop builds for macOS and Linux come from CI; they are checked by
   hand on a Mac and on an Ubuntu virtual machine.
+- A session changes a document in `tripmate-docs` only for its own
+  card, or when the product owner asks. Two machines can still change
+  the same document at the same time, so every document pull request
+  passes a version check in CI before it merges, and its branch must
+  be up to date with `main`. The first to merge keeps the version; the
+  other rebases and takes the next one. The steps are in the
+  `CLAUDE.md` of `tripmate-docs`.
 
 **The board.** Tasks are cards on the [TripMate board](https://trello.com/b/zsxAnzsz/tripmate). Every task
 is one card. A card moves left to right, and only the condition in the
@@ -379,6 +388,7 @@ and before a release ([test-strategy.md](test-strategy.md), sections
 | Mutation testing only on changed rule files, in the backend | The whole repository on every pull request; the clients as well | The rules live in the backend ([test-strategy.md](test-strategy.md), section 1), and a full run is too slow for every pull request |
 | Four defect severities | No scale | "No open Critical or High defect" is a quality gate and needs a definition |
 | A client card is split into a mock card and an integration card | One client card after the backend is done | Web and Mobile are built while the backend is, against the same draft; the integration card catches any difference between the draft and the real API |
+| Any machine may change `tripmate-docs`, guarded by a version check in CI and branches kept up to date with `main` | Only Mac 1 changes the documents; the other machines hand their answers to Mac 1 | The answer to a question found on Mac 2 or Windows belongs in the spec before that card's tests. A hand-off to Mac 1 delays the card and can lose the answer; the check stops two changes from taking the same version. |
 
 ### 5.2 Open questions
 
@@ -398,3 +408,4 @@ None. Each repository's coding conventions live in its own
 | 1.6 | 2026-11-23 | Approved by the product owner. No content changed. |
 | 1.7 | 2026-11-23 | Section 3: the full AI evaluation runs when the assistant changes and before a release, as test-strategy.md now says, not nightly. |
 | 1.8 | 2026-11-23 | Section 1: the work runs on three machines, one per group of repositories (Mac 1: backend, contracts, documents; Mac 2: Mobile; Windows: Web and Desktop), with one session per card and a git worktree for cards of one repository that run at the same time. The Definition of Done follows the translation files split by area. |
+| 1.9 | 2026-11-23 | Section 1: any machine may change `tripmate-docs`, not only Mac 1. A session changes a document only for its own card or when the product owner asks; every document pull request passes a version check in CI and must be up to date with `main`. Mac 1 still plans the Trello cards and the Build Tracker. Decision added to 5.1. |
