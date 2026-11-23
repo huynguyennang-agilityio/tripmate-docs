@@ -3,7 +3,7 @@
 **Document type:** API Design\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.6\
+**Version:** 1.7\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -46,7 +46,7 @@ that the backend generates and publishes to `tripmate-contracts`
 | Authentication | `Authorization: Bearer <access token>` on every request except sign-up, sign-in, refresh, and the health check, `GET /v1/health` ([security.md](security.md)) |
 | Device | `X-Device-Id: <uuid>` on every request, created once per install; used for rate limits and session names only |
 | Request ID | The server returns `X-Request-Id` on every response; clients send it when reporting a problem |
-| Idempotency | `Idempotency-Key: <uuid>` required on every `POST` that creates a record; the key is made once per user action and reused on retry ([data-model.md](data-model.md), section 6.3) |
+| Idempotency | `Idempotency-Key: <uuid>` required on every `POST` that creates a record; the key is made once per user action and reused on retry ([data-model.md](data-model.md), section 6.3). Sign-in and refresh take no key: a repeated sign-in replaces the device's session, and a repeated refresh is refused ([EPIC-01 spec](specs/epic-01/spec.md), section 5.1). |
 | Concurrency | Records that Members edit carry a version ([data-model.md](data-model.md), section 3), returned in `ETag`. `PATCH`, `PUT`, and `DELETE` on such a record send `If-Match`: a missing one returns `428 request.version_required`, a stale one returns `409 conflict.stale_version` with the current record. Records with no version take no `If-Match`, because only the caller changes them or repeating the request gives the same result: the caller's own profile, session, and Vote; a membership; the Invitation; a Saved place; an Idea draft; a Gap acknowledgement or snooze. |
 | Money | `{ "amount": 3000000, "currency": "VND" }`; `amount` is an integer in the smallest unit of the Trip currency |
 | Dates and times | ISO 8601. Trip dates as `YYYY-MM-DD`, read in the trip's time zone; Day window and planned times as `HH:MM`, local time at the place; moments in UTC with `Z`. A time zone is an IANA name such as `Asia/Ho_Chi_Minh` |
@@ -73,6 +73,10 @@ written from `/v1/trips/{tripId}`.
 | `GET /v1/auth/sessions`, `DELETE /v1/auth/sessions/{id}`, `POST /v1/auth/sessions/end-others` | List and end signed-in devices; end every device except this one | AUTH-02 |
 | `GET /v1/me`, `PATCH /v1/me` | Read and edit the profile | AUTH-03, AUTH-04 |
 | `GET /v1/me/readiness-summary` | Open Gaps across the user's trips, for the Desktop tray | DESK-04 |
+
+Register and sign-in name the client kind in the body: `web`, `mobile`,
+or `desktop`. For `web` the refresh token is set as a cookie and left
+out of the body ([security.md](security.md), section 2.1).
 
 ### 3.2 Trips and membership
 
@@ -308,3 +312,4 @@ they depend on each other). Everything they must agree on lives in
 | 1.4 | 2026-11-20 | `POST /v1/auth/sessions/end-others` added for "sign out other devices", following the EPIC-01 spec. |
 | 1.5 | 2026-11-20 | Section 6: a feature starts with a contract stub in the backend, published as a draft tag for the clients' mock cards; the landing order and the CI check include the draft. |
 | 1.6 | 2026-11-20 | Section 2 names the health check path, `GET /v1/health`, following the EPIC-11 spec. |
+| 1.7 | 2026-11-23 | Follows the decisions of the EPIC-01 spec: sign-in and refresh take no `Idempotency-Key` (section 2), and register and sign-in name the client kind in the body (section 3.1). |
