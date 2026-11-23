@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.6\
+**Version:** 1.7\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -200,7 +200,7 @@ Until the beta there are two environments
 |-------------|-----------|------|---------------|
 | Local | `compose.yaml`: the API, worker, and scheduler from the backend image, PostgreSQL, Redis. Web and Mobile run against it. | Seed data ([test-strategy.md](../../test-strategy.md), section 3) | `docker compose up` |
 | CI | The same `compose.yaml`, for the end-to-end smoke set | Seed data | On every pull request |
-| Production, until the beta | On Render, from `render.yaml`: one instance that runs the API, the worker, and the scheduler together, Postgres and Key Value on their free plans, and the Web static site | The product owner and one or two first users | A tagged release, by hand |
+| Production, until the beta | On Render, from `render.yaml`: one web instance on the free plan that runs the API, the worker, and the scheduler together, Postgres and Key Value on their free plans, and the Web static site | The product owner and one or two first users | A tagged release, by hand |
 | Production, from the beta | Two API instances, one worker, one scheduler, Postgres with point-in-time recovery, Key Value, and the Web static site | Real | A tagged release, by hand |
 
 - The backend image is published to GitHub Container Registry for
@@ -213,6 +213,12 @@ Until the beta there are two environments
   for a few seconds at each deploy. The three processes still start
   from the one image with their own commands, so moving them to
   separate instances before the beta changes `render.yaml` only.
+- The free web instance sleeps when no request comes for a while, and
+  the worker and the scheduler sleep with it: the first request after
+  a pause is slow, and a job or a due reminder waits until the
+  instance wakes. This is accepted while only the product owner and
+  one or two first users use it; F11 moves to a paid plan before the
+  beta.
 - The monthly cost limit is 10 USD until the beta
   ([mvp-roadmap.md](../../../mvp-roadmap.md), section 3). F11 first
   checks that Render's free Postgres plan can hold the data that long;
@@ -341,10 +347,15 @@ The requirements are the cross-cutting rows of
 | Web framework | FastAPI on Uvicorn, Pydantic v2 |
 | Database | SQLAlchemy 2 with `asyncpg`; Alembic for migrations |
 | Background jobs | Taskiq with `taskiq-redis` ([architecture.md](../../architecture.md), section 12.1) |
-| Logs and traces | `structlog`; OpenTelemetry SDK |
+| Logs and traces | `structlog`; OpenTelemetry SDK, its OTLP exporter, and its instrumentation for FastAPI, SQLAlchemy, and Redis |
+| Error reporting | `sentry-sdk` with its FastAPI integration |
+| Tokens and passwords | PyJWT with `cryptography` for EdDSA access tokens; `argon2-cffi` for Argon2id password hashes ([security.md](../../security.md), section 2) |
 | Quality | Ruff, mypy in strict mode, import-linter |
 | Tests | pytest, Hypothesis, Schemathesis, an HTTP test client; `mutmut` for mutation testing |
 | Supply chain | pip-audit, a secret scan, Dependabot |
+
+The skeleton (F1) puts every library in this table in the lock file,
+so later cards that run at the same time do not change it.
 
 ### 4.2 Data
 
@@ -391,12 +402,12 @@ line endings, because the work runs on macOS and on Windows
 | Sentry takes errors from the backend, Web, and Mobile; Grafana Cloud takes traces, metrics, and alerts; both on free plans | Sentry alone; Google Cloud Observability with Firebase Crashlytics; a self-hosted stack | Both take OpenTelemetry and need no payment card. Sentry has SDKs for all three clients with release tags, and Grafana alerts on P95, job age, and the outbox. |
 | A fine-grained GitHub token opens the pull request in `tripmate-contracts`, stored as the backend secret `CONTRACTS_TOKEN` | A GitHub App | Five minutes to set up, limited to one repository. The product owner creates it with Contents and Pull requests set to read and write and a one-year expiry, and renews it before it expires. The publishing job runs only on pushes to `main`, never on a pull request, so a changed workflow cannot reach the token. |
 | TripMate gets its own `.com` domain through Cloudflare Registrar, bought by the product owner before the beta; production uses `app.` and `api.` under it | `onrender.com` addresses; a free or first-year-discount domain | The Web refresh cookie is `SameSite=Strict` and needs the Web client and the API on one site ([security.md](../../security.md), section 2.1). Invitation links and app links carry the domain, so it must not change once real users have them. Before the beta, production has no real users and runs on `onrender.com`; locally both are `localhost`. |
-
 | The flow checks are scripts with their own tests, shared as one reusable workflow from `tripmate-backend` | A copy in each repository; a marketplace action | One place to change a gate, and the gate is tested like any other code |
 | A test commit is marked by a trailer in its message | A separate branch or pull request for tests | One pull request per card stays the rule; the trailer is enough for CI to tell the two kinds of commit apart |
 | The requirement IDs in scope are a file in each code repository | CI reads prd.md from `tripmate-docs` | A code repository's CI needs nothing outside it, and the scope grows epic by epic |
 | A rate-limited route returns `503 server.unavailable` when Redis does not answer | Let the request through without counting | A limit that cannot be counted is not skipped: sign-in and sign-up limits are a security control |
 | Until the beta, production is one instance for the three processes, with free Postgres and Key Value plans | The full setup from the first deploy | One or two people use it before the beta, and the monthly cost limit is 10 USD. The cost: no point-in-time recovery, and a short stop at each deploy. The full setup returns before the beta. |
+| Until the beta, the one web instance is on Render's free plan | The Starter plan, about 7 USD a month, which never sleeps | Starter would leave about 3 USD a month for Claude and Google Maps. The cost: the instance sleeps when idle, so the first request is slow and jobs wait until it wakes (2.8). |
 | The skeleton makes one file per part of `platform`, finds modules by scanning, and installs every dependency at once | Each card creates what it needs | Cards that run at the same time must not change the same file. The lock file and the app's start-up file are where two cards would otherwise meet. |
 | Translations are one file per area in each language, `translations/en/<area>.json` | One `en.json` and one `vi.json` | Web, Mobile, and the backend add keys at the same time, from three machines; one file per area keeps their changes apart |
 | The Web and Mobile skeleton cards need no contract; generated messages and the flow checks move to WF2 and MF2 | WF1 and MF1 wait for CT1 | The three machines start on the first day instead of two waiting for the backend's first three cards |
@@ -826,3 +837,4 @@ Shown once on a throwaway pull request for each case.
 | 1.4 | 2026-11-23 | The product owner set the monthly cost limit to 10 USD until the beta. Section 2.8: until the beta, production is one instance that runs the API, the worker, and the scheduler, with free Postgres and Key Value plans; the full setup returns before the beta. Card F11 follows, checks the free Postgres plan first, and gains case F11-6. Decision added to 5.1. |
 | 1.5 | 2026-11-23 | The work runs on three machines, and cards run at the same time. New 6.7: which machine builds what, in which wave. The skeleton (F1) makes one file per part of `platform`, finds modules by scanning, and installs every dependency (2.1; cases F1-7, F1-8). WF1 and MF1 need no contract and start on the first day; generated messages and the flow checks move to WF2 and MF2, with their cases. Translations are one file per area in each language. CI checks for one migration head (case F2-6). Every repository has a `.gitattributes`. Three decisions added to 5.1. |
 | 1.6 | 2026-11-23 | The product owner set the Mobile project conventions (2.11): Flutter 3.38.5 pinned, `flutter_bloc`, `go_router`, a folder per feature, flavors on Android and iOS with their application IDs, and `flutter_lints` with warnings as errors. MF1 follows them and gains case MF1-4, an automated test of the flavor name. Section 6.7: no two machines change the same code repository; `tripmate-docs` may be changed from any machine. Two decisions added to 5.1. |
+| 1.7 | 2026-11-23 | Section 4.1 lists the libraries later cards need, so the skeleton puts them all in the lock file: the OpenTelemetry exporter and instrumentation, `sentry-sdk`, PyJWT with `cryptography`, and `argon2-cffi`. Until the beta, the one production web instance is on Render's free plan, which sleeps when idle (2.8, decision added to 5.1). The table of decisions in 5.1 is one table again, so the page shows all its rows. |
