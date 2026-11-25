@@ -3,7 +3,7 @@
 **Document type:** Product Workflow\
 **Product:** TripMate\
 **Status:** Proposed\
-**Version:** 2.11\
+**Version:** 2.12\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -193,8 +193,10 @@ tracked, estimated, and controlled.
   (initial version), Release Plan.
 - **Documents:** [mvp-roadmap.md](mvp-roadmap.md);
   [docs/test-strategy.md](docs/test-strategy.md);
-  [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md); tasks as cards
-  on the Trello board.
+  [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md); a task file
+  in each code repository, with every task of the epic and its test
+  cases; tasks as cards on the Trello board, created from the approved
+  task files.
 - **Ready to move on when:** every epic is ordered with its
   dependencies; every task for the next epic has scope, dependencies,
   and a test; the Definition of Done and AI release gates are written.
@@ -206,17 +208,20 @@ human oversight, independent verification, and quality gates.
 
 ```mermaid
 flowchart TD
-    P[AI plans the epic: spec, cards, risk levels, test cases] --> C{Product owner approves plan?}
-    C -->|No| D[Revise plan] --> P
-    C -->|Yes| A[Trello card / task]
+    P[AI writes the epic spec] --> C{Product owner approves the spec?}
+    C -->|No| P
+    C -->|Yes| T[AI writes a task file per repository: tasks, risk levels, test cases]
+    T --> TA{Product owner approves the tasks?}
+    TA -->|No| T
+    TA -->|Yes| A[Trello cards from the task files]
     A --> B[Test agent writes the tests first]
-    B --> E[Code agent implements] --> F[Automated tests & verification]
-    F --> G[Independent AI review]
-    G --> I{All quality gates pass?}
-    I -->|No| J[Fix issues] --> E
-    I -->|Yes| K{High-risk change?}
-    K -->|Yes| H[Product owner review] --> L[Merge]
-    K -->|No| L
+    B --> E[Code agent implements] --> F[Test-check agent: tests and code, before the pull request]
+    F --> G[Pull request: AI diff review, round 1, then fixes]
+    G --> R2[AI diff review, round 2: no fixes]
+    R2 --> I{Defect or High-risk change?}
+    I -->|Yes| H[Product owner review] --> L[Merge]
+    I -->|No| L
+    L --> N[Notes settled when the epic closes]
 ```
 
 - **Activities:**
@@ -226,9 +231,10 @@ flowchart TD
     branch.
   - *AI analysis and planning:* once per epic, the AI reads the
     requirements, the codebase, and conventions; analyses impact;
-    proposes the epic's plan: the spec, the cards, a risk level for
-    each card, and its test cases with their edge cases. The product
-    owner approves the plan before any card starts.
+    proposes the epic's spec. Once the product owner approves it, the
+    AI writes a task file for each code repository: the tasks, a risk
+    level for each, and their test cases with their edge cases. The
+    product owner approves the task files before any card starts.
   - *Implementation:* one agent writes the card's tests first, from
     its test cases; a separate agent then writes the code within the
     task's scope, following architecture, coding standards, and
@@ -236,12 +242,16 @@ flowchart TD
   - *Verification:* unit, integration, contract, end-to-end, and
     regression tests; static analysis and lint; security checks; UI and
     design QA where relevant; AI evaluation where relevant.
-  - *Review:* an independent AI review of the diff for correctness,
-    tests, security, scope, and what the change affects outside the
-    task. The product owner reviews only High-risk changes: a shared
+  - *Review:* before the pull request, an independent AI check that the
+    tests match the task and the code meets the tests. On the pull
+    request, an independent AI review of the diff for correctness,
+    security, scope, and what the change affects outside the task, in
+    two rounds: the first is fixed, the second fixes nothing and turns
+    its suggestions into notes with a proposed fix, settled when the
+    epic closes. The product owner reviews High-risk changes (a shared
     contract, the schema, access, money, a major dependency, or the
-    checks themselves. Reviewers do not change code during a
-    review-only pass.
+    checks themselves) and any change whose second round found a
+    defect. Reviewers do not change code.
   - *Git workflow:* Trello card → branch → commit → merge request; tests and
     lint run before a merge request is opened or updated.
 - **Quality gates:** acceptance criteria met; related tests pass; no
@@ -362,7 +372,7 @@ exist today, and their versions, is shown in the Build Tracker.
 | [product-vision.md](product-vision.md) | What is the product and why build it? Vision, value, positioning, goals, metrics, principles | 1 |
 | [docs/solution-options.md](docs/solution-options.md) | Which ways of solving each problem were considered, which was chosen, and why features are in or out of the MVP? | 2 |
 | [prd.md](prd.md) | What must it do? MVP scope, requirements, business rules, acceptance criteria | 2 |
-| `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, tasks with their risk levels, test cases | 2--4 |
+| `docs/specs/<epic>/spec.md` | How does this epic behave, how is it built, how is it verified? One file: behaviour, rules, acceptance criteria, technical design, the order of the cards across repositories, checkpoints | 2--4 |
 | Prototype canvases | How will people use it? | 3 |
 | [Design system](https://claude.ai/artifact/NDUCBnrHZE3Boubq3s8XjX) (artifact) | What do screens look like? Colour, type, spacing tokens, usage rules, and components, the same for every client | 3 |
 | [docs/information-architecture.md](docs/information-architecture.md) | Where do things live and how do people move between them? Places, Navigation Map, user journey, high-level flows, the same for every platform | 3 |
@@ -375,7 +385,9 @@ exist today, and their versions, is shown in the Build Tracker.
 | [mvp-roadmap.md](mvp-roadmap.md) | In what order and by when? Phases, milestones, risks, release gates | 4 |
 | [docs/test-strategy.md](docs/test-strategy.md) | How is TripMate tested? Test levels, requirements-to-test mapping, AI evaluation plan | 4 |
 | [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) | Which cases is the assistant evaluated on, and what is expected in each? | 4 |
-| [docs/development-flow.md](docs/development-flow.md) | How does a task go from Trello card to merged? Definition of Done | 5 |
+| `tasks/<epic>.md`, in each code repository | Which tasks build this epic in this repository? Each task with its risk level, scope, and test cases, as its Trello card will say | 4 |
+| `tasks/<epic>-notes/<card>.md`, in each code repository | Which suggestions did the second review round leave, how would each be solved, and what was decided when the epic closed? | 5 |
+| [docs/development-flow.md](docs/development-flow.md) | How does a task go from an approved spec to merged? Task files, Definition of Done | 5 |
 | `docs/release-plan.md` | How do we harden, ship, roll back, and measure? | 6 |
 
 **Rules**
@@ -407,15 +419,16 @@ exist today, and their versions, is shown in the Build Tracker.
   [docs/architecture.md](docs/architecture.md), section 11.
 - Each code repository has a `CLAUDE.md` that points to the glossary,
   the PRD, and the current epic spec under `../tripmate-docs/`.
-- Tasks are cards on the Trello board. The documents stay in this
-  repository; a card only links to them.
+- Tasks are written in each code repository's task file, then copied
+  to cards on the Trello board. The documents stay in this repository;
+  a task links to them.
 - The requirement ID ties a card to its code, as the table below
   shows.
 
 | Where | Carries the requirement ID | Example |
 |-------|----------------------------|---------|
 | Trello card title | At the start | `INV-01 Create an Invitation` |
-| Trello card description | A link to the spec section | `docs/specs/epic-02/spec.md`, INV-01 |
+| Trello card description | Its task, copied from the task file, and a link to it | `tasks/EPIC-02.md`, INV-01 |
 | Branch name | After the type | `feat/INV-01-create-invitation` |
 | Test name | In the name | `test_INV_01_invitation_expires_after_7_days` |
 | Pull request | Attached to the card by Trello's GitHub Power-Up | -- |
@@ -428,13 +441,14 @@ exist today, and their versions, is shown in the Build Tracker.
 
 **Verify what it builds**
 
-- Automated tests and an independent AI review run before any human
-  review.
+- Automated tests, an independent AI test check, and two rounds of
+  independent AI review run before any human review.
 - AI features (idea capture, Itinerary drafts, Gap revisions) get
   evaluation sets with expected outcomes, run on every change.
 - The product owner approves every epic plan and every stage gate,
-  and reviews every High-risk change before it merges. Every other
-  change merges when its checks and its independent AI review pass.
+  and every task file, and reviews every High-risk change, and every
+  change whose second review round found a defect, before it merges.
+  Every other change merges when its checks and its AI review pass.
 
 ## 8. Version History
 
@@ -454,3 +468,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.9 | 2026-11-20 | docs/test-strategy.md and docs/ai-golden-dataset.md now exist and are linked from the Stage 4 documents and the document map. The golden dataset has its own document, so the test strategy holds only what changes rarely. |
 | 2.10 | 2026-11-20 | docs/development-flow.md now exists and is linked from the Stage 5 documents and the document map: the Trello board and Definition of Ready, the steps from card to merge, the Definition of Done, and defect severities. |
 | 2.11 | 2026-11-23 | Stage 5 follows docs/development-flow.md: the product owner approves each epic's plan (spec, cards, risk levels, test cases) and reviews only High-risk changes; a test agent writes the tests before a separate code agent writes the code; every other change merges when its checks and its independent AI review pass. Section 7 says the same. |
+| 2.12 | 2026-11-25 | Stage 4 and 5 follow docs/development-flow.md: after the spec is approved, a task file in each code repository lists the epic's tasks with their risk levels and test cases, the product owner approves it, and the Trello cards are created from it. An AI test check runs before the pull request; the AI diff review runs on the pull request in two rounds, and the second round's suggestions become notes settled when the epic closes. The document map adds the task files and the notes files; the epic spec keeps what spans repositories. |

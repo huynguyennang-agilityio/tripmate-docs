@@ -30,7 +30,7 @@ separate repositories.
 | Know how TripMate is tested and how the assistant is evaluated | [docs/test-strategy.md](docs/test-strategy.md) |
 | See the cases the assistant is evaluated on | [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) |
 | Know how an epic behaves, how it is built, and which cards build it | [docs/specs/](docs/specs/), one `spec.md` per epic |
-| Take a task from Trello card to merged, and know when it is Done | [docs/development-flow.md](docs/development-flow.md) |
+| Write the task files of an epic, take a task to merged, and know when it is Done | [docs/development-flow.md](docs/development-flow.md) |
 | Change a document | [CLAUDE.md](CLAUDE.md) |
 
 New to the project? Read the vision, then sections 2 to 4 of the PRD,

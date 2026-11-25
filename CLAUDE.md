@@ -24,7 +24,7 @@ by AI agents such as Claude Code.
 | [docs/security.md](docs/security.md) | How accounts, trips, and money records are kept safe: authentication, capabilities, data protection, threats. |
 | [docs/test-strategy.md](docs/test-strategy.md) | How TripMate is tested: test levels, the requirements-to-test matrix, the AI evaluation plan. |
 | [docs/ai-golden-dataset.md](docs/ai-golden-dataset.md) | The cases the AI assistant is evaluated on, and what is expected in each. |
-| [docs/development-flow.md](docs/development-flow.md) | How a task goes from Trello card to merged: the board, the steps, the Definition of Done, defects. |
+| [docs/development-flow.md](docs/development-flow.md) | How a task goes from an approved spec to merged: the task files, the board, the steps, the four agents, the Definition of Done, defects. |
 | [docs/specs/epic-01/spec.md](docs/specs/epic-01/spec.md) | EPIC-01: how accounts behave, how they are built, and which cards build them. |
 | [docs/specs/epic-11/spec.md](docs/specs/epic-11/spec.md) | EPIC-11, first part: what the platform gives every epic, how it is built, and which cards build it. |
 | [docs/adr](docs/adr/) | Architecture and product decision records. |
