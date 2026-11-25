@@ -2,8 +2,8 @@
 
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 2.0\
+**Status:** Approved\
+**Version:** 2.1\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -520,3 +520,4 @@ None. Each repository's coding conventions live in its own
 | 1.8 | 2026-11-23 | Section 1: the work runs on three machines, one per group of repositories (Mac 1: backend, contracts, documents; Mac 2: Mobile; Windows: Web and Desktop), with one session per card and a git worktree for cards of one repository that run at the same time. The Definition of Done follows the translation files split by area. |
 | 1.9 | 2026-11-23 | Section 1: any machine may change `tripmate-docs`, not only Mac 1. A session changes a document only for its own card or when the product owner asks; every document pull request passes a version check in CI and must be up to date with `main`. Mac 1 still plans the Trello cards and the Build Tracker. Decision added to 5.1. |
 | 2.0 | 2026-11-25 | The product owner changed how tasks are planned and reviewed. After the spec is approved, Claude Code writes a task file in each code repository (`tasks/<epic>.md`) with every task, its risk level, and its test cases; the product owner approves it, and the cards are created from it. The spec keeps what spans repositories. A test-check agent checks the tests against the task and the code against the tests before the pull request. A diff-review agent reviews the pull request in two rounds: the code agent fixes round 1; round 2 fixes nothing, asks the product owner only for a defect, and writes every other finding to the card's notes file with its proposed fix and its level (project, repository, or epic), settled when the epic closes. Section 2.4 says which records belong to which of the three levels. No card only checks another card. Status back to Proposed. |
+| 2.1 | 2026-11-25 | Approved by the product owner. No content changed. |

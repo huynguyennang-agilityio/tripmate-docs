@@ -2,8 +2,8 @@
 
 **Document type:** Product Workflow\
 **Product:** TripMate\
-**Status:** Proposed\
-**Version:** 2.12\
+**Status:** Approved\
+**Version:** 2.13\
 **Visual version:** [TripMate Product Workflow artifact](https://claude.ai/artifact/8yk7w1MUE79bXX58HL1QhA)\
 **Live status:** [TripMate Build Tracker](https://claude.ai/artifact/2ZRasgxPpxxeR2WH3SjmxU)
 
@@ -469,3 +469,4 @@ exist today, and their versions, is shown in the Build Tracker.
 | 2.10 | 2026-11-20 | docs/development-flow.md now exists and is linked from the Stage 5 documents and the document map: the Trello board and Definition of Ready, the steps from card to merge, the Definition of Done, and defect severities. |
 | 2.11 | 2026-11-23 | Stage 5 follows docs/development-flow.md: the product owner approves each epic's plan (spec, cards, risk levels, test cases) and reviews only High-risk changes; a test agent writes the tests before a separate code agent writes the code; every other change merges when its checks and its independent AI review pass. Section 7 says the same. |
 | 2.12 | 2026-11-25 | Stage 4 and 5 follow docs/development-flow.md: after the spec is approved, a task file in each code repository lists the epic's tasks with their risk levels and test cases, the product owner approves it, and the Trello cards are created from it. An AI test check runs before the pull request; the AI diff review runs on the pull request in two rounds, and the second round's suggestions become notes settled when the epic closes. The document map adds the task files and the notes files; the epic spec keeps what spans repositories. |
+| 2.13 | 2026-11-25 | Approved by the product owner. No content changed. |
