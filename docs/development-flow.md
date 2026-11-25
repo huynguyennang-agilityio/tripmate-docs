@@ -2,8 +2,8 @@
 
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
-**Status:** Approved\
-**Version:** 1.9\
+**Status:** Proposed\
+**Version:** 2.0\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -13,18 +13,19 @@ gates are set in [product-workflow.md](../product-workflow.md), Stage
 is owned by [test-strategy.md](test-strategy.md), and the rules a task
 implements are in [prd.md](../prd.md) and its epic spec.
 
-This document answers *how a task goes from a Trello card to merged,
-and when it is Done*: the board, the risk levels, the steps and who
-takes each, what each step writes, the Definition of Done, and how
-defects are handled.
+This document answers *how a task goes from an approved spec to
+merged, and when it is Done*: the task files and the board, the risk
+levels, the steps and who takes each, what each step writes, the
+Definition of Done, and how defects are handled.
 
 ## 1. The Trello Board
 
 **Who.** The team is the product owner and Claude Code. Claude Code
-plans each epic, writes the tests and the code, and reviews them. The
-product owner approves each epic's plan, answers what a spec does not
-decide, and reviews the pull requests of High-risk cards (section
-2.1).
+plans each epic, writes its task files, the tests, and the code, and
+reviews them. The product owner approves each epic's spec and its task
+files, answers what a spec does not decide, and reviews a pull request
+when its card is High-risk (section 2.1) or when the second review
+round finds a defect (section 2.3).
 
 **Machines.** The work runs on three machines, one per group of code
 repositories, so no two machines change the same code repository.
@@ -44,6 +45,11 @@ by the version check below.
   that run at the same time each use their own git worktree.
 - The rules every session follows are in the `CLAUDE.md` of
   `tripmate-docs`; each code repository's `CLAUDE.md` points to them.
+- The task files of an epic (below) are added to every code
+  repository from Mac 1, by one planning pull request per repository
+  that changes only `tasks/`. No card changes its task file; a
+  correction to an approved task goes through the same kind of
+  planning pull request and the product owner's approval.
 - Desktop builds for macOS and Linux come from CI; they are checked by
   hand on a Mac and on an Ubuntu virtual machine.
 - A session changes a document in `tripmate-docs` only for its own
@@ -61,7 +67,7 @@ table moves it.
 | Column | A card moves here when |
 |--------|------------------------|
 | Discussion | It is a question or an idea that is not a task yet. It leaves this column as a task in Backlog, as a change to a document, or archived. |
-| Backlog | It is written: a requirement ID and a title |
+| Backlog | Its task is in an approved task file. The card is created from that task. |
 | ToDo | It meets the Definition of Ready below |
 | In-Progress | Its test agent starts (section 2.2) |
 | Review | Its pull request is open |
@@ -71,14 +77,15 @@ table moves it.
 
 - The requirement ID at the start of its title, for example
   `INV-01 Create an Invitation`.
-- A link to the spec section that describes the behaviour.
+- A link to its task in the task file, and to the spec section that
+  describes the behaviour.
 - Its scope in one or two sentences, and what is out of scope.
 - Its dependencies: the cards or epics that must be Done first, all
   Done or named (the epic order is in
   [mvp-roadmap.md](../mvp-roadmap.md), section 6.1).
-- Its test cases in the epic spec: the main cases and the edge cases,
-  each with its expected result, matching the rows of the matrix in
-  [test-strategy.md](test-strategy.md), section 5.
+- Its test cases in its task file: the main cases, the error cases,
+  and the edge cases, each with its expected result, matching the rows
+  of the matrix in [test-strategy.md](test-strategy.md), section 5.
 - Its risk level, which says whether the product owner reviews its
   pull request (section 2.1).
 - A link to the design, if it changes a screen.
@@ -88,6 +95,34 @@ table moves it.
 
 A card for the next epic that is not in ToDo is the signal that Stage 4
 work is not finished for that epic.
+
+**Task files.** After the product owner approves an epic's spec,
+Claude Code writes one task file for each code repository the epic
+changes, for example `tripmate-backend/tasks/EPIC-11.md` and
+`tripmate-mobile/tasks/EPIC-11.md`. The product owner reads it in its
+planning pull request to check the business rules and the edge cases
+before any card exists. Each task in the file holds everything its
+Trello card will say:
+
+| Part | Content |
+|------|---------|
+| Title | The ID and the card title, for example `F1 Backend skeleton and health check` |
+| Facts | Epic, repository, machine, size, risk level with its reason, depends on, requirement IDs, spec sections |
+| Scope | What the task does, and what it leaves out |
+| Done when | The conditions that close it |
+| Test cases | One row per case: ID, kind (main, error, edge), given, expected result, level of [test-strategy.md](test-strategy.md), section 2 |
+| Manual checks | The cases of level M, and the checkpoint items the task closes, as a checklist |
+
+- The file starts with a header (epic, spec link, status, version) and
+  a list of its tasks in order, and ends with a Version History, as
+  every document does.
+- The spec keeps what spans repositories: the behaviour, the
+  acceptance criteria, the design, the order of the cards across
+  repositories, and the checkpoints. The cards themselves and their
+  test cases live only in the task files.
+- When the planning pull request merges, the file is Approved and
+  its cards are created on the board, each with its task copied into
+  the description and a link to the task.
 
 **Cards for a feature with an API and screens.** The backend and the
 clients are built at the same time, against a draft contract
@@ -122,33 +157,42 @@ flowchart LR
 
 ## 2. From Card to Merge
 
-The product owner approves the plan of an epic once: its spec, with
-every card, its risk level, and its test cases. After that Claude Code
-writes the tests, writes the code, and reviews each card. A card merges
-on its own when every check passes, unless its risk level is High.
+The product owner approves two things before any card starts: the
+epic's spec, then its task files, with every task, its risk level, and
+its test cases. After that Claude Code writes the tests, writes the
+code, checks the tests, and reviews the diff in two rounds on the pull
+request. A card merges on its own when every check passes and the
+second round finds no defect, unless its risk level is High.
 
 ```mermaid
 flowchart TD
-    P["Epic plan: spec, cards,<br/>risk levels, test cases"] --> A{"Product owner<br/>approves the plan?"}
-    A -->|No| P
-    A -->|Yes| T["Test agent: tests from the<br/>card's cases, shown failing"]
+    S["Epic spec"] --> A{"Product owner<br/>approves the spec?"}
+    A -->|No| S
+    A -->|Yes| TF["Task file in each<br/>code repository"]
+    TF --> B{"Product owner<br/>approves the tasks?"}
+    B -->|No| TF
+    B -->|Yes| TR["Cards created<br/>on the board"]
+    TR --> T["Test agent: tests from the<br/>task's cases, shown failing"]
     T --> C["Code agent: code<br/>until the tests pass"]
-    C --> G["Local checks: lint, types, tests,<br/>mutation where it applies"]
-    G --> R["Review agent: the diff<br/>against the card and the spec"]
-    R --> F{"Critical or High<br/>finding?"}
-    F -->|Yes| C
-    F -->|No| PR["Pull request and CI"]
-    PR --> K{"Risk level High?"}
-    K -->|No| M["Merges on its own;<br/>card to Done"]
-    K -->|Yes| H{"Product owner<br/>approves?"}
-    H -->|Yes| M
-    H -->|No| C
+    C --> TC["Test-check agent, local:<br/>code against tests,<br/>tests against the task"]
+    TC -->|Problem| C
+    TC -->|Clean| PR["Pull request and CI"]
+    PR --> R1["Diff review, round 1:<br/>findings on the pull request"]
+    R1 --> FX["Code agent fixes<br/>and pushes"]
+    FX --> R2["Diff review, round 2:<br/>no fixes"]
+    R2 --> D{"Defect found?"}
+    D -->|Yes| PO["Product owner<br/>reviews"]
+    D -->|No| K{"Risk level High?"}
+    K -->|Yes| PO
+    K -->|No| M["Merges on its own;<br/>notes kept for the epic"]
+    PO --> M
 ```
 
 ### 2.1 Risk levels
 
 Every card has one risk level. It decides whether the product owner
-reviews the pull request.
+reviews the pull request; a defect found in the second review round
+brings the product owner in at any level.
 
 | Level | A card is at this level when it changes | Before the merge |
 |-------|------------------------------------------|------------------|
@@ -170,68 +214,93 @@ A card is High when it changes any of these:
 
 Rules:
 
-- The epic spec gives each card its level, and the product owner sees
-  it when approving the plan.
+- The task file gives each task its level and the reason, and the
+  product owner sees it when approving the tasks.
 - CI works the level out again from the files the pull request
   changes. The higher of the two applies, so a card planned as Low
   that touches a migration becomes High.
 - When the level is not clear, it is High.
 - For a High card the product owner reads the impact part of the
-  review report first, then the diff, and approves by adding the label
-  `human-approved` to the pull request. Claude Code never adds this
-  label.
+  first review round first, then the diff, and approves by adding the
+  label `human-approved` to the pull request. Claude Code never adds
+  this label.
 
 ### 2.2 The steps
 
 | Step | Who | Reads | Produces |
 |------|-----|-------|----------|
-| 1. Plan the epic | Claude Code, in a planning session | prd.md, the architecture documents, the code | The epic spec: behaviour, acceptance criteria, technical design, decisions, and the cards with their risk levels and test cases. An ADR for a decision that is hard to reverse. |
-| 2. Approve the plan | The product owner | The epic spec | The spec is Approved. The cards are created on the board; those that are ready move to ToDo. |
-| 3. Write the tests | The test agent | The card, the spec, the pinned contract | A test commit with one test for each case of the card, a run that shows each new test failing, and the case-to-test table. The card moves to In-Progress. |
-| 4. Write the code | The code agent | The card, the spec, the test files | Code on the same branch until every test passes, with any further unit tests it needs, and a note of each decision it made |
-| 5. Local checks | The code agent | -- | The results of the repository's lint, type, and test commands, and of mutation testing where it applies |
-| 6. Review | The review agent | The diff, the card, the spec | The review report (section 2.3) |
-| 7. Open the pull request | The code agent | -- | A pull request with the description of section 2.5. The card moves to Review, and CI runs. |
-| 8. Merge | GitHub, when every required check passes; for a High card, after the product owner's approval | -- | A merge commit. The card moves to Done. |
+| 1. Plan the epic | Claude Code, in a planning session | prd.md, the architecture documents, the code | The epic spec: behaviour, acceptance criteria, technical design, decisions, the order of the cards across repositories, and the checkpoints. An ADR for a decision that is hard to reverse. |
+| 2. Approve the spec | The product owner | The epic spec | The spec is Approved |
+| 3. Write the task files | Claude Code, in the planning session | The approved spec | One task file per code repository (section 1), each in its own planning pull request |
+| 4. Approve the tasks | The product owner | The planning pull requests | The planning pull requests merge. The cards are created on the board from the files; those that are ready move to ToDo. |
+| 5. Write the tests | The test agent | The task, the spec, the pinned contract | A test commit with one test for each case of the task, a run that shows each new test failing, and the case-to-test table. The card moves to In-Progress. |
+| 6. Write the code | The code agent | The task, the spec, the test files | Code on the same branch until every test passes, with any further unit tests it needs, a note of each decision it made, and the results of the repository's lint, type, and test commands |
+| 7. Check the tests | The test-check agent, on the developer machine | The task, the test files, the code, the test results | The test-check report (section 2.3). A problem goes back to the agent that owns it before the pull request opens. |
+| 8. Open the pull request | The code agent | -- | A pull request with the description of section 2.5. The card moves to Review, and CI runs. |
+| 9. Review, round 1 | The diff-review agent | The pull request's diff, the task, the spec | Its findings, posted on the pull request |
+| 10. Fix | The code agent | The round 1 findings | Fixes pushed to the same branch, and a reply to each finding |
+| 11. Review, round 2 | A new diff-review agent | The diff since round 1, the replies | Its findings, posted on the pull request; nothing is fixed. A defect asks the product owner to review; every other finding becomes a note (section 2.4). |
+| 12. Merge | GitHub, when every required check passes; for a High card, or when round 2 found a defect, after the product owner's approval | -- | A merge commit. The card moves to Done. |
+| 13. Close the epic | The product owner and Claude Code | The epic's notes | A decision on each note: a new card, a later epic, or dropped |
 
-### 2.3 The three agents
+### 2.3 The four agents
 
-One lead session takes a card and starts three agents, each in a new
+One lead session takes a card and starts the agents, each in a new
 session with no memory of the others. Only files pass between them:
-the test files, the code, and the reports.
+the test files, the code, the reports, and the comments on the pull
+request.
 
 | Agent | Starts with | May change | Never |
 |-------|-------------|------------|-------|
-| Test agent | The card, its spec sections, the pinned contract | Test files | Reads the code written for the card; makes up an expected result the spec does not give |
-| Code agent | The card, its spec sections, the test files | Code, and tests of its own | Changes, skips, or deletes a test of the test agent; reads the test agent's conversation |
-| Review agent | The diff, the card, its spec sections, the test results | Nothing | Changes code or tests; reads the conversation of either agent |
+| Test agent | The task, its spec sections, the pinned contract | Test files | Reads the code written for the card; makes up an expected result the task does not give |
+| Code agent | The task, its spec sections, the test files, and later the review findings | Code, and tests of its own | Changes, skips, or deletes a test of the test agent; reads the conversation of another agent |
+| Test-check agent | The task, the test files, the code, the test results | Nothing | Changes code or tests; reads the conversation of another agent |
+| Diff-review agent | The pull request's diff, the task, its spec sections | Nothing; it only posts on the pull request | Changes code or tests; reads the conversation of another agent |
 
-- Each code repository defines the three roles in `.claude/agents/`,
+- Each code repository defines the four roles in `.claude/agents/`,
   written by its skeleton card, so every card runs with the same
   instructions.
 - A test commit carries the trailer `Agent: test` in its message.
 - When the code agent finds a test it believes is wrong, it stops and
   names the case and the reason. A new test agent session checks the
-  case against the spec and corrects the test, or keeps it.
-- When the spec does not decide something, the agent stops and asks.
-  The answer goes into the spec before the tests or the code.
+  case against the task and corrects the test, or keeps it.
+- When the spec or the task does not decide something, the agent stops
+  and asks. The answer goes into the spec or the task file before the
+  tests or the code.
 
-**The review report** has three parts:
+**The test check** runs before the pull request opens and is about the
+tests only. Its report goes in the pull request description.
 
-| Part | Content |
-|------|---------|
-| Test cases | For each case of the card: covered, missing, or tested with a wrong expected result |
-| Findings | Each with a severity of section 4, the file and line, and what goes wrong. No remark about style that lint decides, and nothing CI already checks. |
-| Impact | What the diff changes outside the card: the contract, tables, callers in other modules, clients, settings; and the risk level the review agent sees |
+| Part | Checks |
+|------|--------|
+| Cases | Each case of the task has a test, and the test asserts the task's expected result, not a weaker one |
+| Lock | The test agent's tests are unchanged since its commit, and each failed before the code |
+| Code against tests | The code passes because it does what the case says, not because it detects the test or returns a fixed value |
+| Matrix | Each test carries its requirement ID, and the rows of [test-strategy.md](test-strategy.md), section 5, for the task's requirements have a test |
+| Results | The commands run and what they returned |
 
-| Finding | What happens |
-|---------|--------------|
-| Critical or High | The pull request is not opened. The code agent fixes it, the checks run again, and the review agent reads the new diff only. |
-| Medium | Fixed in the same pull request, or it gets its own card |
-| Low | Left to the code agent |
+A problem in the tests goes to a new test agent session; a problem in
+the code goes to the code agent. The pull request opens only when the
+report is clean.
 
-After two rounds with a Critical or High finding still open, the card
-goes to the product owner.
+**The diff review** runs after the pull request opens, on the
+developer machine, in two rounds. Each finding is posted on the pull
+request at its file and line, and a summary comment gives the impact:
+what the diff changes outside the card (the contract, tables, callers
+in other modules, clients, settings) and the risk level the agent
+sees. Every finding says what goes wrong and how to fix it. No remark
+about style that lint decides, and nothing CI already checks.
+
+| Round | Who | What happens to the findings |
+|-------|-----|------------------------------|
+| 1 | A diff-review agent | The code agent fixes each finding and replies to it, or replies with the reason it does not apply. Then it pushes. |
+| 2 | A new diff-review agent, on the diff since round 1 and the replies | Nothing is fixed. A defect asks the product owner to review the pull request. Every other finding is written to the card's notes file (section 2.4), with its proposed fix. |
+
+A **defect** in round 2 is a Critical, High, or Medium problem of
+section 4, a test case the code does not meet, a security problem, a
+break of the spec or the contract, or a change outside the card's
+scope. When the product owner asks for a fix, the code agent pushes
+it and round 2 runs again on the new commits.
 
 **Checks that hold these rules.** They run in CI on every pull request
 and are built in the [EPIC-11 spec](specs/epic-11/spec.md).
@@ -248,15 +317,28 @@ and are built in the [EPIC-11 spec](specs/epic-11/spec.md).
 
 | Record | Written at | Where |
 |--------|------------|-------|
-| Behaviour, acceptance criteria, technical design, cards, risk levels, test cases | Step 1 | `docs/specs/<epic>/spec.md` |
+| Behaviour, acceptance criteria, technical design, the order of the cards across repositories, checkpoints | Step 1 | `docs/specs/<epic>/spec.md` |
 | A design decision of the epic | Step 1 | The decisions table of the epic spec |
 | A decision that is hard to reverse | Step 1, or any step that finds one: the agent stops and asks | An ADR in [docs/adr](adr/) |
-| The task | Step 2 | A card on the Trello board, linking to its spec section |
-| The tests and the case-to-test table | Step 3 | The test commit; the table goes in the pull request |
-| A technical decision inside one card | Step 4 | "Decisions" in the pull request. It moves to the epic spec when it binds another card. |
-| The review report | Step 6 | The pull request |
+| The tasks, with their risk levels and test cases | Step 3 | `tasks/<epic>.md` in each code repository, for example `tasks/EPIC-11.md` |
+| The card | Step 4 | A card on the Trello board, created from its task |
+| The tests and the case-to-test table | Step 5 | The test commit; the table goes in the pull request |
+| A technical decision inside one card | Step 6 | "Decisions" in the pull request. It moves to the epic spec when it binds another card. |
+| The test-check report | Step 7 | The pull request description |
+| The review findings and the replies | Steps 9 to 11 | Comments on the pull request |
+| The notes of round 2 | Step 11 | `tasks/<epic>-notes/<card>.md` in the card's repository, for example `tasks/EPIC-11-notes/F1.md`, committed in the card's pull request. One file per card, so cards that run at the same time do not touch the same file. |
+| The decision on each note | Step 13 | The notes file, and a new card when one is made |
 | Which test proves which requirement | Every CI run | The requirement-to-test report, generated from test names |
-| A changed rule, endpoint, or table | Step 4, in the same card | The document that owns it, with a new version (section 3) |
+| A changed rule, endpoint, or table | Step 6, in the same card | The document that owns it, with a new version (section 3) |
+
+**A notes file** has one row per note:
+
+| Column | Content |
+|--------|---------|
+| Note | What the round 2 agent saw, at its file and line |
+| Proposed fix | How to solve it, concrete enough to become a card |
+| Priority | High, Medium, or Low, by what it costs to leave it |
+| Decision | Empty until the epic closes; then a card ID, a later epic, or "dropped" with the reason |
 
 ### 2.5 Naming
 
@@ -265,11 +347,15 @@ and are built in the [EPIC-11 spec](specs/epic-11/spec.md).
 | Branch | `<type>/<ID>-<short-name>`; type is `feat`, `fix`, `refactor`, `test`, or `chore` | `feat/INV-01-create-invitation` |
 | Commit message | Starts with the requirement ID | `INV-01 Expire an Invitation after 7 days` |
 | Pull request title | Starts with the requirement ID | `INV-01 Create an Invitation` |
-| Pull request description | The card link, the risk level, what changed and what is left out, the case-to-test table with its failing and passing runs, decisions, and the review report | -- |
+| Pull request description | The card and task links, the risk level, what changed and what is left out, the case-to-test table with its failing and passing runs, decisions, and the test-check report | -- |
 
 ### 2.6 Rules
 
 - One card has one pull request per repository.
+- No card only checks another card. Each card checks its own work by
+  the steps above. A case of level M, and a checkpoint item of the
+  epic spec, is a line in the Manual checks of the task that closes
+  it; its result goes in that card's pull request.
 - A pull request that fails a check is fixed on the same branch; the
   checks it affects run again.
 - At each checkpoint of the epic spec the product owner may read any
@@ -292,17 +378,22 @@ reason.
   requirement ID in its name, for example
   `test_INV_01_invitation_expires_after_7_days`, and the matrix row in
   [test-strategy.md](test-strategy.md), section 5, names it.
-- [ ] Each test case of the card in the epic spec has a test, written
-  before the code and shown failing. No later commit changed, skipped,
-  or deleted it.
+- [ ] Each test case of the card's task has a test, written before the
+  code and shown failing. No later commit changed, skipped, or deleted
+  it.
+- [ ] The test check was clean before the pull request opened, and its
+  report is in the pull request.
 - [ ] Everything that runs on every pull request passed: CI (lint,
   types, unit, property, integration, API and authorization, contract,
   screens, translations) and the end-to-end smoke set
   ([test-strategy.md](test-strategy.md), section 4).
-- [ ] The review agent ran before the pull request was opened. No
-  Critical or High finding is open, and every other finding is fixed,
-  answered, or has a card.
-- [ ] For a High card, the product owner approved the pull request.
+- [ ] Both diff review rounds ran on the pull request. Every round 1
+  finding is fixed or answered, and every round 2 note is in the
+  card's notes file with its proposed fix.
+- [ ] For a High card, or when round 2 found a defect, the product
+  owner approved the pull request.
+- [ ] Every manual check of the task is ticked, with its result in the
+  pull request.
 - [ ] No Critical or High defect (section 4) is open in the area the
   card changes.
 - [ ] The pull request is merged and attached to the card.
@@ -379,10 +470,14 @@ and before a release ([test-strategy.md](test-strategy.md), sections
 |----------|------------------------|-----|
 | The Definition of Done lives here, with the flow it closes | In test-strategy.md or in mvp-roadmap.md | The document map gives this document "how a task goes from card to merged"; the test strategy says which tests exist, not when a card is finished |
 | A Definition of Ready on the board | Cards start as soon as someone takes them | The Stage 4 gate asks that every task of the next epic has scope, dependencies, and a test before building starts |
-| The review agent runs in a separate session | The authoring session reviews its own change | A reviewer that saw the reasoning tends to accept it |
-| The product owner reviews only High cards | A person reviews every pull request | The checks and the review agent are there to find defects. A person's review is kept for the changes whose effects reach beyond the card: the contract, the schema, access, money, and the gates themselves. |
+| Every agent runs in a separate session | The authoring session reviews its own change | A reviewer that saw the reasoning tends to accept it |
+| The product owner reviews High cards, and a pull request whose second review round found a defect | A person reviews every pull request | The checks and the agents are there to find defects. A person's review is kept for the changes whose effects reach beyond the card (the contract, the schema, access, money, and the gates themselves) and for a defect the agents could not settle. |
+| The tasks of an epic are written to a task file in each code repository, and the product owner approves them before any card exists | Cards written on the board straight from the spec; one task file for the whole epic in `tripmate-docs` | The product owner reads every task with its edge cases in one place, in git, and a correction is a reviewed change. Each machine finds its tasks in its own repository. The spec no longer repeats the cards. |
+| The test check runs locally before the pull request; the diff review runs on the pull request, in two rounds | One review agent before the pull request | A wrong or weak test is fixed before anyone waits on the pull request. The diff review is on the pull request, where the product owner can read it. Round 2 fixes nothing, so the loop always ends. |
+| Round 2 findings that are not defects become notes with a proposed fix, settled when the epic closes | Every finding is fixed at once | Suggestions do not hold up a card, and seen together at the end of an epic they show which ones are worth a card |
+| No card only checks another card | A check card after each group of cards | Each card checks its own work; the manual checks and the checkpoint items are lines in the task that closes them |
 | A separate agent writes the tests first, from the card's test cases | The author writes the tests with the code | A test written next to the code tends to repeat the code's mistake. The expected results come from the spec the product owner approved, and a test that fails first is known to check something. |
-| The review agent runs before the pull request, on the developer machine | An AI review as a CI job | No model key in CI, and a finding is fixed before anyone waits on the pull request. The cost: GitHub cannot prove the review ran; the report in the pull request is the evidence. |
+| The agents run on the developer machine, not in CI | An AI review as a CI job | No model key in CI. The cost: GitHub cannot prove the agents ran; the test-check report and the review comments on the pull request are the evidence. |
 | CI works out the risk level from the changed files | The author states the level | An author judges its own change too kindly. The plan's level is a forecast; the files decide. |
 | The product owner approves a High card with a label | A second GitHub account for Claude Code and a required approving review | Both act through one GitHub account, which cannot approve its own pull request. The label is a rule, not a technical barrier; a bot account can replace it later. |
 | Mutation testing only on changed rule files, in the backend | The whole repository on every pull request; the clients as well | The rules live in the backend ([test-strategy.md](test-strategy.md), section 1), and a full run is too slow for every pull request |
@@ -409,3 +504,4 @@ None. Each repository's coding conventions live in its own
 | 1.7 | 2026-11-23 | Section 3: the full AI evaluation runs when the assistant changes and before a release, as test-strategy.md now says, not nightly. |
 | 1.8 | 2026-11-23 | Section 1: the work runs on three machines, one per group of repositories (Mac 1: backend, contracts, documents; Mac 2: Mobile; Windows: Web and Desktop), with one session per card and a git worktree for cards of one repository that run at the same time. The Definition of Done follows the translation files split by area. |
 | 1.9 | 2026-11-23 | Section 1: any machine may change `tripmate-docs`, not only Mac 1. A session changes a document only for its own card or when the product owner asks; every document pull request passes a version check in CI and must be up to date with `main`. Mac 1 still plans the Trello cards and the Build Tracker. Decision added to 5.1. |
+| 2.0 | 2026-11-25 | The product owner changed how tasks are planned and reviewed. After the spec is approved, Claude Code writes a task file in each code repository (`tasks/<epic>.md`) with every task, its risk level, and its test cases; the product owner approves it, and the cards are created from it. The spec keeps what spans repositories. A test-check agent checks the tests against the task and the code against the tests before the pull request. A diff-review agent reviews the pull request in two rounds: the code agent fixes round 1; round 2 fixes nothing, asks the product owner only for a defect, and writes every other finding to the card's notes file with its proposed fix, settled when the epic closes. No card only checks another card. Status back to Proposed. |
