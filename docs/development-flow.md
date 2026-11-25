@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.1\
+**Version:** 2.2\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -250,16 +250,20 @@ session with no memory of the others. Only files pass between them:
 the test files, the code, the reports, and the comments on the pull
 request.
 
-| Agent | Starts with | May change | Never |
-|-------|-------------|------------|-------|
-| Test agent | The task, its spec sections, the pinned contract | Test files | Reads the code written for the card; makes up an expected result the task does not give |
-| Code agent | The task, its spec sections, the test files, and later the review findings | Code, and tests of its own | Changes, skips, or deletes a test of the test agent; reads the conversation of another agent |
-| Test-check agent | The task, the test files, the code, the test results | Nothing | Changes code or tests; reads the conversation of another agent |
-| Diff-review agent | The pull request's diff, the task, its spec sections | Nothing; it only posts on the pull request | Changes code or tests; reads the conversation of another agent |
+| Agent | Model | Starts with | May change | Never |
+|-------|-------|-------------|------------|-------|
+| Test agent | Opus | The task, its spec sections, the pinned contract | Test files | Reads the code written for the card; makes up an expected result the task does not give |
+| Code agent | Sonnet | The task, its spec sections, the test files, and later the review findings | Code, and tests of its own | Changes, skips, or deletes a test of the test agent; reads the conversation of another agent |
+| Test-check agent | Opus | The task, the test files, the code, the test results | Nothing | Changes code or tests; reads the conversation of another agent |
+| Diff-review agent | Opus | The pull request's diff, the task, its spec sections | Nothing; it only posts on the pull request | Changes code or tests; reads the conversation of another agent |
 
 - Each code repository defines the four roles in `.claude/agents/`,
   written by its skeleton card, so every card runs with the same
   instructions.
+- Each role file sets its model in its header (`model: opus` or
+  `model: sonnet`), as the table says. The agents that check the code
+  run on a different model from the one that writes it, so they do not
+  share its blind spots. Haiku is not used.
 - A test commit carries the trailer `Agent: test` in its message.
 - When the code agent finds a test it believes is wrong, it stops and
   names the case and the reason. A new test agent session checks the
@@ -499,6 +503,7 @@ and before a release ([test-strategy.md](test-strategy.md), sections
 | Four defect severities | No scale | "No open Critical or High defect" is a quality gate and needs a definition |
 | A client card is split into a mock card and an integration card | One client card after the backend is done | Web and Mobile are built while the backend is, against the same draft; the integration card catches any difference between the draft and the real API |
 | Any machine may change `tripmate-docs`, guarded by a version check in CI and branches kept up to date with `main` | Only Mac 1 changes the documents; the other machines hand their answers to Mac 1 | The answer to a question found on Mac 2 or Windows belongs in the spec before that card's tests. A hand-off to Mac 1 delays the card and can lose the answer; the check stops two changes from taking the same version. |
+| The code agent runs on Sonnet; the test, test-check, and diff-review agents run on Opus | Every agent on the lead session's model; the code agent on Opus and the others on Sonnet | A checker on the same model as the author tends to miss the same mistakes. The code is held by tests already written, so the stronger model goes where a miss costs most: writing the tests and checking the work. |
 
 ### 5.2 Open questions
 
@@ -521,3 +526,4 @@ None. Each repository's coding conventions live in its own
 | 1.9 | 2026-11-23 | Section 1: any machine may change `tripmate-docs`, not only Mac 1. A session changes a document only for its own card or when the product owner asks; every document pull request passes a version check in CI and must be up to date with `main`. Mac 1 still plans the Trello cards and the Build Tracker. Decision added to 5.1. |
 | 2.0 | 2026-11-25 | The product owner changed how tasks are planned and reviewed. After the spec is approved, Claude Code writes a task file in each code repository (`tasks/<epic>.md`) with every task, its risk level, and its test cases; the product owner approves it, and the cards are created from it. The spec keeps what spans repositories. A test-check agent checks the tests against the task and the code against the tests before the pull request. A diff-review agent reviews the pull request in two rounds: the code agent fixes round 1; round 2 fixes nothing, asks the product owner only for a defect, and writes every other finding to the card's notes file with its proposed fix and its level (project, repository, or epic), settled when the epic closes. Section 2.4 says which records belong to which of the three levels. No card only checks another card. Status back to Proposed. |
 | 2.1 | 2026-11-25 | Approved by the product owner. No content changed. |
+| 2.2 | 2026-11-25 | Section 2.3: each agent has a set model, written in its role file. The code agent runs on Sonnet; the test, test-check, and diff-review agents run on Opus, so the code is never checked by the model that wrote it. Haiku is not used. Decision added to 5.1. |
