@@ -241,7 +241,7 @@ Rules:
 | 10. Fix | The code agent | The round 1 findings | Fixes pushed to the same branch, and a reply to each finding |
 | 11. Review, round 2 | A new diff-review agent | The diff since round 1, the replies | Its findings, posted on the pull request; nothing is fixed. A defect asks the product owner to review; every other finding becomes a note (section 2.4). |
 | 12. Merge | GitHub, when every required check passes; for a High card, or when round 2 found a defect, after the product owner's approval | -- | A merge commit. The card moves to Done. |
-| 13. Close the epic | The product owner and Claude Code | The epic's notes | A decision on each note: a new card, a later epic, or dropped |
+| 13. Close the epic | The product owner and Claude Code | Every notes file of the epic, in every repository | The notes in three lists, by level, and a decision on each. A project note becomes a change to the document that owns it in `tripmate-docs`; a repository note becomes a change to that repository's `CLAUDE.md` or an agent role, or a card; an epic note becomes a card in this epic or a later one. A note can also be dropped, with the reason. |
 
 ### 2.3 The four agents
 
@@ -331,14 +331,28 @@ and are built in the [EPIC-11 spec](specs/epic-11/spec.md).
 | Which test proves which requirement | Every CI run | The requirement-to-test report, generated from test names |
 | A changed rule, endpoint, or table | Step 6, in the same card | The document that owns it, with a new version (section 3) |
 
-**A notes file** has one row per note:
+**Three levels.** Every record belongs to one of three levels, and
+goes to the lowest level that still reaches everyone who needs it. A
+business rule or anything two repositories share is always at the
+project level.
+
+| Level | Holds | Where |
+|-------|-------|-------|
+| Project | What every repository shares: the product, the business rules, the contract, the architecture, this flow, and the rules every session follows | `tripmate-docs` |
+| Repository | How one repository is built: setup, commands, coding conventions, the agent roles | The repository's `CLAUDE.md` and `.claude/agents/` |
+| Epic | What one epic builds: its behaviour across repositories, then its tasks and notes in each repository | `docs/specs/<epic>/spec.md` in `tripmate-docs`; `tasks/<epic>.md` and `tasks/<epic>-notes/` in each code repository |
+
+**A notes file** has one row per note. It stays one file per card in
+the card's repository whatever the level of its notes, so a card
+never opens a second pull request for a note.
 
 | Column | Content |
 |--------|---------|
 | Note | What the round 2 agent saw, at its file and line |
+| Level | Project, repository, or epic, by the table above |
 | Proposed fix | How to solve it, concrete enough to become a card |
 | Priority | High, Medium, or Low, by what it costs to leave it |
-| Decision | Empty until the epic closes; then a card ID, a later epic, or "dropped" with the reason |
+| Decision | Empty until the epic closes; then the change or card it became, or "dropped" with the reason |
 
 ### 2.5 Naming
 
@@ -475,6 +489,7 @@ and before a release ([test-strategy.md](test-strategy.md), sections
 | The tasks of an epic are written to a task file in each code repository, and the product owner approves them before any card exists | Cards written on the board straight from the spec; one task file for the whole epic in `tripmate-docs` | The product owner reads every task with its edge cases in one place, in git, and a correction is a reviewed change. Each machine finds its tasks in its own repository. The spec no longer repeats the cards. |
 | The test check runs locally before the pull request; the diff review runs on the pull request, in two rounds | One review agent before the pull request | A wrong or weak test is fixed before anyone waits on the pull request. The diff review is on the pull request, where the product owner can read it. Round 2 fixes nothing, so the loop always ends. |
 | Round 2 findings that are not defects become notes with a proposed fix, settled when the epic closes | Every finding is fixed at once | Suggestions do not hold up a card, and seen together at the end of an epic they show which ones are worth a card |
+| Records are kept at three levels: project, repository, and epic. Notes keep their level in a column of one file per card. | Everything in `tripmate-docs`; a notes folder at each level | Each record sits where the sessions that need it look first, and a shared business rule never hides in one repository. One notes file per card means a card writes only in its own repository, and the levels are sorted when the epic closes. |
 | No card only checks another card | A check card after each group of cards | Each card checks its own work; the manual checks and the checkpoint items are lines in the task that closes them |
 | A separate agent writes the tests first, from the card's test cases | The author writes the tests with the code | A test written next to the code tends to repeat the code's mistake. The expected results come from the spec the product owner approved, and a test that fails first is known to check something. |
 | The agents run on the developer machine, not in CI | An AI review as a CI job | No model key in CI. The cost: GitHub cannot prove the agents ran; the test-check report and the review comments on the pull request are the evidence. |
@@ -504,4 +519,4 @@ None. Each repository's coding conventions live in its own
 | 1.7 | 2026-11-23 | Section 3: the full AI evaluation runs when the assistant changes and before a release, as test-strategy.md now says, not nightly. |
 | 1.8 | 2026-11-23 | Section 1: the work runs on three machines, one per group of repositories (Mac 1: backend, contracts, documents; Mac 2: Mobile; Windows: Web and Desktop), with one session per card and a git worktree for cards of one repository that run at the same time. The Definition of Done follows the translation files split by area. |
 | 1.9 | 2026-11-23 | Section 1: any machine may change `tripmate-docs`, not only Mac 1. A session changes a document only for its own card or when the product owner asks; every document pull request passes a version check in CI and must be up to date with `main`. Mac 1 still plans the Trello cards and the Build Tracker. Decision added to 5.1. |
-| 2.0 | 2026-11-25 | The product owner changed how tasks are planned and reviewed. After the spec is approved, Claude Code writes a task file in each code repository (`tasks/<epic>.md`) with every task, its risk level, and its test cases; the product owner approves it, and the cards are created from it. The spec keeps what spans repositories. A test-check agent checks the tests against the task and the code against the tests before the pull request. A diff-review agent reviews the pull request in two rounds: the code agent fixes round 1; round 2 fixes nothing, asks the product owner only for a defect, and writes every other finding to the card's notes file with its proposed fix, settled when the epic closes. No card only checks another card. Status back to Proposed. |
+| 2.0 | 2026-11-25 | The product owner changed how tasks are planned and reviewed. After the spec is approved, Claude Code writes a task file in each code repository (`tasks/<epic>.md`) with every task, its risk level, and its test cases; the product owner approves it, and the cards are created from it. The spec keeps what spans repositories. A test-check agent checks the tests against the task and the code against the tests before the pull request. A diff-review agent reviews the pull request in two rounds: the code agent fixes round 1; round 2 fixes nothing, asks the product owner only for a defect, and writes every other finding to the card's notes file with its proposed fix and its level (project, repository, or epic), settled when the epic closes. Section 2.4 says which records belong to which of the three levels. No card only checks another card. Status back to Proposed. |
