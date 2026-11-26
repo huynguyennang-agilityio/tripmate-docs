@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.8\
+**Version:** 1.9\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -303,17 +303,26 @@ section 2.3, are held by five checks. This epic builds them.
 
 | Check | How it works |
 |-------|--------------|
-| Failing first | Finds the commits with the trailer `Agent: test`, checks out the last one, and runs the tests those commits added. Each must fail or error. |
-| Test lock | Compares the tests added by the test commits with the head of the branch. A test that a commit without the trailer changed, skipped, or deleted fails the check. |
+| Failing first | Checks out each commit with the trailer `Agent: test` in turn and runs the tests it adds. Each must fail: a test failure or error (pytest exit 1 or 2), or its own module failing to import. A test commit that only changes existing tests, such as a correction after the code, is not asked to fail. |
+| Test lock | Locks the tests that the test commits add and every other file under `tests/` that they add or change, such as a `conftest.py` or a helper. The check fails when a commit without the trailer changes, skips, or deletes a locked test or file, or adds or changes any `conftest.py`; and when a test commit changes a file outside `tests/`. |
 | Requirement-to-test report | Collects every test name, reads the requirement ID in it, and compares with `tests/requirement-ids.txt`, the P0 IDs in scope. The first card of each epic adds that epic's IDs. The report is kept with the CI run. |
-| Mutation | Runs mutation testing on the rule files the pull request changes. A surviving mutant fails the check unless the pull request lists it with a reason. Backend only. |
-| Risk gate | Matches the changed files against the repository's path list for the High items of development-flow.md, section 2.1. A match, or a path no rule names, needs the label `human-approved`. |
+| Mutation | Runs mutation testing on the rule files the pull request changes. A surviving mutant fails the check unless the pull request description lists it under `## Surviving mutants`, one line with its name and a reason. Editing the description runs the check again. Backend only. |
+| Risk gate | Matches the changed files against the repository's path list for the High items of development-flow.md, section 2.1. A match, or a path no rule names, needs the label `human-approved`, added after the newest commit reached the pull request; a push removes the label (development-flow.md, section 2.1). |
 
 - The checks are scripts with their own tests, kept in
   `tripmate-backend` and offered as one reusable workflow. The other
   code repositories call it with their own path list and test command.
 - The path list, the workflows, each `CLAUDE.md`, and the agent roles
   are on the path list themselves.
+- On the backend path list, each module's `schemas.py`, `api.py`, and
+  `events.py`, all of `app/platform/`, and `app/main.py`,
+  `app/worker.py`, and `app/scheduler.py` are High.
+- A pull request is judged by the checks of its base, never by its own
+  copy: the risk gate runs from `main`'s workflow on
+  `pull_request_target`, so a pull request cannot change the check that
+  reviews it.
+- How each check works in the backend, with its known limits, is in
+  the [backend's `CLAUDE.md`, section "Flow checks"](https://github.com/huynguyennang-agilityio/tripmate-backend/blob/main/CLAUDE.md#flow-checks).
 
 ## 3. Acceptance Criteria
 
@@ -362,8 +371,9 @@ so later cards that run at the same time do not change it.
 ### 4.2 Data
 
 The tables are in [data-model.md](../../data-model.md), section 6.
-This epic creates `idempotency_keys` and `outbox_events` in the first
-migration. `outbox_events.trip_id` gets its foreign key in the EPIC-02
+F3 sets up Alembic with an empty first migration; F7 and F8 then
+create `idempotency_keys` and `outbox_events` in their own migrations.
+`outbox_events.trip_id` gets its foreign key in the EPIC-02
 migration that creates `trips`.
 
 `idempotency_keys` holds `device_id` next to `user_id`, which is empty
@@ -517,3 +527,4 @@ no two machines change the same code repository.
 | 1.6 | 2026-11-23 | The product owner set the Mobile project conventions (2.11): Flutter 3.38.5 pinned, `flutter_bloc`, `go_router`, a folder per feature, flavors on Android and iOS with their application IDs, and `flutter_lints` with warnings as errors. MF1 follows them and gains case MF1-4, an automated test of the flavor name. Section 6.7: no two machines change the same code repository; `tripmate-docs` may be changed from any machine. Two decisions added to 5.1. |
 | 1.7 | 2026-11-23 | Section 4.1 lists the libraries later cards need, so the skeleton puts them all in the lock file: the OpenTelemetry exporter and instrumentation, `sentry-sdk`, PyJWT with `cryptography`, and `argon2-cffi`. Until the beta, the one production web instance is on Render's free plan, which sleeps when idle (2.8, decision added to 5.1). The table of decisions in 5.1 is one table again, so the page shows all its rows. |
 | 1.8 | 2026-11-25 | Follows development-flow.md: the cards and their test cases move to a task file in each code repository, with each card's scope, what it leaves out, the reason for its risk level, and its manual checks. Section 6 keeps the order of the cards, the checkpoints (6.1), and the machines (6.2), and links the five task files; section 7, Test Cases, is removed, and the Version History is now section 7. Each skeleton card writes four agent roles (4.3): test, code, test-check, and diff review. |
+| 1.9 | 2026-11-26 | Section 2.12 says what the flow checks do as built in F14: failing first checks each test commit in turn and accepts a failure, an error, or the test's own module failing to import; the test lock also covers the support files under `tests/` that a test commit added or changed and any `conftest.py`, and a test commit changes files under `tests/` only; surviving mutants are listed under `## Surviving mutants` in the pull request description; `human-approved` counts only when added after the newest commit, and a push removes it; the backend's High paths; the risk gate runs from `main`'s workflow, so a pull request cannot change the check that reviews it. Section 4.2: F7 and F8 create `idempotency_keys` and `outbox_events` in their own migrations after the empty first one. |
