@@ -3,7 +3,7 @@
 **Document type:** Software Architecture Document\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.12\
+**Version:** 1.13\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Software Architecture artifact](https://claude.ai/artifact/JQa8y2nWNf9HWzzdtJ9ZiB)
 
@@ -539,7 +539,7 @@ Every part has its own repository.
 
 | Repository | Holds | Depends on |
 |------------|-------|------------|
-| `tripmate-backend` | FastAPI app, worker, scheduler, migrations | -- |
+| `tripmate-backend` | FastAPI app, worker, scheduler, migrations | The translations of a pinned `tripmate-contracts` commit, for the error code text check (`contracts-ref`) |
 | `tripmate-contracts` | `openapi.json`, realtime event schema, shared translations | Generated from `tripmate-backend` |
 | `tripmate-web` | Next.js client | A pinned `tripmate-contracts` version |
 | `tripmate-mobile` | Flutter client | A pinned `tripmate-contracts` version |
@@ -638,3 +638,4 @@ the table.
 | 1.10 | 2026-11-20 | Until the beta there are two environments, local in Docker and production; staging is added before the beta and there are no preview environments. The hosting needs no longer list a preview per pull request; point-in-time recovery is 3 days on Render's Hobby plan and 7 on Pro. |
 | 1.11 | 2026-11-23 | Sections 9.1 and 9.2: until the beta, production is one instance for the API, the worker, and the scheduler with free database plans, to stay within the monthly cost limit of 10 USD; the full setup is in place before the beta. |
 | 1.12 | 2026-11-23 | Section 7: the translation source is one file per area in each language. |
+| 1.13 | 2026-11-26 | Section 11: the backend pins a `tripmate-contracts` commit by its SHA for the error code text check (card F4), until CT2 adds tags. |
