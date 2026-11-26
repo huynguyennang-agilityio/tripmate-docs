@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.9\
+**Version:** 2.0\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -18,7 +18,7 @@ not repeat what other documents own; it links to them:
 | Containers, modules and their rules, background work, hosting on Render | [architecture.md](../../architecture.md), sections 3, 4, 9, 10 |
 | Request conventions, the error format, how the contract moves between repositories | [api-design.md](../../api-design.md), sections 2, 4, 6 |
 | Tokens, the access guard, capabilities, rate limits | [security.md](../../security.md), sections 2 and 3 |
-| `outbox_events`, `idempotency_keys`, migrations | [data-model.md](../../data-model.md), sections 6 and 8 |
+| `outbox_events`, `outbox_trip_seqs`, `idempotency_keys`, migrations | [data-model.md](../../data-model.md), sections 6 and 8 |
 | Test levels and what runs when | [test-strategy.md](../../test-strategy.md), sections 2 to 4 |
 | Card kinds, task files, risk levels, the four agents, and the Definition of Done | [docs/development-flow.md](../../development-flow.md), sections 1 to 3 |
 
@@ -372,8 +372,11 @@ so later cards that run at the same time do not change it.
 
 The tables are in [data-model.md](../../data-model.md), section 6.
 F3 sets up Alembic with an empty first migration; F7 and F8 then
-create `idempotency_keys` and `outbox_events` in their own migrations.
-`outbox_events.trip_id` gets its foreign key in the EPIC-02
+create `idempotency_keys` and the outbox tables in their own
+migrations. F8 creates `outbox_events` and `outbox_trip_seqs`, the
+counter that gives each trip's events their `trip_seq` without a gap
+(data-model.md, section 6.2). `outbox_events.trip_id` and
+`outbox_trip_seqs.trip_id` get their foreign keys in the EPIC-02
 migration that creates `trips`.
 
 `idempotency_keys` holds `device_id` next to `user_id`, which is empty
@@ -528,3 +531,4 @@ no two machines change the same code repository.
 | 1.7 | 2026-11-23 | Section 4.1 lists the libraries later cards need, so the skeleton puts them all in the lock file: the OpenTelemetry exporter and instrumentation, `sentry-sdk`, PyJWT with `cryptography`, and `argon2-cffi`. Until the beta, the one production web instance is on Render's free plan, which sleeps when idle (2.8, decision added to 5.1). The table of decisions in 5.1 is one table again, so the page shows all its rows. |
 | 1.8 | 2026-11-25 | Follows development-flow.md: the cards and their test cases move to a task file in each code repository, with each card's scope, what it leaves out, the reason for its risk level, and its manual checks. Section 6 keeps the order of the cards, the checkpoints (6.1), and the machines (6.2), and links the five task files; section 7, Test Cases, is removed, and the Version History is now section 7. Each skeleton card writes four agent roles (4.3): test, code, test-check, and diff review. |
 | 1.9 | 2026-11-26 | Section 2.12 says what the flow checks do as built in F14: failing first checks each test commit in turn and accepts a failure, an error, or the test's own module failing to import; the test lock also covers the support files under `tests/` that a test commit added or changed and any `conftest.py`, and a test commit changes files under `tests/` only; surviving mutants are listed under `## Surviving mutants` in the pull request description; `human-approved` counts only when added after the newest commit, and a push removes it; the backend's High paths; the risk gate runs from `main`'s workflow, so a pull request cannot change the check that reviews it. Section 4.2: F7 and F8 create `idempotency_keys` and `outbox_events` in their own migrations after the empty first one. |
+| 2.0 | 2026-11-26 | Section 4.2 and the table of what other documents own: F8 creates `outbox_trip_seqs` next to `outbox_events`, and the EPIC-02 migration adds the foreign key on the `trip_id` of both tables. |

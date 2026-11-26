@@ -3,7 +3,7 @@
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.6\
+**Version:** 1.7\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -52,6 +52,7 @@ Only the owning module writes to its tables
 | Assistant | `assistant_requests` | Each assistant request, its status, token use and cost | `assistant` | FR-04 |
 | System | `audit_entries` | The Audit log | `audit` | PRD section 3.2 |
 | System | `outbox_events` | Domain events waiting to be published | `platform` | [architecture.md](architecture.md), section 5.2 |
+| System | `outbox_trip_seqs` | The last `trip_seq` given to each trip's events | `platform` | [architecture.md](architecture.md), section 5.2 |
 | System | `idempotency_keys` | Keys of recent create requests and their responses | `platform` | FR-08 |
 
 ## 2. Entity Relationship Diagrams
@@ -284,6 +285,7 @@ erDiagram
     USERS ||--o{ AUDIT_ENTRIES : "acts in"
     TRIPS ||--o{ ASSISTANT_REQUESTS : "has"
     TRIPS ||--o{ OUTBOX_EVENTS : "emits"
+    TRIPS ||--o| OUTBOX_TRIP_SEQS : "numbers its events with"
 
     GAP_STATES {
         uuid trip_id FK
@@ -328,7 +330,12 @@ erDiagram
         bigint trip_seq
         text type
         jsonb payload
+        timestamptz created_at
         timestamptz published_at
+    }
+    OUTBOX_TRIP_SEQS {
+        uuid trip_id PK, FK
+        bigint last_seq
     }
 ```
 
@@ -370,6 +377,7 @@ second line of defence for the rules that must never break.
 | `settlements` | `from_member_id <> to_member_id`; `amount > 0` | No Member pays themselves (FR-08) |
 | `trips` | `currency` cannot change once an Expense or Settlement exists, checked by a trigger | Trip detail rules (FR-02), ADR-0001 |
 | `audit_entries` | The application role has `INSERT` and `SELECT` only; no `UPDATE` or `DELETE` | The Audit log cannot be rewritten |
+| `outbox_events` | Unique `(trip_id, trip_seq)` | A trip's events are numbered without gaps or repeats ([api-design.md](api-design.md), section 5) |
 
 ## 5. Values That Are Computed, Not Stored
 
@@ -416,6 +424,16 @@ closes. Once closed it never changes (FR-03).
   section 5.2).
 - `trip_seq` numbers a trip's events without gaps, so a client can tell
   whether it missed any ([api-design.md](api-design.md), section 5).
+- `outbox_trip_seqs` holds one row per trip with the last `trip_seq`
+  given. Adding an event raises it by one in the same transaction, so
+  a rolled-back transaction gives its number back, and a second
+  transaction of the same trip waits for the first. It is a stored
+  value on purpose: numbering from the highest `trip_seq` left in
+  `outbox_events` would start again at 1 once the published rows of a
+  quiet trip are deleted.
+- `created_at` is when the event was added (the database clock, not
+  the start of the transaction); it is the `at` of the realtime event
+  and the age that cleanup reads.
 - The worker publishes rows in `id` order and sets `published_at`.
   Published rows are deleted after 7 days.
 
@@ -466,3 +484,4 @@ closes. Once closed it never changes (FR-03).
 | 1.4 | 2026-11-19 | Time convention follows the Trip time zone rules in prd.md: `trips.time_zone` comes from the creating Member's device and is used for dates; the Day window and planned times are local at the place. |
 | 1.5 | 2026-11-20 | `sessions` gains `replaced_token_hash`, to recognize a reused refresh token, and `last_used_at`, for the devices list, following the EPIC-01 spec. |
 | 1.6 | 2026-11-20 | Section 6.3: an idempotency key belongs to the device ID before sign-in, following the EPIC-11 spec. |
+| 1.7 | 2026-11-26 | Outbox, following card F8 of EPIC-11: `outbox_events` gains `created_at` and a unique `(trip_id, trip_seq)`; the new table `outbox_trip_seqs` keeps each trip's last `trip_seq` so numbering has no gap and survives the cleanup of published rows (sections 1, 2.4, 4, and 6.2). |
