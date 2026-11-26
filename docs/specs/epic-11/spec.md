@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.2\
+**Version:** 2.3\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -309,7 +309,7 @@ section 2.3, are held by five checks. This epic builds them.
 
 | Check | How it works |
 |-------|--------------|
-| Failing first | Checks out each commit with the trailer `Agent: test` in turn and runs the tests it adds. Each must fail: a test failure or error (pytest exit 1 or 2), or its own module failing to import. A test commit that only changes existing tests, such as a correction after the code, is not asked to fail. |
+| Failing first | Checks out each commit with the trailer `Agent: test` in turn and runs the tests it adds. Each must fail: a test failure or error (pytest exit 1 or 2), or its own module failing to import. A test file of another language that a test commit adds is run on its own with the caller's test command and must fail: a non-zero exit counts as failing, except an error of the run (below). A test commit that only changes existing tests, such as a correction after the code, is not asked to fail. |
 | Test lock | Locks the tests that the test commits add and every other file under `tests/` that they add or change, such as a `conftest.py` or a helper. The check fails when a commit without the trailer changes, skips, or deletes a locked test or file, or adds or changes any `conftest.py`; and when a test commit changes a file outside `tests/`. |
 | Requirement-to-test report | Collects every test name, reads the requirement ID in it, and compares with `tests/requirement-ids.txt`, the P0 IDs in scope. The first card of each epic adds that epic's IDs. The report is kept with the CI run. |
 | Mutation | Runs mutation testing on the rule files the pull request changes. A surviving mutant fails the check unless the pull request description lists it under `## Surviving mutants`, one line with its name and a reason. Editing the description runs the check again. Backend only. |
@@ -320,6 +320,20 @@ section 2.3, are held by five checks. This epic builds them.
   code repositories call it with their own path list, test command,
   and test file pattern; failing first runs each test file of another
   language that a test commit adds, and Python tests per function (F15).
+- For a test file of another language, an error of the run fails
+  failing first and names the file. It is one of two things:
+  - the test command cannot start: it is not found or cannot be run
+    (exit 126 or 127);
+  - the run is killed by a signal, such as an out-of-memory kill; an
+    exit code of 128 or more from a wrapper still counts as failing;
+  - the runner's output matches the caller's no-test pattern, which
+    says the file holds no test. For `node --test --test-reporter=tap`
+    it is `^ok \d+ - \S+\.test\.js$`: Node reports a file with no test
+    as one passing test named after the file.
+- The `failing-first` job sets up the caller's runtime, such as
+  Node 24, before the caller's setup command. No unit test covers it.
+  F15's pull request shows one CI run with it, and CT2 shows it again
+  as the first caller that needs Node.
 - The path list, the workflows, each `CLAUDE.md`, and the agent roles
   are on the path list themselves.
 - On the backend path list, each module's `schemas.py`, `api.py`, and
@@ -436,6 +450,7 @@ line endings, because the work runs on macOS and on Windows
 | Translations are one file per area in each language, `translations/en/<area>.json` | One `en.json` and one `vi.json` | Web, Mobile, and the backend add keys at the same time, from three machines; one file per area keeps their changes apart |
 | The Web and Mobile skeleton cards need no contract; generated messages and the flow checks move to WF2 and MF2 | WF1 and MF1 wait for CT1 | The three machines start on the first day instead of two waiting for the backend's first three cards |
 | Mobile uses `flutter_bloc`, `go_router`, a folder per feature, and a pinned Flutter version (2.11) | Riverpod; Navigator with hand-written deep links; folders per layer; the latest stable Flutter in CI | Cubits and Blocs are tested with `bloc_test` from a state and an event, which suits tests written before the code. `go_router` opens the join links. A folder per feature keeps cards that run at the same time apart. A pinned version gives CI and every machine the same result. |
+| Failing first knows a test file of another language holds no test from the caller's no-test pattern, matched against the runner's output | A JUnit report from every runner; reading the file's text for `test(` calls; treating an empty file as a passing one | Each runner already prints how many tests it ran, so one input per repository is enough. `flutter test` and `cargo test` write no JUnit report of their own, and reading the text depends on the language. |
 | MF1 has one automated test, MF1-4, next to its manual cases | Manual cases only | `flutter test` needs a test to run, and the test agent needs a case that fails before the code exists |
 
 ### 5.2 Open questions
@@ -545,3 +560,4 @@ no two machines change the same code repository.
 | 2.0 | 2026-11-26 | Section 4.2 and the table of what other documents own: F8 creates `outbox_trip_seqs` next to `outbox_events`, and the EPIC-02 migration adds the foreign key on the `trip_id` of both tables. |
 | 2.1 | 2026-11-26 | New card F15, as the product owner decided during CT1: failing first read only Python tests, so it learns each repository's test file pattern and runs the added test files of any language. Section 2.12, the order of the cards, and wave 3 follow. |
 | 2.2 | 2026-11-26 | Section 2.3, as the product owner decided during F4: the backend pins `tripmate-contracts` by commit SHA until CT2, and F4 adds four codes: the two field codes of `request.invalid`, `request.not_found`, and `request.method_not_allowed`. |
+| 2.3 | 2026-11-26 | Section 2.12, as the product owner decided during F15: a test file of another language fails when its run exits non-zero; an error of the run is a command that cannot start (exit 126 or 127), a run killed by a signal, or runner output that matches the caller's no-test pattern, such as `^ok \d+ - \S+\.test\.js$` for `node --test` with the TAP reporter; the `failing-first` job sets up the caller's runtime, shown on one CI run. Decision added to 5.1. |
