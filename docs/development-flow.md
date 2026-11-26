@@ -3,7 +3,7 @@
 **Document type:** Development Flow and Definition of Done\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.2\
+**Version:** 2.3\
 **Stage:** 5. AI-native SDLC\
 **Page version:** [TripMate Development Flow artifact](https://claude.ai/artifact/NL1pqAnSqERZfZo5gje9eM)
 
@@ -224,6 +224,10 @@ Rules:
   first review round first, then the diff, and approves by adding the
   label `human-approved` to the pull request. Claude Code never adds
   this label.
+- A push to the pull request removes `human-approved`. The product
+  owner adds it again after reading the new commits.
+- The label counts only when it was added after the newest commit
+  reached the pull request.
 
 ### 2.2 The steps
 
@@ -253,7 +257,7 @@ request.
 | Agent | Model | Starts with | May change | Never |
 |-------|-------|-------------|------------|-------|
 | Test agent | Opus | The task, its spec sections, the pinned contract | Test files | Reads the code written for the card; makes up an expected result the task does not give |
-| Code agent | Sonnet | The task, its spec sections, the test files, and later the review findings | Code, and tests of its own | Changes, skips, or deletes a test of the test agent; reads the conversation of another agent |
+| Code agent | Sonnet | The task, its spec sections, the test files, and later the review findings | Code, and tests of its own | Changes, skips, or deletes a test or support file of the test agent; adds or changes a `conftest.py`; reads the conversation of another agent |
 | Test-check agent | Opus | The task, the test files, the code, the test results | Nothing | Changes code or tests; reads the conversation of another agent |
 | Diff-review agent | Opus | The pull request's diff, the task, its spec sections | Nothing; it only posts on the pull request | Changes code or tests; reads the conversation of another agent |
 
@@ -307,15 +311,17 @@ scope. When the product owner asks for a fix, the code agent pushes
 it and round 2 runs again on the new commits.
 
 **Checks that hold these rules.** They run in CI on every pull request
-and are built in the [EPIC-11 spec](specs/epic-11/spec.md).
+and are built in the [EPIC-11 spec](specs/epic-11/spec.md), section
+2.12. A pull request is judged by the checks of its base, never by its
+own copy of them.
 
 | Check | Fails when |
 |-------|------------|
-| Failing first | A new test of the test commit passes before the code exists |
-| Test lock | A commit that is not a test commit changes, skips, or deletes a test of the card's test commit |
+| Failing first | A new test of a test commit passes at that commit, before its code exists. Each test commit is checked in turn; one that only changes existing tests is not asked to fail. |
+| Test lock | A commit that is not a test commit changes, skips, or deletes a test of a test commit, or a support file under `tests/` that a test commit added or changed, or adds or changes any `conftest.py`; or a test commit changes a file outside `tests/` |
 | Requirement-to-test report | An acceptance criterion of a P0 requirement in the epics built so far has no test with its ID |
-| Mutation | A changed rule file has a surviving mutant that the pull request does not explain. Backend only in the MVP. |
-| Risk gate | The files changed make the card High and the pull request has no `human-approved` label |
+| Mutation | A changed rule file has a surviving mutant that the pull request description does not list under `## Surviving mutants` with a reason. Backend only in the MVP. |
+| Risk gate | The files changed make the card High and the pull request has no `human-approved` label added after its newest commit (section 2.1) |
 
 ### 2.4 What is written where
 
@@ -397,8 +403,8 @@ reason.
   `test_INV_01_invitation_expires_after_7_days`, and the matrix row in
   [test-strategy.md](test-strategy.md), section 5, names it.
 - [ ] Each test case of the card's task has a test, written before the
-  code and shown failing. No later commit changed, skipped, or deleted
-  it.
+  code and shown failing. No commit but a test commit changed, skipped,
+  or deleted it.
 - [ ] The test check was clean before the pull request opened, and its
   report is in the pull request.
 - [ ] Everything that runs on every pull request passed: CI (lint,
@@ -429,7 +435,8 @@ reason.
 - [ ] Domain rules are pure functions with unit tests; money, voting,
   and Gap rules also have property tests.
 - [ ] A changed rule file has no surviving mutant, or the pull request
-  explains each one.
+  description lists each one under `## Surviving mutants` with a
+  reason.
 
 **When the task changes the API or a screen**
 
@@ -527,3 +534,4 @@ None. Each repository's coding conventions live in its own
 | 2.0 | 2026-11-25 | The product owner changed how tasks are planned and reviewed. After the spec is approved, Claude Code writes a task file in each code repository (`tasks/<epic>.md`) with every task, its risk level, and its test cases; the product owner approves it, and the cards are created from it. The spec keeps what spans repositories. A test-check agent checks the tests against the task and the code against the tests before the pull request. A diff-review agent reviews the pull request in two rounds: the code agent fixes round 1; round 2 fixes nothing, asks the product owner only for a defect, and writes every other finding to the card's notes file with its proposed fix and its level (project, repository, or epic), settled when the epic closes. Section 2.4 says which records belong to which of the three levels. No card only checks another card. Status back to Proposed. |
 | 2.1 | 2026-11-25 | Approved by the product owner. No content changed. |
 | 2.2 | 2026-11-25 | Section 2.3: each agent has a set model, written in its role file. The code agent runs on Sonnet; the test, test-check, and diff-review agents run on Opus, so the code is never checked by the model that wrote it. Haiku is not used. Decision added to 5.1. |
+| 2.3 | 2026-11-26 | Follows the flow checks as built in EPIC-11, card F14. Section 2.1: a push removes `human-approved`, the product owner adds it again after reading the new commits, and the label counts only when added after the newest commit reached the pull request. Section 2.3: failing first checks each test commit in turn; the test lock also covers the support files under `tests/` that a test commit added or changed and any `conftest.py`, and a test commit changes files under `tests/` only; surviving mutants are listed under `## Surviving mutants`; a pull request is judged by the checks of its base. The Definition of Done follows. |
