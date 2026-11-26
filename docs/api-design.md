@@ -3,7 +3,7 @@
 **Document type:** API Design\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.8\
+**Version:** 1.9\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate API Design artifact](https://claude.ai/artifact/RNMJoX3cpUfRNwMYutf8Tf)
 
@@ -168,6 +168,16 @@ out of the body ([security.md](security.md), section 2.1).
 - `code` is `<area>.<reason>` in snake case.
 - `params` holds the values the client needs to build the message.
 - `fields` lists validation problems as `{ "field": "amount", "code": "money.not_positive" }`, or is `null`.
+  A body that breaks its schema, or is not JSON, returns `400 request.invalid` with one entry per
+  problem: `field` is the path inside the body, query, path, or header, joined with dots (for
+  example `items.0.name`), or `body` for the body as a whole; `code` is `request.field_missing` for
+  a missing value and `request.field_invalid` for any other problem. A module's own rule may use its
+  own field code, as `money.not_positive` above.
+- `requestId` equals the `X-Request-Id` header. The server makes a new one for every request
+  (26 characters, ULID-like) and ignores one the client sends.
+- Anything unexpected returns `500 server.error` with the request ID and no message or stack.
+  An unknown route returns `404 request.not_found`, and a method the route does not take returns
+  `405 request.method_not_allowed`.
 - The text for every code lives in the shared translation source in
   `tripmate-contracts`. CI in `tripmate-backend` fails if the backend
   can return a code that has no text in both languages.
@@ -314,3 +324,4 @@ they depend on each other). Everything they must agree on lives in
 | 1.6 | 2026-11-20 | Section 2 names the health check path, `GET /v1/health`, following the EPIC-11 spec. |
 | 1.7 | 2026-11-23 | Follows the decisions of the EPIC-01 spec: sign-in and refresh take no `Idempotency-Key` (section 2), and register and sign-in name the client kind in the body (section 3.1). |
 | 1.8 | 2026-11-23 | Section 6: the translation source is one file per area in each language. |
+| 1.9 | 2026-11-26 | Section 4.1, as card F4 builds it: the field codes `request.field_missing` and `request.field_invalid` and how `field` is named, the request ID, `500 server.error`, and the codes for an unknown route and a wrong method. |

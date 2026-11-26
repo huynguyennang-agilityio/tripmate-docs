@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.1\
+**Version:** 2.2\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -122,7 +122,9 @@ flowchart LR
   and no detail; the full error goes to error reporting (2.6).
 - A module registers the codes it can return. A test fails when a
   registered code has no text in both languages in the pinned
-  contracts version.
+  contracts version. Until CT2 adds tags, the backend pins
+  `tripmate-contracts` by commit SHA in its file `contracts-ref`; the
+  CI job `error-codes` checks that commit out and runs the check.
 
 Codes this epic adds:
 
@@ -130,6 +132,10 @@ Codes this epic adds:
 |--------|------|------|
 | `400` | `request.idempotency_key_required` | A create `POST` with no `Idempotency-Key` |
 | `409` | `request.idempotency_in_progress` | The same key arrives while the first request is still running |
+| `400` | `request.field_missing` | Field code in `fields` of `request.invalid`: a value is missing |
+| `400` | `request.field_invalid` | Field code in `fields` of `request.invalid`: any other problem, also a body that is not JSON |
+| `404` | `request.not_found` | No route has this path |
+| `405` | `request.method_not_allowed` | The route does not take this method |
 | `500` | `server.error` | Anything unexpected |
 | `503` | `server.unavailable` | The health check finds PostgreSQL or Redis unreachable; a rate limit cannot be counted |
 
@@ -538,3 +544,4 @@ no two machines change the same code repository.
 | 1.9 | 2026-11-26 | Section 2.12 says what the flow checks do as built in F14: failing first checks each test commit in turn and accepts a failure, an error, or the test's own module failing to import; the test lock also covers the support files under `tests/` that a test commit added or changed and any `conftest.py`, and a test commit changes files under `tests/` only; surviving mutants are listed under `## Surviving mutants` in the pull request description; `human-approved` counts only when added after the newest commit, and a push removes it; the backend's High paths; the risk gate runs from `main`'s workflow, so a pull request cannot change the check that reviews it. Section 4.2: F7 and F8 create `idempotency_keys` and `outbox_events` in their own migrations after the empty first one. |
 | 2.0 | 2026-11-26 | Section 4.2 and the table of what other documents own: F8 creates `outbox_trip_seqs` next to `outbox_events`, and the EPIC-02 migration adds the foreign key on the `trip_id` of both tables. |
 | 2.1 | 2026-11-26 | New card F15, as the product owner decided during CT1: failing first read only Python tests, so it learns each repository's test file pattern and runs the added test files of any language. Section 2.12, the order of the cards, and wave 3 follow. |
+| 2.2 | 2026-11-26 | Section 2.3, as the product owner decided during F4: the backend pins `tripmate-contracts` by commit SHA until CT2, and F4 adds four codes: the two field codes of `request.invalid`, `request.not_found`, and `request.method_not_allowed`. |
