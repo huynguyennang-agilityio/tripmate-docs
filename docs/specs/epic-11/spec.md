@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.0\
+**Version:** 2.1\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -311,7 +311,9 @@ section 2.3, are held by five checks. This epic builds them.
 
 - The checks are scripts with their own tests, kept in
   `tripmate-backend` and offered as one reusable workflow. The other
-  code repositories call it with their own path list and test command.
+  code repositories call it with their own path list, test command,
+  and test file pattern; failing first runs each test file of another
+  language that a test commit adds, and Python tests per function (F15).
 - The path list, the workflows, each `CLAUDE.md`, and the agent roles
   are on the path list themselves.
 - On the backend path list, each module's `schemas.py`, `api.py`, and
@@ -447,7 +449,7 @@ the checkpoints, and which machine runs what.
 
 | Repository | Task file | Cards |
 |------------|-----------|-------|
-| `tripmate-backend` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-backend/blob/main/tasks/EPIC-11.md) | F1 to F14 |
+| `tripmate-backend` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-backend/blob/main/tasks/EPIC-11.md) | F1 to F15 |
 | `tripmate-contracts` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-contracts/blob/main/tasks/EPIC-11.md) | CT1, CT2 |
 | `tripmate-web` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-web/blob/main/tasks/EPIC-11.md) | WF1 to WF3 |
 | `tripmate-mobile` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-mobile/blob/main/tasks/EPIC-11.md) | MF1, MF2 |
@@ -463,6 +465,7 @@ day.
 flowchart LR
     F1 --> F2 --> F14
     F2 --> F13
+    F14 --> F15
     F14 --> CT1
     F14 --> DF1
     F1 --> F3
@@ -481,10 +484,12 @@ flowchart LR
     CT1 --> CT2
     WF1 --> WF2
     CT2 --> WF2
+    F15 --> WF2
     WF2 --> WF3
     F11 --> WF3
     MF1 --> MF2
     CT2 --> MF2
+    F15 --> MF2
 ```
 
 ### 6.1 Checkpoints
@@ -506,7 +511,7 @@ no two machines change the same code repository.
 |------|------------------------------|---------------|--------------------------|
 | 1 | F1, then F2, then F14 | MF1 | WF1 |
 | 2 | CT1, F3, F13 | -- | DF1 |
-| 3 | F4, F8, F12, then CT2 | MF2 | WF2 |
+| 3 | F4, F8, F12, F15, then CT2 | MF2 | WF2 |
 | 4 | F5, F10, then F6 and F7 | -- | -- |
 | 5 | F9, then F11 | -- | WF3 |
 
@@ -532,3 +537,4 @@ no two machines change the same code repository.
 | 1.8 | 2026-11-25 | Follows development-flow.md: the cards and their test cases move to a task file in each code repository, with each card's scope, what it leaves out, the reason for its risk level, and its manual checks. Section 6 keeps the order of the cards, the checkpoints (6.1), and the machines (6.2), and links the five task files; section 7, Test Cases, is removed, and the Version History is now section 7. Each skeleton card writes four agent roles (4.3): test, code, test-check, and diff review. |
 | 1.9 | 2026-11-26 | Section 2.12 says what the flow checks do as built in F14: failing first checks each test commit in turn and accepts a failure, an error, or the test's own module failing to import; the test lock also covers the support files under `tests/` that a test commit added or changed and any `conftest.py`, and a test commit changes files under `tests/` only; surviving mutants are listed under `## Surviving mutants` in the pull request description; `human-approved` counts only when added after the newest commit, and a push removes it; the backend's High paths; the risk gate runs from `main`'s workflow, so a pull request cannot change the check that reviews it. Section 4.2: F7 and F8 create `idempotency_keys` and `outbox_events` in their own migrations after the empty first one. |
 | 2.0 | 2026-11-26 | Section 4.2 and the table of what other documents own: F8 creates `outbox_trip_seqs` next to `outbox_events`, and the EPIC-02 migration adds the foreign key on the `trip_id` of both tables. |
+| 2.1 | 2026-11-26 | New card F15, as the product owner decided during CT1: failing first read only Python tests, so it learns each repository's test file pattern and runs the added test files of any language. Section 2.12, the order of the cards, and wave 3 follow. |
