@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 3.0\
+**Version:** 3.1\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -292,8 +292,10 @@ the change; nobody writes a number by hand.
   changes only tests, task files, the README, or CI gets no tag.
 - Once a tag exists, the change is everything since the last tag, so
   the next merge catches up a merge whose tagging run was cancelled.
-  Before the first tag, the change is the merge alone. A commit that
-  the last tag already holds gets no tag.
+  Before the first tag, the change is everything in the repository, so
+  the first merge after the pipeline exists tags the contract already
+  on `main`, even when that merge changes only scripts or task files.
+  A commit that the last tag already holds gets no tag.
 - The numbers stay at `0.x` until the MVP launches, which moves them
   to `1.0.0`.
 
@@ -637,3 +639,4 @@ no two machines change the same code repository.
 | 2.8 | 2026-11-27 | Section 2.10, as the product owner decided after CT2's second review: removing a response header counts as removing a response field; removing a deprecated item before the date in its `x-sunset` fails, for optional fields too; an added enum value in a response passes, and every client shows an unknown value as a neutral fallback; the type rows say which direction fails. |
 | 2.9 | 2026-11-27 | New card F16, as the product owner decided during CT2: failing first runs the caller's setup command in the worktree of each test commit, so a test runs with its own commit's dependencies (2.12). F16 follows F15 and comes before WF2 and MF2, in wave 3. |
 | 3.0 | 2026-11-27 | Section 2.2, as the product owner decided during F6: the general ceiling of 300 requests a minute in the setting `RATE_LIMIT_PER_MINUTE`, counted for the IP address and also the user on a route that is not `public`; the IP address from the last entry of `X-Forwarded-For`; a fixed window with `Retry-After` rounded up; the health check not counted; `0` turns the ceiling off; the contract documents `429` and `503` on every operation except the health check; the longest wait when a request is over more than one limit; the IP address counted before the token check; a service counting a key itself. Nine decisions added to 5.1. |
+| 3.1 | 2026-11-27 | Section 2.10, as the product owner decided after CT2 merged with no tag: before the first tag, the change is everything in the repository, not the merge alone, so the contract that reached `main` before the pipeline gets `contracts-v0.1.0` on the next merge and WF2 and MF2 can pin it. |
