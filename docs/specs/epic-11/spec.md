@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 3.2\
+**Version:** 3.3\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -182,9 +182,10 @@ it belongs to the device ID.
 | Signal | What this epic builds |
 |--------|-----------------------|
 | Logs | JSON lines with request ID, user ID, and trip ID. No email, name, token, or request body; a test checks a log line made from a sign-in request. |
-| Traces | OpenTelemetry across the API, the worker, PostgreSQL, Redis, and outgoing HTTP calls |
-| Metrics | Request rate, errors, and latency per endpoint; queue depth and job age; outbox rows waiting |
+| Traces | OpenTelemetry across the API, the worker, PostgreSQL, Redis, and outgoing HTTP calls. F10 builds them for the API; F9 adds the worker and the scheduler with the same setup. No span holds a query string, a token, or an email. |
+| Metrics | Request rate, errors, and latency per endpoint; queue depth and job age; outbox rows waiting. Pushed with the OpenTelemetry exporter to Grafana Cloud, the same way as traces; no metrics route. F10 creates the queue depth and job age metrics, which read 0 until F9 adds the queue and feeds them. |
 | Errors | Error reporting with the release tag, on the backend, Web, and Mobile |
+| Settings | `SENTRY_DSN` for error reporting, and `OTEL_EXPORTER_OTLP_ENDPOINT` with `OTEL_EXPORTER_OTLP_HEADERS` for Grafana Cloud. All three are optional at start-up for now: without `SENTRY_DSN` nothing goes to Sentry, and without the endpoint no trace or metric leaves the process. A value that is given is checked, and a malformed one stops start-up and names the setting. |
 | Alerts | P95 latency over 500 ms, error rate, job age over 5 minutes, outbox not draining ([architecture.md](../../architecture.md), section 9.4) |
 
 ### 2.7 Configuration, secrets, and the health check
@@ -442,8 +443,8 @@ The requirements are the cross-cutting rows of
 | Web framework | FastAPI on Uvicorn, Pydantic v2 |
 | Database | SQLAlchemy 2 with `asyncpg`; Alembic for migrations |
 | Background jobs | Taskiq with `taskiq-redis` ([architecture.md](../../architecture.md), section 12.1) |
-| Logs and traces | `structlog`; OpenTelemetry SDK, its OTLP exporter, and its instrumentation for FastAPI, SQLAlchemy, and Redis |
-| Error reporting | `sentry-sdk` with its FastAPI integration |
+| Logs and traces | `structlog`; OpenTelemetry SDK, its OTLP exporter, and its instrumentation for FastAPI, SQLAlchemy, Redis, and HTTPX (outgoing calls, turned on for each client) |
+| Error reporting | `sentry-sdk` with no integration turned on; the platform captures each unexpected error itself |
 | Tokens and passwords | PyJWT with `cryptography` for EdDSA access tokens; `argon2-cffi` for Argon2id password hashes ([security.md](../../security.md), section 2) |
 | Quality | Ruff, mypy in strict mode, import-linter |
 | Tests | pytest, Hypothesis, Schemathesis, an HTTP test client; `mutmut` for mutation testing |
@@ -495,6 +496,12 @@ line endings, because the work runs on macOS and on Windows
 | Web and Mobile foundations are in this epic | In EPIC-10, cross-platform experience | The mock cards of EPIC-01 need a project, a generated client, and mock mode before they start |
 | The access token's claims are `sub`, `sid`, `iat`, and `exp`, with no `kid`; `ACCESS_TOKEN_PUBLIC_KEYS` lists the trusted PEM public keys, and any of them may verify a token | A `kid` in the header and a map from `kid` to key | Decided by the product owner during F5. Rotation is publishing the new key next to the old one for one token lifetime (security.md, section 2), and EPIC-01 stamps nothing extra on a token. |
 | `ACCESS_TOKEN_PUBLIC_KEYS` is optional at start-up for now | Required, so the process stops without it, as for the other settings of 2.7 | Decided by the product owner during F5. Without a key no token can pass, so nothing is opened. Whether production must refuse to start without it is settled by F11 or EPIC-01. |
+| `SENTRY_DSN`, `OTEL_EXPORTER_OTLP_ENDPOINT`, and `OTEL_EXPORTER_OTLP_HEADERS` are optional at start-up for now | Required, so the process stops without them, as for the other settings of 2.7 | Decided by the product owner during F10. Local runs and tests need no account, and a missing value only stops what is sent out. Whether production must refuse to start without them is settled by F11. |
+| Metrics are pushed with the OpenTelemetry exporter to Grafana Cloud | A Prometheus `GET /metrics` route that Grafana reads | Decided by the product owner during F10. It takes the same path as traces and opens no route on the public API, so no access declaration or scrape token is needed. |
+| F10 creates the queue depth and job age metrics, and F9 feeds them | F10 reads a Redis list now; queue depth and job age move to F9 | Decided by the product owner during F10. F9, which adds the queue, comes after F10; F10's test checks that the two metrics exist and read 0, and checks outbox rows waiting for real. |
+| Sentry runs with no integration turned on, and the platform captures each unexpected error with the release tag and the request ID | `sentry-sdk` with its FastAPI integration | Decided by the product owner during F10. The integrations patch the whole process and collect request data, which could carry a token or an email, and one process-wide client cannot keep each app's events apart. |
+| Outgoing HTTP calls are traced with `opentelemetry-instrumentation-httpx`, turned on for each client | No trace for outgoing calls until a later card | Decided by the product owner during F10. The skeleton's lock file had no HTTP instrumentation; F10 adds it. |
+| F9 adds logs, traces, and error reporting to the worker and the scheduler | F10 adds them now | Decided by the product owner during F10. The worker and the scheduler run no job before F9. |
 | A route with no access declaration is served as it is at run time | Refused by default with `401 auth.not_signed_in` | Decided by the product owner during F5. The declaration test in CI is the guard 2.2 asks for, and every merged route passes it. |
 | A route is a stub when the contract marks it `x-stub` | A label on the pull request; a separate draft branch | The contract itself says what is not built yet, so the tag follows from the file |
 | Mock responses come from the contract's examples | Hand-written mock data in each client | One source for both clients; a stub without examples fails CI |
@@ -648,3 +655,4 @@ no two machines change the same code repository.
 | 3.0 | 2026-11-27 | Section 2.2, as the product owner decided during F6: the general ceiling of 300 requests a minute in the setting `RATE_LIMIT_PER_MINUTE`, counted for the IP address and also the user on a route that is not `public`; the IP address from the last entry of `X-Forwarded-For`; a fixed window with `Retry-After` rounded up; the health check not counted; `0` turns the ceiling off; the contract documents `429` and `503` on every operation except the health check; the longest wait when a request is over more than one limit; the IP address counted before the token check; a service counting a key itself. Nine decisions added to 5.1. |
 | 3.1 | 2026-11-27 | Section 2.10, as the product owner decided after CT2 merged with no tag: before the first tag, the change is everything in the repository, not the merge alone, so the contract that reached `main` before the pipeline gets `contracts-v0.1.0` on the next merge and WF2 and MF2 can pin it. |
 | 3.2 | 2026-11-27 | New card F17, as the product owner decided after CT2 tagged `contracts-v0.1.0` with no example on `GET /v1/health`: every success response with content carries an example, not only those of stubs, and the backend's example check names an operation without one (2.10). F17 follows F12 and comes before WF2 and MF2, in wave 3. |
+| 3.3 | 2026-11-27 | Sections 2.6 and 4.1, as the product owner decided during F10: `SENTRY_DSN`, `OTEL_EXPORTER_OTLP_ENDPOINT`, and `OTEL_EXPORTER_OTLP_HEADERS` are optional at start-up for now; metrics are pushed with the OpenTelemetry exporter, with no metrics route; F10 creates the queue depth and job age metrics and F9 feeds them; Sentry runs with no integration and the platform captures errors itself; outgoing HTTP is traced with the HTTPX instrumentation; no span holds a query string, a token, or an email; F9 adds the worker and the scheduler. Six decisions added to 5.1. |
