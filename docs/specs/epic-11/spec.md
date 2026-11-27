@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.5\
+**Version:** 2.6\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -104,8 +104,8 @@ flowchart LR
 |------|------|
 | Request ID | A new ID for every request, returned in `X-Request-Id` and written in every log line and error |
 | Device ID | `X-Device-Id` is required on every request except the health check; a missing or malformed one returns `400 request.invalid` |
-| Access declaration | Every route declares `public`, `signed_in`, or a capability of [security.md](../../security.md), section 3.2. A route with no declaration fails a test in CI. |
-| Token check | For any route that is not `public`: the EdDSA access token's signature and expiry are checked, and `identity` is asked through its registered hook whether the session is still active. A failure returns `401 auth.not_signed_in` or `401 auth.token_expired`. |
+| Access declaration | Every route declares `public`, `signed_in`, or a capability of [security.md](../../security.md), section 3.2. A route with no declaration fails a test in CI; at run time it is served as it is, with no check added. |
+| Token check | For any route that is not `public`: the EdDSA access token's signature and expiry are checked, and `identity` is asked through its registered hook whether the session is still active. A failure returns `401 auth.not_signed_in` or `401 auth.token_expired`. The token is sent as `Authorization: Bearer`; its header is `alg` `EdDSA` with no `kid`, and its claims are `sub` (the user ID), `sid` (the session ID), `iat`, and `exp`, checked with no leeway. The setting `ACCESS_TOKEN_PUBLIC_KEYS` holds one or more PEM public keys one after another, and a token passes when any of them verifies it. The setting is optional at start-up; without it every route that is not `public` returns `401 auth.not_signed_in`. |
 | Capability | For a capability route, the guard asks `trips` for the caller's membership (registered by EPIC-02). Until then only `public` and `signed_in` routes exist. |
 | Rate limits | The general ceiling of [security.md](../../security.md), section 2.2, on every route; a route can add its own limit with its key. Counters live in Redis. A limit returns `429 rate.limited` with `Retry-After`. When Redis does not answer, a rate-limited route returns `503 server.unavailable`. |
 | Idempotency | Every `POST` that creates a record declares it; the platform applies 2.4. |
@@ -458,6 +458,9 @@ line endings, because the work runs on macOS and on Windows
 | Decision | Alternatives set aside | Why |
 |----------|------------------------|-----|
 | Web and Mobile foundations are in this epic | In EPIC-10, cross-platform experience | The mock cards of EPIC-01 need a project, a generated client, and mock mode before they start |
+| The access token's claims are `sub`, `sid`, `iat`, and `exp`, with no `kid`; `ACCESS_TOKEN_PUBLIC_KEYS` lists the trusted PEM public keys, and any of them may verify a token | A `kid` in the header and a map from `kid` to key | Decided by the product owner during F5. Rotation is publishing the new key next to the old one for one token lifetime (security.md, section 2), and EPIC-01 stamps nothing extra on a token. |
+| `ACCESS_TOKEN_PUBLIC_KEYS` is optional at start-up for now | Required, so the process stops without it, as for the other settings of 2.7 | Decided by the product owner during F5. Without a key no token can pass, so nothing is opened. Whether production must refuse to start without it is settled by F11 or EPIC-01. |
+| A route with no access declaration is served as it is at run time | Refused by default with `401 auth.not_signed_in` | Decided by the product owner during F5. The declaration test in CI is the guard 2.2 asks for, and every merged route passes it. |
 | A route is a stub when the contract marks it `x-stub` | A label on the pull request; a separate draft branch | The contract itself says what is not built yet, so the tag follows from the file |
 | Mock responses come from the contract's examples | Hand-written mock data in each client | One source for both clients; a stub without examples fails CI |
 | An idempotency key before sign-in belongs to the device ID | No key on register; a key with no owner | Register creates a record and api-design.md asks for a key on every create |
@@ -591,3 +594,4 @@ no two machines change the same code repository.
 | 2.3 | 2026-11-26 | Section 2.12, as the product owner decided during F15: a test file of another language fails when its run exits non-zero; an error of the run is a command that cannot start (exit 126 or 127), a run killed by a signal, or runner output that matches the caller's no-test pattern, such as `^ok \d+ - \S+\.test\.js$` for `node --test` with the TAP reporter; the `failing-first` job sets up the caller's runtime, shown on one CI run. Decision added to 5.1. |
 | 2.4 | 2026-11-27 | Section 2.12: an error of the run is one of three things, not two (wording only). |
 | 2.5 | 2026-11-27 | Section 2.10, as the product owner decided before CT2: CI works out each contracts version from the tags and the change, starting at `0.1.0`; a draft is the next minor version and keeps its number until its release; only a merge that changes the contract or the translations is tagged; `oasdiff` compares each pull request with the last release and the latest draft. Decision added to 5.1. |
+| 2.6 | 2026-11-27 | Section 2.2, as the product owner decided during F5: the access token's claims (`sub`, `sid`, `iat`, `exp`, no `kid`), the setting `ACCESS_TOKEN_PUBLIC_KEYS` with one or more PEM public keys, optional at start-up for now, and an undeclared route served as it is at run time while the declaration test fails CI. Three decisions added to 5.1. |
