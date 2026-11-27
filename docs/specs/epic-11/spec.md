@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 3.3\
+**Version:** 3.4\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -156,9 +156,34 @@ This epic builds them:
 | The same key and a different body | `409 request.idempotency_mismatch` |
 | The same key while the first request runs | `409 request.idempotency_in_progress`; the client retries later |
 | The request fails with `5xx` | Nothing is stored, so a retry runs again |
+| The handler refuses the request with `4xx` | The refusal is stored and returned for the same key and body |
+| The request is refused before its handler runs (`400` for its schema, `401`, `429`, `503`) | Nothing is stored, so a retry runs again |
+| The same key on another method or path | `409 request.idempotency_mismatch` |
+| A key whose first request started more than 60 seconds ago and has no response | Taken as abandoned: the request runs again |
+| A key older than 24 hours | Taken as expired: the request runs as for a new key, and its row is replaced |
 
 A key belongs to the signed-in user. Before sign-in, for registering,
 it belongs to the device ID.
+
+How it is built:
+
+- Before the handler runs, the key is written with no response in its
+  own transaction; a second request with the same key then sees it in
+  flight.
+- A `2xx` response is stored in the handler's transaction, so the record
+  and its stored response are written together or not at all. A `4xx`
+  that the handler returns is stored in a transaction of its own after
+  the handler's changes are rolled back. On a `5xx` the key's row is
+  deleted.
+- "The same body" is the SHA-256 of the method, the path, and the body:
+  a JSON body with its keys sorted and no whitespace, any other body as
+  its bytes. `{"a":1,"b":2}` and `{ "b": 2, "a": 1 }` are the same body.
+- The stored response is its status, its body, and its `Location`,
+  `ETag`, `Content-Type`, and `Retry-After` headers. A stored response that is returned
+  again carries `Idempotent-Replayed: true`.
+- The contract documents, on every operation that declares it, the
+  required header `Idempotency-Key` (a UUID) and the `400` and `409`
+  answers as `ErrorResponse`.
 
 ### 2.5 Outbox, worker, and scheduler
 
@@ -506,6 +531,10 @@ line endings, because the work runs on macOS and on Windows
 | A route is a stub when the contract marks it `x-stub` | A label on the pull request; a separate draft branch | The contract itself says what is not built yet, so the tag follows from the file |
 | Mock responses come from the contract's examples | Hand-written mock data in each client | One source for both clients; a stub without examples fails CI |
 | An idempotency key before sign-in belongs to the device ID | No key on register; a key with no owner | Register creates a record and api-design.md asks for a key on every create |
+| A `2xx` is stored in the handler's transaction, and a handler's `4xx` in a transaction of its own; nothing refused before the handler is stored | Every response stored after the handler, in one transaction; every `4xx` stored | Decided by the product owner before F7. A record and its stored response cannot part, and a `401` or `429` is not repeated to a client that signed in again or waited. |
+| An idempotency key in flight for more than 60 seconds is taken as abandoned; one older than 24 hours as expired | A key in flight until cleanup; a key valid until cleanup deletes it | Decided by the product owner before F7. A process that stops mid-request does not block the key for a day, and the answer does not depend on when cleanup last ran. |
+| "The same body" hashes the method, the path, and the body as sorted JSON | The body's bytes only | Decided by the product owner before F7. A client that sends the same fields in another order gets the stored response, and a key used on another endpoint is a client error, `409 request.idempotency_mismatch`. |
+| A replayed response keeps `Location`, `ETag`, `Content-Type`, and `Retry-After` and carries `Idempotent-Replayed: true` | Status and body only | Decided by the product owner before F7. A client reads a replayed create the same way as the first one and can tell the two apart. `Retry-After` was added after review round 1, so a replayed `429` keeps its wait, as the contract documents it. |
 | The WebSocket gateway is built with the first epic that sends an event to a screen | In this epic | The outbox already publishes to Redis; the gateway's rules (subscriptions, Former members) need trips |
 | Two environments until the beta: local in Docker, and production | A preview per pull request and a staging environment from Phase 1 | A team of two reviews in CI and locally; production has no real users before the beta. It saves the Render Pro plan and a second server to keep running. Staging is added before the beta. |
 | Mobile has two flavors; mock mode is a build setting | One flavor per environment, and one for mock | A flavor is needed only to install two apps on one phone |
@@ -656,3 +685,4 @@ no two machines change the same code repository.
 | 3.1 | 2026-11-27 | Section 2.10, as the product owner decided after CT2 merged with no tag: before the first tag, the change is everything in the repository, not the merge alone, so the contract that reached `main` before the pipeline gets `contracts-v0.1.0` on the next merge and WF2 and MF2 can pin it. |
 | 3.2 | 2026-11-27 | New card F17, as the product owner decided after CT2 tagged `contracts-v0.1.0` with no example on `GET /v1/health`: every success response with content carries an example, not only those of stubs, and the backend's example check names an operation without one (2.10). F17 follows F12 and comes before WF2 and MF2, in wave 3. |
 | 3.3 | 2026-11-27 | Sections 2.6 and 4.1, as the product owner decided during F10: `SENTRY_DSN`, `OTEL_EXPORTER_OTLP_ENDPOINT`, and `OTEL_EXPORTER_OTLP_HEADERS` are optional at start-up for now; metrics are pushed with the OpenTelemetry exporter, with no metrics route; F10 creates the queue depth and job age metrics and F9 feeds them; Sentry runs with no integration and the platform captures errors itself; outgoing HTTP is traced with the HTTPX instrumentation; no span holds a query string, a token, or an email; F9 adds the worker and the scheduler. Six decisions added to 5.1. |
+| 3.4 | 2026-11-27 | Section 2.4, as the product owner decided before F7: a handler's `4xx` is stored, nothing refused before the handler is; another method or path with the same key is a mismatch; a key in flight for 60 seconds is abandoned and one older than 24 hours is expired; how it is built: the key written before the handler, a `2xx` stored in the handler's transaction, the body hash, the stored headers (with `Retry-After`) and `Idempotent-Replayed`, and the contract. Four decisions added to 5.1. |
