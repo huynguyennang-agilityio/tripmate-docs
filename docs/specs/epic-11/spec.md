@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.3\
+**Version:** 2.4\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -321,7 +321,7 @@ section 2.3, are held by five checks. This epic builds them.
   and test file pattern; failing first runs each test file of another
   language that a test commit adds, and Python tests per function (F15).
 - For a test file of another language, an error of the run fails
-  failing first and names the file. It is one of two things:
+  failing first and names the file. It is one of three things:
   - the test command cannot start: it is not found or cannot be run
     (exit 126 or 127);
   - the run is killed by a signal, such as an out-of-memory kill; an
@@ -561,3 +561,4 @@ no two machines change the same code repository.
 | 2.1 | 2026-11-26 | New card F15, as the product owner decided during CT1: failing first read only Python tests, so it learns each repository's test file pattern and runs the added test files of any language. Section 2.12, the order of the cards, and wave 3 follow. |
 | 2.2 | 2026-11-26 | Section 2.3, as the product owner decided during F4: the backend pins `tripmate-contracts` by commit SHA until CT2, and F4 adds four codes: the two field codes of `request.invalid`, `request.not_found`, and `request.method_not_allowed`. |
 | 2.3 | 2026-11-26 | Section 2.12, as the product owner decided during F15: a test file of another language fails when its run exits non-zero; an error of the run is a command that cannot start (exit 126 or 127), a run killed by a signal, or runner output that matches the caller's no-test pattern, such as `^ok \d+ - \S+\.test\.js$` for `node --test` with the TAP reporter; the `failing-first` job sets up the caller's runtime, shown on one CI run. Decision added to 5.1. |
+| 2.4 | 2026-11-27 | Section 2.12: an error of the run is one of three things, not two (wording only). |
