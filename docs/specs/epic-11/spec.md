@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 3.1\
+**Version:** 3.2\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -271,6 +271,10 @@ flowchart LR
 - A stub route is marked `x-stub: true` in the generated contract and
   returns `501`. Every response schema of a stub carries an example,
   which the mock modes of Web and Mobile return.
+- Every other operation carries an example on each success (`2xx`)
+  response with content, such as `GET /v1/health`, so the mock modes
+  can answer it too; a `204` with no content needs none. The backend's
+  example check fails and names an operation without one (F17).
 - The pull request in `tripmate-contracts` is opened with a token kept
   in the backend's GitHub Actions secrets.
 
@@ -541,7 +545,7 @@ the checkpoints, and which machine runs what.
 
 | Repository | Task file | Cards |
 |------------|-----------|-------|
-| `tripmate-backend` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-backend/blob/main/tasks/EPIC-11.md) | F1 to F16 |
+| `tripmate-backend` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-backend/blob/main/tasks/EPIC-11.md) | F1 to F17 |
 | `tripmate-contracts` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-contracts/blob/main/tasks/EPIC-11.md) | CT1, CT2 |
 | `tripmate-web` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-web/blob/main/tasks/EPIC-11.md) | WF1 to WF3 |
 | `tripmate-mobile` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-mobile/blob/main/tasks/EPIC-11.md) | MF1, MF2 |
@@ -577,11 +581,14 @@ flowchart LR
     WF1 --> WF2
     CT2 --> WF2
     F16 --> WF2
+    F12 --> F17
+    F17 --> WF2
     WF2 --> WF3
     F11 --> WF3
     MF1 --> MF2
     CT2 --> MF2
     F16 --> MF2
+    F17 --> MF2
 ```
 
 ### 6.1 Checkpoints
@@ -603,7 +610,7 @@ no two machines change the same code repository.
 |------|------------------------------|---------------|--------------------------|
 | 1 | F1, then F2, then F14 | MF1 | WF1 |
 | 2 | CT1, F3, F13 | -- | DF1 |
-| 3 | F4, F8, F12, F15, then CT2 and F16 | MF2 | WF2 |
+| 3 | F4, F8, F12, F15, then CT2, F16, and F17 | MF2 | WF2 |
 | 4 | F5, F10, then F6 and F7 | -- | -- |
 | 5 | F9, then F11 | -- | WF3 |
 
@@ -640,3 +647,4 @@ no two machines change the same code repository.
 | 2.9 | 2026-11-27 | New card F16, as the product owner decided during CT2: failing first runs the caller's setup command in the worktree of each test commit, so a test runs with its own commit's dependencies (2.12). F16 follows F15 and comes before WF2 and MF2, in wave 3. |
 | 3.0 | 2026-11-27 | Section 2.2, as the product owner decided during F6: the general ceiling of 300 requests a minute in the setting `RATE_LIMIT_PER_MINUTE`, counted for the IP address and also the user on a route that is not `public`; the IP address from the last entry of `X-Forwarded-For`; a fixed window with `Retry-After` rounded up; the health check not counted; `0` turns the ceiling off; the contract documents `429` and `503` on every operation except the health check; the longest wait when a request is over more than one limit; the IP address counted before the token check; a service counting a key itself. Nine decisions added to 5.1. |
 | 3.1 | 2026-11-27 | Section 2.10, as the product owner decided after CT2 merged with no tag: before the first tag, the change is everything in the repository, not the merge alone, so the contract that reached `main` before the pipeline gets `contracts-v0.1.0` on the next merge and WF2 and MF2 can pin it. |
+| 3.2 | 2026-11-27 | New card F17, as the product owner decided after CT2 tagged `contracts-v0.1.0` with no example on `GET /v1/health`: every success response with content carries an example, not only those of stubs, and the backend's example check names an operation without one (2.10). F17 follows F12 and comes before WF2 and MF2, in wave 3. |
