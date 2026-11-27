@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.8\
+**Version:** 2.9\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -384,6 +384,12 @@ section 2.3, are held by five checks. This epic builds them.
   Node 24, before the caller's setup command. No unit test covers it.
   F15's pull request shows one CI run with it, and CT2 shows it again
   as the first caller that needs Node.
+- Failing first runs the caller's setup command again in the worktree
+  of each test commit, before that commit's test files run, so a test
+  runs with the dependencies of its own commit (F16). Until F16, a
+  caller's test command must work in a worktree with no installed
+  dependencies, such as `npx --yes vitest@5.1.1 run` in
+  `tripmate-contracts`.
 - The path list, the workflows, each `CLAUDE.md`, and the agent roles
   are on the path list themselves.
 - On the backend path list, each module's `schemas.py`, `api.py`, and
@@ -524,7 +530,7 @@ the checkpoints, and which machine runs what.
 
 | Repository | Task file | Cards |
 |------------|-----------|-------|
-| `tripmate-backend` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-backend/blob/main/tasks/EPIC-11.md) | F1 to F15 |
+| `tripmate-backend` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-backend/blob/main/tasks/EPIC-11.md) | F1 to F16 |
 | `tripmate-contracts` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-contracts/blob/main/tasks/EPIC-11.md) | CT1, CT2 |
 | `tripmate-web` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-web/blob/main/tasks/EPIC-11.md) | WF1 to WF3 |
 | `tripmate-mobile` | [tasks/EPIC-11.md](https://github.com/huynguyennang-agilityio/tripmate-mobile/blob/main/tasks/EPIC-11.md) | MF1, MF2 |
@@ -540,7 +546,7 @@ day.
 flowchart LR
     F1 --> F2 --> F14
     F2 --> F13
-    F14 --> F15
+    F14 --> F15 --> F16
     F14 --> CT1
     F14 --> DF1
     F1 --> F3
@@ -559,12 +565,12 @@ flowchart LR
     CT1 --> CT2
     WF1 --> WF2
     CT2 --> WF2
-    F15 --> WF2
+    F16 --> WF2
     WF2 --> WF3
     F11 --> WF3
     MF1 --> MF2
     CT2 --> MF2
-    F15 --> MF2
+    F16 --> MF2
 ```
 
 ### 6.1 Checkpoints
@@ -586,7 +592,7 @@ no two machines change the same code repository.
 |------|------------------------------|---------------|--------------------------|
 | 1 | F1, then F2, then F14 | MF1 | WF1 |
 | 2 | CT1, F3, F13 | -- | DF1 |
-| 3 | F4, F8, F12, F15, then CT2 | MF2 | WF2 |
+| 3 | F4, F8, F12, F15, then CT2 and F16 | MF2 | WF2 |
 | 4 | F5, F10, then F6 and F7 | -- | -- |
 | 5 | F9, then F11 | -- | WF3 |
 
@@ -620,3 +626,4 @@ no two machines change the same code repository.
 | 2.6 | 2026-11-27 | Section 2.2, as the product owner decided during F5: the access token's claims (`sub`, `sid`, `iat`, `exp`, no `kid`), the setting `ACCESS_TOKEN_PUBLIC_KEYS` with one or more PEM public keys, optional at start-up for now, and an undeclared route served as it is at run time while the declaration test fails CI. Three decisions added to 5.1. |
 | 2.7 | 2026-11-27 | Section 2.10, as the product owner decided during CT2: the breaking-change rules in a table (any removed response field fails; a removed request field, `writeOnly` field, or deprecated item passes); `breaking-change` is required and branches must be up to date; the risk gate guards the check's own scripts; the change is counted since the last tag, or the merge alone before the first tag; a parameter is a patch. |
 | 2.8 | 2026-11-27 | Section 2.10, as the product owner decided after CT2's second review: removing a response header counts as removing a response field; removing a deprecated item before the date in its `x-sunset` fails, for optional fields too; an added enum value in a response passes, and every client shows an unknown value as a neutral fallback; the type rows say which direction fails. |
+| 2.9 | 2026-11-27 | New card F16, as the product owner decided during CT2: failing first runs the caller's setup command in the worktree of each test commit, so a test runs with its own commit's dependencies (2.12). F16 follows F15 and comes before WF2 and MF2, in wave 3. |
