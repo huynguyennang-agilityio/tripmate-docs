@@ -3,7 +3,7 @@
 **Document type:** Data Model (Database ERD)\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 1.7\
+**Version:** 1.8\
 **Stage:** 3. UI/UX & Software Architecture Design\
 **Page version:** [TripMate Data Model artifact](https://claude.ai/artifact/KBoRVLJ5qWK3f87PPDLV3H)
 
@@ -447,6 +447,25 @@ closes. Once closed it never changes (FR-03).
   same key with a different body returns `409
   request.idempotency_mismatch`.
 - Rows are deleted after 24 hours.
+- Its columns, following card F7 of EPIC-11:
+
+| Column | Meaning |
+|--------|---------|
+| `id` | The row's own number, its primary key |
+| `key` | The `Idempotency-Key` the client sent, a UUID |
+| `user_id` | The owner when signed in; empty before sign-in |
+| `device_id` | The owner before sign-in; empty when `user_id` is set |
+| `method`, `path` | The request the key was first used for |
+| `request_hash` | SHA-256 of the method, the path, and the body (EPIC-11 spec, section 2.4) |
+| `status` | The stored response's status; empty while the request runs |
+| `response_headers` | The stored `Location`, `ETag`, `Content-Type`, and `Retry-After` |
+| `response_body` | The stored response's body |
+| `created_at` | When the first request started |
+| `completed_at` | When its response was stored; empty while the request runs |
+
+- A key is unique per `(user_id, key)` when `user_id` is set, and per
+  `(device_id, key)` before sign-in.
+- Exactly one of `user_id` and `device_id` is set.
 
 ## 7. What Is Stored Where
 
@@ -485,3 +504,4 @@ closes. Once closed it never changes (FR-03).
 | 1.5 | 2026-11-20 | `sessions` gains `replaced_token_hash`, to recognize a reused refresh token, and `last_used_at`, for the devices list, following the EPIC-01 spec. |
 | 1.6 | 2026-11-20 | Section 6.3: an idempotency key belongs to the device ID before sign-in, following the EPIC-11 spec. |
 | 1.7 | 2026-11-26 | Outbox, following card F8 of EPIC-11: `outbox_events` gains `created_at` and a unique `(trip_id, trip_seq)`; the new table `outbox_trip_seqs` keeps each trip's last `trip_seq` so numbering has no gap and survives the cleanup of published rows (sections 1, 2.4, 4, and 6.2). |
+| 1.8 | 2026-11-27 | Section 6.3, following card F7 of EPIC-11: the columns of `idempotency_keys`, with the method and path, the stored headers, and `completed_at` for a request still running, its two unique keys, and the rule that exactly one owner is set. |
