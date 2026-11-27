@@ -274,6 +274,33 @@ flowchart LR
 - The pull request in `tripmate-contracts` is opened with a token kept
   in the backend's GitHub Actions secrets.
 
+**Version numbers.** CI works out the next version from the tags and
+the change; nobody writes a number by hand.
+
+| Last tag | The merge | Next tag | Example |
+|----------|-----------|----------|---------|
+| None | Any operation marked `x-stub` | The first draft of `0.1.0` | `contracts-v0.1.0-draft.1` |
+| None | No stub | The first release | `contracts-v0.1.0` |
+| A release `X.Y.Z` | Any operation marked `x-stub` | The first draft of the next minor version | `v1.3.0` to `v1.4.0-draft.1` |
+| A release `X.Y.Z` | No stub; adds an operation, a field, or an enum value, or changes `events.schema.json` | The next minor version | `v1.3.0` to `v1.4.0` |
+| A release `X.Y.Z` | No stub; any other change, such as translations, descriptions, or examples | The next patch version | `v1.3.0` to `v1.3.1` |
+| A draft `X.Y.Z-draft.N` | Any operation still marked `x-stub` | The next draft of the same version | `v1.4.0-draft.1` to `v1.4.0-draft.2` |
+| A draft `X.Y.Z-draft.N` | No stub | The release of that version | `v1.4.0-draft.2` to `v1.4.0` |
+
+- A merge to `main` is tagged only when it changes `openapi.json`,
+  `events.schema.json`, or a file under `translations/`. A merge that
+  changes only tests, task files, the README, or CI gets no tag.
+- The numbers stay at `0.x` until the MVP launches, which moves them
+  to `1.0.0`.
+
+**The breaking-change check.** On every pull request, `oasdiff`
+compares the new `openapi.json` with the one at the last release tag
+and, when a draft is newer than that release, with the one at the
+latest draft. A breaking change against either fails the check:
+removing an operation or a field, changing a type, or making a
+request field required. Adding an optional field passes. With no tag
+yet, there is nothing to compare and the check passes.
+
 ### 2.11 Web and Mobile foundations
 
 | | Web | Mobile |
@@ -451,6 +478,7 @@ line endings, because the work runs on macOS and on Windows
 | The Web and Mobile skeleton cards need no contract; generated messages and the flow checks move to WF2 and MF2 | WF1 and MF1 wait for CT1 | The three machines start on the first day instead of two waiting for the backend's first three cards |
 | Mobile uses `flutter_bloc`, `go_router`, a folder per feature, and a pinned Flutter version (2.11) | Riverpod; Navigator with hand-written deep links; folders per layer; the latest stable Flutter in CI | Cubits and Blocs are tested with `bloc_test` from a state and an event, which suits tests written before the code. `go_router` opens the join links. A folder per feature keeps cards that run at the same time apart. A pinned version gives CI and every machine the same result. |
 | Failing first knows a test file of another language holds no test from the caller's no-test pattern, matched against the runner's output | A JUnit report from every runner; reading the file's text for `test(` calls; treating an empty file as a passing one | Each runner already prints how many tests it ran, so one input per repository is enough. `flutter test` and `cargo test` write no JUnit report of their own, and reading the text depends on the language. |
+| CI works out each contracts version from the tags and the change, starting at `0.1.0`; only a change to the contract or the translations is tagged; `oasdiff` finds breaking changes (2.10) | The backend writes `info.version`; a `VERSION` file edited in each pull request; a tag on every merge; a check written in Node or the `openapi-diff` package | The pull request comes from the backend's CI, so nobody is there to type a number. `0.x` says the API is still taking shape before the MVP. A tag for a README change would give Web and Mobile versions that differ in nothing. `oasdiff` knows far more breaking rules than a check of our own. |
 | MF1 has one automated test, MF1-4, next to its manual cases | Manual cases only | `flutter test` needs a test to run, and the test agent needs a case that fails before the code exists |
 
 ### 5.2 Open questions
@@ -562,3 +590,4 @@ no two machines change the same code repository.
 | 2.2 | 2026-11-26 | Section 2.3, as the product owner decided during F4: the backend pins `tripmate-contracts` by commit SHA until CT2, and F4 adds four codes: the two field codes of `request.invalid`, `request.not_found`, and `request.method_not_allowed`. |
 | 2.3 | 2026-11-26 | Section 2.12, as the product owner decided during F15: a test file of another language fails when its run exits non-zero; an error of the run is a command that cannot start (exit 126 or 127), a run killed by a signal, or runner output that matches the caller's no-test pattern, such as `^ok \d+ - \S+\.test\.js$` for `node --test` with the TAP reporter; the `failing-first` job sets up the caller's runtime, shown on one CI run. Decision added to 5.1. |
 | 2.4 | 2026-11-27 | Section 2.12: an error of the run is one of three things, not two (wording only). |
+| 2.5 | 2026-11-27 | Section 2.10, as the product owner decided before CT2: CI works out each contracts version from the tags and the change, starting at `0.1.0`; a draft is the next minor version and keeps its number until its release; only a merge that changes the contract or the translations is tagged; `oasdiff` compares each pull request with the last release and the latest draft. Decision added to 5.1. |
