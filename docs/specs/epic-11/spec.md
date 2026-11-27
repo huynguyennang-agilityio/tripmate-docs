@@ -3,7 +3,7 @@
 **Document type:** Epic Spec\
 **Product:** TripMate\
 **Status:** Approved\
-**Version:** 2.6\
+**Version:** 2.7\
 **Stage:** 2--4, epic level\
 **Epic:** EPIC-11, first part, Phase 1\
 **Page version:** [TripMate EPIC-11 Spec artifact](https://claude.ai/artifact/U3abYrK3zy9Fm2CaQETpT2)
@@ -282,14 +282,18 @@ the change; nobody writes a number by hand.
 | None | Any operation marked `x-stub` | The first draft of `0.1.0` | `contracts-v0.1.0-draft.1` |
 | None | No stub | The first release | `contracts-v0.1.0` |
 | A release `X.Y.Z` | Any operation marked `x-stub` | The first draft of the next minor version | `v1.3.0` to `v1.4.0-draft.1` |
-| A release `X.Y.Z` | No stub; adds an operation, a field, or an enum value, or changes `events.schema.json` | The next minor version | `v1.3.0` to `v1.4.0` |
-| A release `X.Y.Z` | No stub; any other change, such as translations, descriptions, or examples | The next patch version | `v1.3.0` to `v1.3.1` |
+| A release `X.Y.Z` | No stub; adds an operation, a schema field, or an enum value, or changes `events.schema.json` | The next minor version | `v1.3.0` to `v1.4.0` |
+| A release `X.Y.Z` | No stub; any other change, such as a parameter, translations, descriptions, or examples | The next patch version | `v1.3.0` to `v1.3.1` |
 | A draft `X.Y.Z-draft.N` | Any operation still marked `x-stub` | The next draft of the same version | `v1.4.0-draft.1` to `v1.4.0-draft.2` |
 | A draft `X.Y.Z-draft.N` | No stub | The release of that version | `v1.4.0-draft.2` to `v1.4.0` |
 
 - A merge to `main` is tagged only when it changes `openapi.json`,
   `events.schema.json`, or a file under `translations/`. A merge that
   changes only tests, task files, the README, or CI gets no tag.
+- Once a tag exists, the change is everything since the last tag, so
+  the next merge catches up a merge whose tagging run was cancelled.
+  Before the first tag, the change is the merge alone. A commit that
+  the last tag already holds gets no tag.
 - The numbers stay at `0.x` until the MVP launches, which moves them
   to `1.0.0`.
 
@@ -297,9 +301,23 @@ the change; nobody writes a number by hand.
 compares the new `openapi.json` with the one at the last release tag
 and, when a draft is newer than that release, with the one at the
 latest draft. A breaking change against either fails the check:
-removing an operation or a field, changing a type, or making a
-request field required. Adding an optional field passes. With no tag
-yet, there is nothing to compare and the check passes.
+
+| Change | The check |
+|--------|-----------|
+| Removing an operation | Fails |
+| Removing a response field, required or optional | Fails |
+| Changing a type, or making a request field required | Fails |
+| Removing a request field, or a `writeOnly` field | Passes: no client reads it |
+| Removing an operation or a field already marked `deprecated` | Passes: the way to remove one ([api-design.md](../../api-design.md), section 6) |
+| Adding an optional field | Passes |
+
+- With no tag yet, there is nothing to compare and the check passes.
+- `breaking-change` is a required check on `main`, and a branch must
+  be up to date with `main` before it merges, so every pull request is
+  compared with the newest tag.
+- The check runs the scripts of the pull request itself. A pull
+  request that changes them changes `scripts/**` or `.github/**`,
+  which are High, so the product owner reads it (2.12).
 
 ### 2.11 Web and Mobile foundations
 
@@ -595,3 +613,4 @@ no two machines change the same code repository.
 | 2.4 | 2026-11-27 | Section 2.12: an error of the run is one of three things, not two (wording only). |
 | 2.5 | 2026-11-27 | Section 2.10, as the product owner decided before CT2: CI works out each contracts version from the tags and the change, starting at `0.1.0`; a draft is the next minor version and keeps its number until its release; only a merge that changes the contract or the translations is tagged; `oasdiff` compares each pull request with the last release and the latest draft. Decision added to 5.1. |
 | 2.6 | 2026-11-27 | Section 2.2, as the product owner decided during F5: the access token's claims (`sub`, `sid`, `iat`, `exp`, no `kid`), the setting `ACCESS_TOKEN_PUBLIC_KEYS` with one or more PEM public keys, optional at start-up for now, and an undeclared route served as it is at run time while the declaration test fails CI. Three decisions added to 5.1. |
+| 2.7 | 2026-11-27 | Section 2.10, as the product owner decided during CT2: the breaking-change rules in a table (any removed response field fails; a removed request field, `writeOnly` field, or deprecated item passes); `breaking-change` is required and branches must be up to date; the risk gate guards the check's own scripts; the change is counted since the last tag, or the merge alone before the first tag; a parameter is a patch. |
